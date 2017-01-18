@@ -1,40 +1,64 @@
 import akka.actor._
 import akka.kafka._
 import akka.kafka.scaladsl._
+import akka.persistence._
 import akka.stream._
 import akka.stream.scaladsl._
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization._
+import reactivemongo.bson._
 
-object User extends App {
-	implicit val system = ActorSystem("User")
-	implicit val materializer = ActorMaterializer()
-	import scala.concurrent.ExecutionContext.Implicits.global
+case class Cmd(data: String)
+case class Evt(data: String)
 
-  val producerSettings = ProducerSettings(
-		system,
-		new ByteArraySerializer,
-		new StringSerializer)
-		.withBootstrapServers("localhost:9092")
-
-	val done = Source(1 to 100)
-		.map(_.toString)
-		.map { elem =>
-			new ProducerRecord[Array[Byte], String]("UserCommand", elem)
-		}
-		.runWith(Producer.plainSink(producerSettings))
-
-  //val consumerSettings = ConsumerSettings(
-		//system,
-		//new ByteArrayDeserializer,
-		//new StringDeserializer)
-		//.withBootstrapServers("localhost:9092")
-		//.withGroupId("service-1")
-		//.withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
-
-	done.onComplete {
-		done => system.terminate
-	}
+case class ExampleState(events: List[String] = Nil) {
+  def updated(evt: Evt): ExampleState = copy(evt.data :: events)
+  def size: Int = events.length
+  override def toString: String = events.reverse.toString
 }
 
+object User {
+	def props(id: String) = Props(new User(id))
+
+	implicit val cmdHandler: BSONHandler[BSONDocument, Cmd] =
+		Macros.handler[Cmd]
+
+	implicit val evtHandler: BSONHandler[BSONDocument, Evt] =
+		Macros.handler[Evt]
+
+	implicit val stateHandler: BSONHandler[BSONDocument, ExampleState] =
+		Macros.handler[ExampleState]
+}
+
+class User(val id: String) extends Actor with PersistentActor {
+	import User._
+
+  override def persistenceId = s"user-$id"
+
+  var state = ExampleState()
+
+  def updateState(event: Evt): Unit = state = state.updated(event)
+  def updateBsonState(bson: BSONDocument): Unit =
+		updateState(BSON.readDocument[Evt](bson))
+
+  def numEvents = state.size
+
+  val receiveRecover: Receive = {
+    case bson: BSONDocument =>
+			updateBsonState(bson)
+    case evt: Evt =>
+			updateState(evt)
+    case SnapshotOffer(_, snapshot: ExampleState) =>
+			state = snapshot
+    case SnapshotOffer(_, snapshot: BSONDocument) =>
+			state = BSON.readDocument[ExampleState](snapshot)
+  }
+
+  val receiveCommand: Receive = {
+    case Cmd(data) =>
+      persist(BSON.write(Evt(s"${data}-${numEvents}")))(updateBsonState)
+    case "snap"  => saveSnapshot(BSON.write(state))
+    case "print" => println(state)
+  }
+}
