@@ -2,6 +2,10 @@ import akka.actor._
 import akka.kafka._
 import akka.kafka.scaladsl._
 import akka.persistence._
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.model._
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.unmarshalling._
 import akka.stream._
 import akka.stream.scaladsl._
 import org.apache.kafka.clients.consumer.ConsumerConfig
@@ -10,8 +14,9 @@ import org.apache.kafka.common.serialization._
 
 object Main extends App {
 	implicit val system = ActorSystem("User")
-	import scala.concurrent.ExecutionContext.Implicits.global
-	//implicit val materializer = ActorMaterializer()
+	//import scala.concurrent.ExecutionContext.Implicits.global
+	implicit val materializer = ActorMaterializer()
+	implicit val executionContext = system.dispatcher
 
   //val producerSettings = ProducerSettings(
 		//system,
@@ -46,6 +51,29 @@ object Main extends App {
 	user ! Shutdown
 	user ! Cmd("ChangeEmail")
 
-	//Thread.sleep(5000)
-	//system.terminate
+	val route =
+		path("hello") {
+			get {
+				complete(
+					HttpEntity(
+						ContentTypes.`text/html(UTF-8)`,
+						"<h1>Say hello to akka-http</h1>"))
+			}
+		} ~
+		path("commands") {
+			post {
+				entity(as[String]) { command =>
+					command match {
+						case "shutdown" =>
+							system.terminate
+							complete(
+								HttpEntity(
+									ContentTypes.`text/plain(UTF-8)`,
+									"System shutting down"))
+					}
+				}
+			}
+		}
+
+	val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
 }

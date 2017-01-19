@@ -56,6 +56,5 @@ class User(val id: String) extends Actor with PersistentActor {
     case "print" => println(state)
     case Shutdown =>
 			context.stop(self)
-			context.system.terminate
   }
 }
