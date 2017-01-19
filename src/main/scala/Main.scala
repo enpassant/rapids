@@ -43,9 +43,9 @@ object Main extends App {
 	user ! Cmd("ChangeNick")
 	user ! "print"
 	user ! "snap"
+	user ! Shutdown
 	user ! Cmd("ChangeEmail")
 
-	Thread.sleep(5001)
-
-	system.terminate
+	//Thread.sleep(5000)
+	//system.terminate
 }

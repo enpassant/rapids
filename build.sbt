@@ -18,8 +18,9 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka"      %% "akka-slf4j"            % akkaVersion,
   "org.json4s"             %% "json4s-jackson"        % "3.2.10",
   "org.json4s"             %% "json4s-ext"            % "3.2.10",
-  "org.reactivemongo"      %% "reactivemongo"         % "0.12.1",
-  "com.github.scullxbones" %% "akka-persistence-mongo-rxmongo" % "1.3.7"
+  "com.github.salat"       %% "salat"                 % "1.10.0",
+  "org.mongodb"            %% "casbah"                % "3.1.1",
+  "com.github.scullxbones" %% "akka-persistence-mongo-casbah" % "1.3.7"
 )
 
 scalacOptions ++= Seq(
