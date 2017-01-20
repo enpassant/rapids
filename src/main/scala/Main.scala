@@ -12,7 +12,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization._
 
-object Main extends App {
+object Main extends App with BaseFormats {
 	implicit val system = ActorSystem("User")
 	//import scala.concurrent.ExecutionContext.Implicits.global
 	implicit val materializer = ActorMaterializer()
@@ -62,9 +62,9 @@ object Main extends App {
 		} ~
 		path("commands") {
 			post {
-				entity(as[String]) { command =>
+				entity(as[Cmd]) { command =>
 					command match {
-						case "shutdown" =>
+						case Cmd("shutdown") =>
 							system.terminate
 							complete(
 								HttpEntity(
