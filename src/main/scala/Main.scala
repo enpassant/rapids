@@ -46,10 +46,8 @@ object Main extends App with BaseFormats {
 	val user = system.actorOf(User.props("12"))
 	user ! Cmd("CreateUser")
 	user ! Cmd("ChangeNick")
-	user ! "print"
-	user ! "snap"
-	user ! Shutdown
-	user ! Cmd("ChangeEmail")
+	user ! Cmd("print")
+	user ! Cmd("snap")
 
 	val route =
 		path("hello") {
@@ -65,11 +63,18 @@ object Main extends App with BaseFormats {
 				entity(as[Cmd]) { command =>
 					command match {
 						case Cmd("shutdown") =>
+							user ! Shutdown
 							system.terminate
 							complete(
 								HttpEntity(
 									ContentTypes.`text/plain(UTF-8)`,
 									"System shutting down"))
+						case cmd: Cmd =>
+							user ! cmd
+							complete(
+								HttpEntity(
+									ContentTypes.`text/plain(UTF-8)`,
+									"Command execution has started"))
 					}
 				}
 			}

@@ -50,10 +50,10 @@ class User(val id: String) extends Actor with PersistentActor {
   }
 
   val receiveCommand: Receive = {
+    case Cmd("snap")  => saveSnapshot(grater[ExampleState].asDBObject(state))
+    case Cmd("print") => println(state)
     case Cmd(data) =>
       persist(grater[Evt].asDBObject(Evt(s"${data}-${numEvents}")))(updateBsonState)
-    case "snap"  => saveSnapshot(grater[ExampleState].asDBObject(state))
-    case "print" => println(state)
     case Shutdown =>
 			context.stop(self)
   }
