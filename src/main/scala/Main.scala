@@ -60,6 +60,12 @@ object Main extends App with BaseFormats {
 		} ~
 		path("commands") {
 			post {
+				formFields('command, 'age.as[Int]) { (command, age) =>
+					complete(
+						HttpEntity(
+							ContentTypes.`text/plain(UTF-8)`,
+							s"$command string and $age age are received"))
+				} ~
 				entity(as[Cmd]) { command =>
 					command match {
 						case Cmd("shutdown") =>
@@ -75,6 +81,17 @@ object Main extends App with BaseFormats {
 								HttpEntity(
 									ContentTypes.`text/plain(UTF-8)`,
 									"Command execution has started"))
+					}
+				} ~
+				entity(as[String]) { command =>
+					command match {
+						case "shutdown" =>
+							user ! Shutdown
+							system.terminate
+							complete(
+								HttpEntity(
+									ContentTypes.`text/plain(UTF-8)`,
+									"System shutting down"))
 					}
 				}
 			}

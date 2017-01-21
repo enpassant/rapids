@@ -18,6 +18,8 @@ object BaseFormats extends BaseFormats {
   }
 }
 
+trait Json
+
 trait BaseFormats {
   import BaseFormats._
 
@@ -33,13 +35,17 @@ trait BaseFormats {
       HttpCharsets.`UTF-8`
     )
 
-  implicit def json4sUnmarshallerMediaType[A: Manifest](mediaType: MediaType)
-    (serialization: Serialization, formats: Formats): FromEntityUnmarshaller[A] =
-    unmarshaller(mediaType)(manifest, serialization, formats)
+  def json4sUnmarshallMediaType[A: Manifest]
+		(mediaType: MediaType)
+    (serialization: Serialization, formats: Formats)
+		: FromEntityUnmarshaller[A] =
+	{
+	    unmarshaller(mediaType)(manifest, serialization, formats)
+	}
 
-  implicit def json4sUnmarshallerConverter[A: Manifest]
-    (implicit serialization: Serialization, formats: Formats): FromEntityUnmarshaller[A] =
-    unmarshaller(MediaTypes.`application/json`)(manifest, serialization, formats)
+	implicit def json4sUnmarshallerConverter[A <: Json : Manifest]
+		(implicit serialization: Serialization, formats: Formats): FromEntityUnmarshaller[A] =
+		unmarshaller(MediaTypes.`application/json`)(manifest, serialization, formats)
 
   /**
    * HTTP entity => `A`
@@ -47,20 +53,16 @@ trait BaseFormats {
    * @tparam A type to decode
    * @return unmarshaller for `A`
    */
-  implicit def unmarshaller[A: Manifest](mediaType: MediaType)
+  def unmarshaller[A: Manifest](mediaType: MediaType)
     (implicit serialization: Serialization, formats: Formats): FromEntityUnmarshaller[A] =
     Unmarshaller
-      .byteStringUnmarshaller
+      .stringUnmarshaller
       .forContentTypes(mediaType)
-      .mapWithCharset { (data, charset) =>
-        val input = if (charset == HttpCharsets.`UTF-8`)
-          data.utf8String
-        else
-          data.decodeString(charset.nioCharset.name)
-        serialization.read(input)
+      .map { data =>
+        serialization.read(data)
       }
 
-  implicit def json4sMarshallMediaType[A <: AnyRef](mediaType: MediaType)
+  def json4sMarshallMediaType[A <: AnyRef](mediaType: MediaType)
     (serialization: Serialization, formats: Formats,
       shouldWritePretty: ShouldWritePretty = ShouldWritePretty.False): ToEntityMarshaller[A] =
     marshaller(mediaType)(serialization, formats, shouldWritePretty)
@@ -75,7 +77,7 @@ trait BaseFormats {
    * @tparam A type to encode, must be upper bounded by `AnyRef`
    * @return marshaller for any `A` value
    */
-  implicit def marshaller[A <: AnyRef](mediaType: MediaType)
+  def marshaller[A <: AnyRef](mediaType: MediaType)
     (implicit serialization: Serialization, formats: Formats,
       shouldWritePretty: ShouldWritePretty = ShouldWritePretty.False): ToEntityMarshaller[A] =
     shouldWritePretty match {

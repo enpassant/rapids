@@ -12,7 +12,7 @@ import salat._
 import salat.global._
 
 case object Shutdown
-case class Cmd(data: String)
+case class Cmd(data: String) extends Json
 case class Evt(data: String)
 
 case class ExampleState(events: List[String] = Nil) {
