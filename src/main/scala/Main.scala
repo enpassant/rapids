@@ -11,12 +11,18 @@ import akka.stream.scaladsl._
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization._
+import org.json4s.{ DefaultFormats, ShortTypeHints }
 
 object Main extends App with BaseFormats {
 	implicit val system = ActorSystem("User")
 	//import scala.concurrent.ExecutionContext.Implicits.global
 	implicit val materializer = ActorMaterializer()
 	implicit val executionContext = system.dispatcher
+
+  implicit val formats = new DefaultFormats {
+		override val typeHintFieldName = "_t"
+		override val typeHints = ShortTypeHints(List(classOf[Json], classOf[Evt]))
+	} ++ org.json4s.ext.JodaTimeSerializers.all
 
   //val producerSettings = ProducerSettings(
 		//system,
@@ -66,7 +72,7 @@ object Main extends App with BaseFormats {
 							ContentTypes.`text/plain(UTF-8)`,
 							s"$command string and $age age are received"))
 				} ~
-				entity(as[Cmd]) { command =>
+				entity(as[Json]) { command =>
 					command match {
 						case Cmd("shutdown") =>
 							user ! Shutdown

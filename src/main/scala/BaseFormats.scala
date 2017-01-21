@@ -24,8 +24,6 @@ trait BaseFormats {
   import BaseFormats._
 
   implicit val serialization = jackson.Serialization
-  implicit val formats =
-		DefaultFormats ++ org.json4s.ext.JodaTimeSerializers.all
 
   lazy val `application/collection+json` =
 		customMediaTypeUTF8("collection+json")
