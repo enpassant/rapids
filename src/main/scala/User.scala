@@ -53,7 +53,8 @@ class User(val id: String) extends Actor with PersistentActor {
     case Cmd("snap")  => saveSnapshot(grater[ExampleState].asDBObject(state))
     case Cmd("print") => println(state)
     case Cmd(data) =>
-      persist(grater[Evt].asDBObject(Evt(s"${data}-${numEvents}")))(updateBsonState)
+			val event = Evt(s"${data}-${numEvents}")
+      persist(grater[Evt].asDBObject(event))(updateBsonState)
     case Shutdown =>
 			context.stop(self)
   }
