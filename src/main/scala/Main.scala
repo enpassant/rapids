@@ -9,9 +9,12 @@ import akka.http.scaladsl.unmarshalling._
 import akka.stream._
 import akka.stream.scaladsl._
 import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization._
 import org.json4s.{ DefaultFormats, ShortTypeHints }
+import scala.concurrent.Future
 
 object Main extends App with BaseFormats {
 	implicit val system = ActorSystem("User")
@@ -24,30 +27,46 @@ object Main extends App with BaseFormats {
 		override val typeHints = ShortTypeHints(List(classOf[Json], classOf[Evt]))
 	} ++ org.json4s.ext.JodaTimeSerializers.all
 
-  //val producerSettings = ProducerSettings(
-		//system,
-		//new ByteArraySerializer,
-		//new StringSerializer)
-		//.withBootstrapServers("localhost:9092")
+  val partition = 0
+	val producerSettings = ProducerSettings(
+		system,
+		new ByteArraySerializer,
+		new StringSerializer)
+		.withBootstrapServers("localhost:9092")
 
-	//val done = Source(1 to 100)
-		//.map(_.toString)
-		//.map { elem =>
-			//new ProducerRecord[Array[Byte], String]("UserCommand", elem)
-		//}
-		//.runWith(Producer.plainSink(producerSettings))
+	val done = Source(1 to 100)
+		.map(_.toString)
+		.map { elem =>
+			new ProducerRecord[Array[Byte], String](
+				"test1", partition, elem.getBytes(), elem + ". elem")
+		}
+		.runWith(Producer.plainSink(producerSettings))
 
-  //val consumerSettings = ConsumerSettings(
-		//system,
-		//new ByteArrayDeserializer,
-		//new StringDeserializer)
-		//.withBootstrapServers("localhost:9092")
-		//.withGroupId("service-1")
-		//.withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
+	val consumerSettings = ConsumerSettings(
+		system,
+		new ByteArrayDeserializer,
+		new StringDeserializer
+	)
+		.withBootstrapServers("localhost:9092")
+		.withGroupId("service-1")
+		.withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
 
-	//done.onComplete {
-		//done => system.terminate
-	//}
+  val fromOffset = 0L
+  val subscription = Subscriptions.assignmentWithOffset(
+    new TopicPartition("test1", partition) -> fromOffset
+  )
+	def process(consumerRecord: ConsumerRecord[Array[Byte], String]) = Future {
+		println(consumerRecord)
+	}
+
+  val done2 =
+    Consumer.plainSource(consumerSettings, subscription)
+			.mapAsync(1)(process)
+      .runWith(Sink.ignore)
+
+	done2.onComplete {
+		done => system.terminate
+	}
 
 	val user = system.actorOf(User.props("12"))
 	user ! Cmd("CreateUser")
