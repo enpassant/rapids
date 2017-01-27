@@ -42,16 +42,14 @@ object WebApp extends App {
 	val route =
 		path("commands") {
 			post {
-				entity(as[String]) { command =>
-					command match {
-						case "shutdown" =>
-							system.terminate
-							complete(
-								HttpEntity(
-									ContentTypes.`text/plain(UTF-8)`,
-									"System shutting down"))
+				entity(as[String]) {
+					case "shutdown" =>
+						system.terminate
+						complete(
+							HttpEntity(
+								ContentTypes.`text/plain(UTF-8)`,
+								"System shut down"))
 					}
-				}
 			}
 		} ~
 		pathPrefix("commands") {
