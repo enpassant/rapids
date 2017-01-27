@@ -1,3 +1,5 @@
+package common
+
 import org.json4s.jackson.Serialization.{ read, writePretty }
 import org.json4s.{ DefaultFormats, Formats, jackson, Serialization }
 import org.joda.time.DateTime

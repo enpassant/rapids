@@ -1,3 +1,5 @@
+import common._
+
 import akka.actor._
 import akka.kafka._
 import akka.kafka.scaladsl._
