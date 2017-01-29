@@ -34,6 +34,7 @@ object Common {
 	val commonDependencies = Seq(
 		"com.typesafe.akka"      %% "akka-actor"            % akkaVersion,
 		"com.typesafe.akka"      %% "akka-persistence"      % akkaVersion,
+		"com.typesafe.akka"      %% "akka-remote"           % akkaVersion,
 		"com.typesafe.akka"      %% "akka-stream"           % akkaVersion,
 		"com.typesafe.akka"      %% "akka-stream-kafka"     % "0.13",
 		"com.typesafe.akka"      %% "akka-testkit"          % akkaVersion   % "test",

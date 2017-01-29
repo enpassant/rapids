@@ -20,6 +20,7 @@ object BaseFormats extends BaseFormats {
   }
 }
 
+case class GetActorRef(key: String)
 trait Json
 
 trait BaseFormats {

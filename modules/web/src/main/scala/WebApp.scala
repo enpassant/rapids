@@ -20,107 +20,119 @@ import org.apache.kafka.common.serialization._
 import scala.concurrent.Future
 
 object WebApp extends App {
-	implicit val system = ActorSystem("WebApp")
-	implicit val materializer = ActorMaterializer()
-	implicit val executionContext = system.dispatcher
+	def start() = {
+		implicit val system = ActorSystem("WebApp")
+		implicit val materializer = ActorMaterializer()
+		implicit val executionContext = system.dispatcher
 
-  val partition = 0
-	val producerSettings = ProducerSettings(
-		system,
-		new ByteArraySerializer,
-		new StringSerializer)
-		.withBootstrapServers("localhost:9092")
+		val partition = 0
+		val producerSettings = ProducerSettings(
+			system,
+			new ByteArraySerializer,
+			new StringSerializer)
+			.withBootstrapServers("localhost:9092")
 
-	val producer = Source.queue[(String, Int, String, String)](
-		256, OverflowStrategy.backpressure
-	)
-		.map { case (topic, partition, key, value) =>
-			new ProducerRecord[Array[Byte], String](
-				topic, partition, key.getBytes(), value)
+		val producer = Source.queue[(String, Int, String, String)](
+			256, OverflowStrategy.backpressure
+		)
+			.map { case (topic, partition, key, value) =>
+				new ProducerRecord[Array[Byte], String](
+					topic, partition, key.getBytes(), value)
+			}
+			.to(Producer.plainSink(producerSettings))
+			.run()
+
+		val consumerSettings = ConsumerSettings(
+			system,
+			new ByteArrayDeserializer,
+			new StringDeserializer
+		)
+			.withBootstrapServers("localhost:9092")
+			.withGroupId("webapp-1")
+			.withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
+
+		val fromOffset = 0L
+		val subscription = Subscriptions.assignmentWithOffset(
+			new TopicPartition("accepted-commands", partition) -> fromOffset,
+			new TopicPartition("rejected-commands", partition) -> fromOffset
+		)
+		def process(consumerRecord: ConsumerRecord[Array[Byte], String]) = Future {
+			TextMessage(consumerRecord.toString)
 		}
-		.to(Producer.plainSink(producerSettings))
-		.run()
 
-	val consumerSettings = ConsumerSettings(
-		system,
-		new ByteArrayDeserializer,
-		new StringDeserializer
-	)
-		.withBootstrapServers("localhost:9092")
-		.withGroupId("webapp-1")
-		.withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
+		def filter(clientId: String)
+			(consumerRecord: ConsumerRecord[Array[Byte], String]) =
+		{
+			new String(consumerRecord.key) == clientId
+		}
 
-  val fromOffset = 0L
-  val subscription = Subscriptions.assignmentWithOffset(
-    new TopicPartition("accepted-commands", partition) -> fromOffset,
-    new TopicPartition("rejected-commands", partition) -> fromOffset
-  )
-	def process(consumerRecord: ConsumerRecord[Array[Byte], String]) = Future {
-		TextMessage(consumerRecord.toString)
-	}
+		def consumer(clientId: String) =
+			Consumer.plainSource(consumerSettings, subscription)
+				.filter(filter(clientId))
+				.mapAsync(1)(process)
 
-	def filter(clientId: String)
-		(consumerRecord: ConsumerRecord[Array[Byte], String]) =
-	{
-		new String(consumerRecord.key) == clientId
-	}
-
-	def consumer(clientId: String) =
-		Consumer.plainSource(consumerSettings, subscription)
-			.filter(filter(clientId))
-			.mapAsync(1)(process)
-
-	val route =
-		pathPrefix("commands") {
-			pathPrefix(Segment) { topic =>
-				path(Segment) { id =>
-					post {
-						entity(as[String]) { message =>
-							onSuccess(producer.offer((topic, 0, id, message))) {
-								reply =>
-									complete(
-										HttpEntity(
-											ContentTypes.`text/html(UTF-8)`,
-											s"<h1>Topic: $topic</h1>"))
+		val route =
+			pathPrefix("commands") {
+				pathPrefix(Segment) { topic =>
+					path(Segment) { id =>
+						post {
+							entity(as[String]) { message =>
+								onSuccess(producer.offer((topic, 0, id, message))) {
+									reply =>
+										complete(
+											HttpEntity(
+												ContentTypes.`text/html(UTF-8)`,
+												s"<h1>Topic: $topic</h1>"))
+								}
 							}
 						}
 					}
 				}
-			}
-		} ~
-		pathPrefix("updates") {
-			path(Segment) { id =>
-				optionalHeaderValueByType[UpgradeToWebSocket]() {
-					case Some(upgrade) =>
-						complete(
-							upgrade.handleMessagesWithSinkSource(Sink.ignore, consumer(id)))
-					case None =>
-						reject(ExpectedWebSocketRequestRejection)
-				}
-			}
-		} ~
-		path("system") {
-			post {
-				entity(as[String]) {
-					case "shutdown" =>
-						system.terminate
-						complete(
-							HttpEntity(
-								ContentTypes.`text/plain(UTF-8)`,
-								"System shut down"))
+			} ~
+			pathPrefix("updates") {
+				path(Segment) { id =>
+					optionalHeaderValueByType[UpgradeToWebSocket]() {
+						case Some(upgrade) =>
+							complete(
+								upgrade.handleMessagesWithSinkSource(Sink.ignore, consumer(id)))
+						case None =>
+							reject(ExpectedWebSocketRequestRejection)
 					}
+				}
+			} ~
+			path("system") {
+				post {
+					entity(as[String]) {
+						case "shutdown" =>
+							system.terminate
+							complete(
+								HttpEntity(
+									ContentTypes.`text/plain(UTF-8)`,
+									"System shut down"))
+						}
+				}
+			} ~
+			path("") {
+				getFromResource(s"public/html/index.html")
+			} ~
+			path("""([^/]+\.html).*""".r) { path =>
+				getFromResource(s"public/html/$path")
+			} ~
+			path(Remaining) { path =>
+				getFromResource(s"public/$path")
 			}
-		} ~
-		path("") {
-			getFromResource(s"public/html/index.html")
-		} ~
-		path("""([^/]+\.html).*""".r) { path =>
-			getFromResource(s"public/html/$path")
-		} ~
-		path(Remaining) { path =>
-			getFromResource(s"public/$path")
-		}
 
-	val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
+		system.actorOf(Props(new WebsocketActor()), "websocket")
+		val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
+		println("WebApp started")
+	}
+	start
+}
+
+class WebsocketActor extends Actor {
+	def receive = {
+		case msg: GetActorRef =>
+			sender ! msg
+	}
 }
 
