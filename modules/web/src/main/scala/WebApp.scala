@@ -29,7 +29,6 @@ object WebApp extends App {
 		implicit val materializer = ActorMaterializer()
 		implicit val executionContext = system.dispatcher
 
-		val partition = 0
 		val producerSettings = ProducerSettings(
 			system,
 			new ByteArraySerializer,
@@ -41,7 +40,7 @@ object WebApp extends App {
 		)
 			.map { case (topic, partition, key, value) =>
 				new ProducerRecord[Array[Byte], String](
-					topic, partition, key.getBytes(), value)
+					topic, key.getBytes(), value)
 			}
 			.to(Producer.plainSink(producerSettings))
 			.run()
@@ -56,9 +55,9 @@ object WebApp extends App {
 			.withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
 
 		val fromOffset = 0L
+		val partition = 0
 		val subscription = Subscriptions.assignmentWithOffset(
-			new TopicPartition("accepted-commands", partition) -> fromOffset,
-			new TopicPartition("rejected-commands", partition) -> fromOffset
+			new TopicPartition("client-commands", partition) -> fromOffset
 		)
 		def process(consumerRecord: ConsumerRecord[Array[Byte], String]) = Future {
 			TextMessage(consumerRecord.toString)
