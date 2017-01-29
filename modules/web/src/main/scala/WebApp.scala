@@ -20,7 +20,7 @@ import org.apache.kafka.common.serialization._
 import scala.concurrent.Future
 
 object WebApp extends App {
-	implicit val system = ActorSystem("WebApp")
+	val system = ActorSystem("WebApp")
 	start(system)
 	scala.io.StdIn.readLine()
 	system.terminate

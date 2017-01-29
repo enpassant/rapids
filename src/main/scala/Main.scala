@@ -18,7 +18,15 @@ import org.apache.kafka.common.serialization._
 import org.json4s.{ DefaultFormats, ShortTypeHints }
 import scala.concurrent.Future
 
-object Main extends App with BaseFormats {
+object Main extends App {
+	val system = ActorSystem("Main")
+
+	WebApp.start(system)
+	scala.io.StdIn.readLine()
+	system.terminate
+}
+
+object MainOld extends App with BaseFormats {
 	implicit val system = ActorSystem("User")
 	//import scala.concurrent.ExecutionContext.Implicits.global
 	implicit val materializer = ActorMaterializer()
