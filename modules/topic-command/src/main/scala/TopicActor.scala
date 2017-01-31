@@ -11,12 +11,11 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization._
 import com.mongodb.casbah.commons.Imports._
 import salat._
-import salat.global._
 
 trait TopicCommand extends Json
 case class CreateTopic(url: String, title: String) extends TopicCommand
 
-trait TopicEvent
+trait TopicEvent extends Json
 case class TopicCreated(url: String, title: String) extends TopicEvent
 
 case class Discussion(id: String, title: String)
@@ -38,14 +37,16 @@ object TopicActor {
 
 class TopicActor(val id: String) extends Actor with PersistentActor {
 	import TopicActor._
+	import common.TypeHintContext._
 
-  override def persistenceId = s"user-$id"
+  override def persistenceId = s"topic-$id"
 
   var state = Topic()
 
   def updateState(event: TopicEvent): Unit = state = state.updated(event)
-  def updateBsonState(bson: DBObject): Unit =
+  def updateBsonState(bson: DBObject): Unit = {
 		updateState(grater[TopicEvent].asObject(bson))
+	}
 
   val receiveRecover: Receive = {
     case bson: DBObject =>
@@ -62,7 +63,7 @@ class TopicActor(val id: String) extends Actor with PersistentActor {
     case "snap"  => saveSnapshot(grater[Topic].asDBObject(state))
     case CreateTopic(url, title) =>
 			val event = TopicCreated(url, title)
-      persist(grater[TopicEvent].asDBObject(event))(updateBsonState)
+      persist(grater[TopicCreated].asDBObject(event))(updateBsonState)
   }
 }
 

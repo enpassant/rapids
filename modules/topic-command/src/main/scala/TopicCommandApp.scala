@@ -62,6 +62,7 @@ object TopicCommandApp extends App with BaseFormats {
 		def process(consumerRecord: ConsumerRecord[Array[Byte], String]) = Future {
 			implicit val timeout = Timeout(100.milliseconds)
 			val key = new String(consumerRecord.key)
+			println(s"Process $key topic with value: ${consumerRecord.value}")
 			service ? ConsumerMessage(key, consumerRecord.value)
 		}
 

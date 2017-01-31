@@ -26,6 +26,7 @@ class TopicService() extends Actor {
 	implicit val formats = new DefaultFormats {
 		override val typeHintFieldName = "_t"
 		override val typeHints = ShortTypeHints(List(
+			classOf[CreateTopic],
 			classOf[TopicCommand],
 			classOf[TopicEvent]
 		))
