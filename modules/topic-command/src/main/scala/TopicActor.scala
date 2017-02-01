@@ -1,14 +1,7 @@
 import common.Json
 
 import akka.actor._
-import akka.kafka._
-import akka.kafka.scaladsl._
 import akka.persistence._
-import akka.stream._
-import akka.stream.scaladsl._
-import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.clients.producer.ProducerRecord
-import org.apache.kafka.common.serialization._
 import com.mongodb.casbah.commons.Imports._
 import salat._
 

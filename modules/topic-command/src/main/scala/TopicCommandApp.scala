@@ -3,11 +3,6 @@ import common._
 import akka.actor._
 import akka.kafka._
 import akka.kafka.scaladsl._
-import akka.persistence._
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.unmarshalling._
 import akka.pattern.ask
 import akka.util.Timeout
 import akka.stream._
@@ -15,11 +10,7 @@ import akka.stream.scaladsl._
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.common.TopicPartition
-import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization._
-import org.json4s._
-import org.json4s.jackson.JsonMethods._
-import scala.concurrent.Future
 import scala.concurrent.duration._
 
 object TopicCommandApp extends App with BaseFormats {
@@ -30,18 +21,8 @@ object TopicCommandApp extends App with BaseFormats {
 	system.terminate
 
 	def start(implicit system: ActorSystem) = {
-		//import scala.concurrent.ExecutionContext.Implicits.global
 		implicit val materializer = ActorMaterializer()
 		implicit val executionContext = system.dispatcher
-
-		implicit val formats = new DefaultFormats {
-			override val typeHintFieldName = "_t"
-			override val typeHints = ShortTypeHints(List(
-				classOf[TopicCommand],
-				classOf[TopicEvent]
-			))
-		} ++ org.json4s.ext.JodaTimeSerializers.all
-
 
 		val consumerSettings = ConsumerSettings(
 			system,
@@ -59,7 +40,7 @@ object TopicCommandApp extends App with BaseFormats {
 		)
 
 		val service = system.actorOf(TopicService.props, s"topic-service")
-		def process(consumerRecord: ConsumerRecord[Array[Byte], String]) = Future {
+		def process(consumerRecord: ConsumerRecord[Array[Byte], String]) = {
 			implicit val timeout = Timeout(100.milliseconds)
 			val key = new String(consumerRecord.key)
 			println(s"Process $key topic with value: ${consumerRecord.value}")

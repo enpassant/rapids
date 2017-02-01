@@ -1,14 +1,9 @@
 import common.Json
 
 import akka.actor._
-import akka.kafka._
-import akka.kafka.scaladsl._
 import akka.persistence._
 import akka.stream._
 import akka.stream.scaladsl._
-import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.clients.producer.ProducerRecord
-import org.apache.kafka.common.serialization._
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import scala.util.{Try, Success, Failure}
