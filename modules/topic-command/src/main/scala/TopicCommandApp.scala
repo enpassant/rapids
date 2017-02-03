@@ -2,6 +2,7 @@ import common._
 
 import akka.actor._
 import akka.kafka._
+import akka.kafka.ConsumerMessage._
 import akka.kafka.scaladsl._
 import akka.pattern.ask
 import akka.util.Timeout
@@ -31,26 +32,30 @@ object TopicCommandApp extends App with BaseFormats {
 		)
 			.withBootstrapServers("localhost:9092")
 			.withGroupId("service-1")
-			.withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
-
-		val partition = 0
-		val fromOffset = 0L
-		val subscription = Subscriptions.assignmentWithOffset(
-			new TopicPartition("topic", partition) -> fromOffset
-		)
+			//.withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
 
 		val service = system.actorOf(TopicService.props, s"topic-service")
 		def process(consumerRecord: ConsumerRecord[Array[Byte], String]) = {
-			implicit val timeout = Timeout(100.milliseconds)
+			implicit val timeout = Timeout(1000.milliseconds)
 			val key = new String(consumerRecord.key)
-			println(s"Process $key topic with value: ${consumerRecord.value}")
 			service ? ConsumerMessage(key, consumerRecord.value)
 		}
 
-		val consumer =
-			Consumer.plainSource(consumerSettings, subscription)
-				.mapAsync(1)(process)
-				.runWith(Sink.ignore)
+		val consumer = Consumer.committableSource(
+			consumerSettings,
+			Subscriptions.topics("topic")
+		)
+			.mapAsync(1) {
+				msg => process(msg.record).map(_ => msg.committableOffset)
+			}
+			.batch(
+				max = 20,
+				first => CommittableOffsetBatch.empty.updated(first)
+			) {
+					(batch, elem) => batch.updated(elem)
+				}
+			.mapAsync(3)(_.commitScaladsl())
+			.runWith(Sink.ignore)
 	}
 }
 

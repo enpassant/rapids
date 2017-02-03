@@ -56,7 +56,11 @@ class TopicActor(val id: String) extends Actor with PersistentActor {
     case "snap"  => saveSnapshot(grater[Topic].asDBObject(state))
     case CreateTopic(url, title) =>
 			val event = TopicCreated(url, title)
-      persist(grater[TopicCreated].asDBObject(event))(updateBsonState)
+      persistAsync(grater[TopicCreated].asDBObject(event)) {
+				bson =>
+					sender ! "ok"
+					updateBsonState(bson)
+			}
   }
 }
 
