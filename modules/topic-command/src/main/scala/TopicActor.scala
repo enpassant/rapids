@@ -9,7 +9,7 @@ trait TopicCommand extends Json
 case class CreateTopic(url: String, title: String) extends TopicCommand
 
 trait TopicEvent extends Json
-case class TopicCreated(url: String, title: String) extends TopicEvent
+case class TopicCreated(id: String, url: String, title: String) extends TopicEvent
 
 case class Discussion(id: String, title: String)
 
@@ -19,7 +19,7 @@ case class Topic(
 	discussions: List[Discussion] = Nil
 ) {
   def updated(evt: TopicEvent): Topic = evt match {
-		case TopicCreated(url, title) =>
+		case TopicCreated(id, url, title) =>
 			copy(url = url, title = title)
 	}
 }
@@ -44,10 +44,6 @@ class TopicActor(val id: String) extends Actor with PersistentActor {
   val receiveRecover: Receive = {
     case bson: DBObject =>
 			updateBsonState(bson)
-    case evt: TopicEvent =>
-			updateState(evt)
-    case SnapshotOffer(_, snapshot: Topic) =>
-			state = snapshot
     case SnapshotOffer(_, snapshot: DBObject) =>
 			state = grater[Topic].asObject(snapshot)
   }
@@ -55,10 +51,10 @@ class TopicActor(val id: String) extends Actor with PersistentActor {
   val receiveCommand: Receive = {
     case "snap"  => saveSnapshot(grater[Topic].asDBObject(state))
     case CreateTopic(url, title) =>
-			val event = TopicCreated(url, title)
+			val event = TopicCreated(id, url, title)
       persistAsync(grater[TopicCreated].asDBObject(event)) {
 				bson =>
-					sender ! "ok"
+					sender ! event
 					updateBsonState(bson)
 			}
   }
