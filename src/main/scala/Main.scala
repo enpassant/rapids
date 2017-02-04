@@ -1,12 +1,20 @@
 import common._
 
 import akka.actor._
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.server.Directives._
+import akka.stream._
 
 object Main extends App {
-	val system = ActorSystem("Main")
+	implicit val system = ActorSystem("Main")
+	implicit val materializer = ActorMaterializer()
 
-	WebApp.start(system)
+	val routeWeb = WebApp.start
+	val routeWebSocket = WebSocketApp.start
+	val route = routeWeb ~ routeWebSocket
 	TopicCommandApp.start(system)
+
+	val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
 
 	scala.io.StdIn.readLine()
 	system.terminate
