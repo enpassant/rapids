@@ -1,3 +1,5 @@
+package topic
+
 import common._
 
 import akka.actor._
@@ -66,7 +68,7 @@ object TopicCommandApp extends App with BaseFormats {
 		def process(consumerRecord: ConsumerRecord[Array[Byte], String]) = {
 			implicit val timeout = Timeout(1000.milliseconds)
 			val key = new String(consumerRecord.key)
-			val result = service ? ConsumerMessage(key, consumerRecord.value)
+			val result = service ? ConsumerData(key, consumerRecord.value)
 			result foreach { event =>
 				event match {
 					case TopicCreated(topicId, url, title) =>

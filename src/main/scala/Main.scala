@@ -12,7 +12,7 @@ object Main extends App {
 	val routeWeb = WebApp.start
 	val routeWebSocket = WebSocketApp.start
 	val route = routeWeb ~ routeWebSocket
-	TopicCommandApp.start(system)
+	topic.TopicCommandApp.start(system)
 
 	val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
 

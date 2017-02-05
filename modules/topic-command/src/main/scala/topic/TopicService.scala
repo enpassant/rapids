@@ -1,4 +1,6 @@
-import common.Json
+package topic
+
+import common._
 
 import akka.actor._
 import akka.persistence._
@@ -11,9 +13,6 @@ import scala.util.{Try, Success, Failure}
 object TopicService {
 	def props() = Props(new TopicService())
 }
-
-case class ConsumerMessage(key: String, value: String)
-case class WrongCommand(consumerMessage: ConsumerMessage)
 
 class TopicService() extends Actor {
 	import TopicService._
@@ -30,7 +29,7 @@ class TopicService() extends Actor {
   val receive: Receive = process(Map.empty[String, ActorRef])
 
   def process(topics: Map[String, ActorRef]): Receive = {
-    case message @ ConsumerMessage(key, value) =>
+    case message @ ConsumerData(key, value) =>
 			val jsonTry = Try(parse(value).extract[TopicCommand])
 			jsonTry match {
 				case Success(json) =>
