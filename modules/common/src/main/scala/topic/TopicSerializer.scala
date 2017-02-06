@@ -46,8 +46,7 @@ class TopicSerializer extends common.JsonSerializer {
 			classOf[Topic],
 			classOf[CreateTopic],
 			classOf[TopicCreated],
-			classOf[Discussion],
-			classOf[DiscussionCommand]
+			classOf[StartDiscussion]
 		))
 	} ++ org.json4s.ext.JodaTimeSerializers.all
 }

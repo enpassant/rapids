@@ -1,7 +1,5 @@
 package topic
 
-import common._
-
 import akka.actor._
 import akka.kafka._
 import akka.kafka.ConsumerMessage._
@@ -16,17 +14,8 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization._
 import scala.concurrent.duration._
-import salat._
 
-trait DiscussionCommand extends Json
-case class StartDiscussion(
-	id: String,
-	topicId: String,
-	url: String,
-	title: String
-)	extends DiscussionCommand
-
-object TopicCommandApp extends App with BaseFormats {
+object TopicCommandApp extends App {
 	val system = ActorSystem("TopicCommandApp")
 	import common.TypeHintContext._
 
@@ -48,7 +37,7 @@ object TopicCommandApp extends App with BaseFormats {
 			256, OverflowStrategy.backpressure
 		)
 			.map { case cmd @ StartDiscussion(id, topicId, url, title) =>
-				val value = grater[StartDiscussion].toPrettyJSON(cmd)
+				val value = new TopicSerializer().toString(cmd)
 				new ProducerRecord[Array[Byte], String](
 					"discussion", id.getBytes(), value)
 			}
@@ -62,17 +51,16 @@ object TopicCommandApp extends App with BaseFormats {
 		)
 			.withBootstrapServers("localhost:9092")
 			.withGroupId("service-1")
-			//.withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
 
 		val service = system.actorOf(TopicService.props, s"topic-service")
 		def process(consumerRecord: ConsumerRecord[Array[Byte], String]) = {
 			implicit val timeout = Timeout(1000.milliseconds)
 			val key = new String(consumerRecord.key)
-			val result = service ? ConsumerData(key, consumerRecord.value)
+			val result = service ? common.ConsumerData(key, consumerRecord.value)
 			result foreach { event =>
 				event match {
 					case TopicCreated(topicId, url, title) =>
-						val id = CommonUtil.uuid
+						val id = common.CommonUtil.uuid
 						producer.offer(StartDiscussion(id, topicId, url, title))
 				}
 			}

@@ -12,13 +12,21 @@ abstract class JsonSerializer extends Serializer {
 
 	def includeManifest: Boolean = false
 
+	def toString(obj: AnyRef): String = {
+		serialization.write(obj)
+	}
+
+	def fromString(json: String) = {
+		serialization.read(json)
+	}
+
 	def toBinary(obj: AnyRef): Array[Byte] = {
-		serialization.write(obj).getBytes
+		toString(obj).getBytes
 	}
 
 	def fromBinary(
 		bytes: Array[Byte],
 		clazz: Option[Class[_]]): AnyRef = {
-			serialization.read(new String(bytes))
+			fromString(new String(bytes))
 	}
 }
