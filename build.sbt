@@ -11,6 +11,9 @@ lazy val common = (project in file("modules/common"))
 lazy val topicCommand = (project in file("modules/topic-command"))
   .dependsOn(common)
 
+lazy val discussionCommand = (project in file("modules/discussion-command"))
+  .dependsOn(common)
+
 lazy val web = (project in file("modules/web"))
   .dependsOn(common)
 
@@ -18,8 +21,8 @@ lazy val websocket = (project in file("modules/websocket"))
   .dependsOn(common)
 
 lazy val root = (project in file("."))
-  .aggregate(common, topicCommand, web, websocket)
-  .dependsOn(common, topicCommand, web, websocket)
+  .aggregate(common, topicCommand, web, websocket, discussionCommand)
+  .dependsOn(common, topicCommand, web, websocket, discussionCommand)
 
 
 libraryDependencies ++= Common.commonDependencies

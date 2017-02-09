@@ -6,6 +6,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import org.apache.kafka.clients.producer.ProducerRecord
 import scala.concurrent.duration._
+import scala.util.{Failure, Success}
 
 object TopicCommandApp extends App {
 	val system = ActorSystem("TopicCommandApp")
@@ -19,7 +20,7 @@ object TopicCommandApp extends App {
 		implicit val executionContext = system.dispatcher
 
 		val producer = Kafka.createProducer[DiscussionCommand]("localhost:9092") {
-			case cmd @ StartDiscussion(id, topicId, url, title) =>
+			case cmd @ StartDiscussion(id, topicId, title) =>
 				val value = new TopicSerializer().toString(cmd)
 				new ProducerRecord[Array[Byte], String](
 					"discussion", id.getBytes(), value)
@@ -37,12 +38,19 @@ object TopicCommandApp extends App {
 			val key = new String(consumerRecord.key)
 			val result = service ? common.ConsumerData(key, consumerRecord.value)
 			result collect {
-				case TopicCreated(topicId, url, title) =>
+				case TopicCreated(topicId, title, content) =>
 					val id = common.CommonUtil.uuid
-					producer.offer(StartDiscussion(id, topicId, url, title))
+					producer.offer(StartDiscussion(id, topicId, title))
+					msg.committableOffset
+				case message =>
+          println(s"Unknown message: $message")
 					msg.committableOffset
 			}
 		}
+    consumer.onComplete {
+      case Success(done) =>
+      case Failure(throwable) => println(throwable)
+    }
 	}
 }
 

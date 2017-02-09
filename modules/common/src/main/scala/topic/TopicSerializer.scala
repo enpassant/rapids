@@ -9,33 +9,80 @@ import org.json4s._
 import org.joda.time.DateTime
 
 sealed trait TopicMessage extends Serializable
-trait TopicCommand extends TopicMessage
-case class CreateTopic(url: String, title: String) extends TopicCommand
+sealed trait TopicCommand extends TopicMessage
+case class CreateTopic(title: String, content: String) extends TopicCommand
 
 trait TopicEvent extends TopicMessage
-case class TopicCreated(id: String, url: String, title: String)
+case class TopicCreated(id: String, title: String, content: String)
 	extends TopicEvent
 
-case class Discussion(id: String, title: String)
+case class DiscussionItem(id: String, title: String)
 case class Topic(
-	url: String = "",
 	title: String = "",
-	discussions: List[Discussion] = Nil
+  content: String = "",
+	discussions: List[DiscussionItem] = Nil
 ) extends TopicMessage
 {
   def updated(evt: TopicEvent): Topic = evt match {
-		case TopicCreated(id, url, title) =>
-			copy(url = url, title = title)
+		case TopicCreated(id, title, content) =>
+			copy(title = title, content = content)
 	}
 }
 
-sealed trait DiscussionCommand extends TopicMessage
+trait DiscussionCommand extends TopicMessage
 case class StartDiscussion(
 	id: String,
 	topicId: String,
-	url: String,
 	title: String
 )	extends DiscussionCommand
+
+case class AddComment(
+	id: String,
+	title: String,
+  content: String
+)	extends DiscussionCommand
+
+case class ReplyComment(
+	id: String,
+	parentId: String,
+	title: String,
+  content: String
+)	extends DiscussionCommand
+
+trait DiscussionEvent extends TopicMessage {
+  def id: String
+}
+
+case class DiscussionStarted(
+	id: String,
+	topicId: String,
+	title: String
+)	extends DiscussionEvent
+
+case class CommentAdded(
+	id: String,
+	title: String,
+  content: String
+)	extends DiscussionEvent
+
+case class CommentReplied(
+	id: String,
+	parentId: String,
+	title: String,
+  content: String
+)	extends DiscussionEvent
+
+case class Comment(
+  id: String,
+  title: String,
+  content: String,
+  comments: List[Comment] = Nil)
+case class Discussion(
+	id: String = "",
+	topicId: String = "",
+	title: String = "",
+	comments: List[Comment] = Nil
+) extends TopicMessage
 
 class TopicSerializer extends common.JsonSerializer {
 	def identifier = 0xfeca
@@ -46,6 +93,11 @@ class TopicSerializer extends common.JsonSerializer {
 			classOf[Topic],
 			classOf[CreateTopic],
 			classOf[TopicCreated],
+			classOf[StartDiscussion],
+			classOf[AddComment],
+			classOf[ReplyComment],
+			classOf[CommentAdded],
+			classOf[CommentReplied],
 			classOf[StartDiscussion]
 		))
 	} ++ org.json4s.ext.JodaTimeSerializers.all

@@ -27,8 +27,8 @@ class TopicActor(val id: String) extends Actor with PersistentActor {
 
   val receiveCommand: Receive = {
     case "snap"  => saveSnapshot(state)
-    case CreateTopic(url, title) =>
-			val event = TopicCreated(id, url, title)
+    case CreateTopic(title, content) =>
+			val event = TopicCreated(id, title, content)
       persistAsync(event) {
 				event =>
 					sender ! event
