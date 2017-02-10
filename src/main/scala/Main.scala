@@ -13,6 +13,7 @@ object Main extends App {
 	val routeWebSocket = WebSocketApp.start
 	val route = routeWeb ~ routeWebSocket
 	topic.TopicCommandApp.start(system)
+	discussion.DiscussionCommandApp.start(system)
 
 	val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
 

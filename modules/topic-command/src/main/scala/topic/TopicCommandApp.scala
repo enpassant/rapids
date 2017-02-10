@@ -43,7 +43,6 @@ object TopicCommandApp extends App {
 					producer.offer(StartDiscussion(id, topicId, title))
 					msg.committableOffset
 				case message =>
-          println(s"Unknown message: $message")
 					msg.committableOffset
 			}
 		}

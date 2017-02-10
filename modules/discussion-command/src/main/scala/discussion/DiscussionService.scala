@@ -31,16 +31,16 @@ class DiscussionService() extends Actor {
 
   def process(actors: Map[String, ActorRef]): Receive = {
     case message @ ConsumerData(key, value) =>
-			val jsonTry = Try(parse(value).extract[TopicCommand])
+			val jsonTry = Try(parse(value).extract[DiscussionCommand])
 			jsonTry match {
 				case Success(json) =>
-					val topic = actors get key getOrElse {
+					val actor = actors get key getOrElse {
 						val actorRef =
 							context.actorOf(DiscussionActor.props(key), s"discussion-$key")
 						context become process(actors + (key -> actorRef))
 						actorRef
 					}
-					topic.tell(json, sender)
+					actor.tell(json, sender)
 				case Failure(e) =>
 					sender ! WrongCommand(message)
 			}

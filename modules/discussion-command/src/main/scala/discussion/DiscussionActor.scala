@@ -15,7 +15,7 @@ class DiscussionActor(val id: String) extends Actor with PersistentActor {
 	import DiscussionActor._
 	import common.TypeHintContext._
 
-  override def persistenceId = s"topic-$id"
+  override def persistenceId = s"discussion-$id"
 
   var state: Option[Discussion] = None
 

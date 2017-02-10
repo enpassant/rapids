@@ -7,6 +7,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import org.apache.kafka.clients.producer.ProducerRecord
 import scala.concurrent.duration._
+import scala.util.{Failure, Success}
 
 object DiscussionCommandApp extends App {
 	val system = ActorSystem("DiscussionCommandApp")
@@ -41,8 +42,14 @@ object DiscussionCommandApp extends App {
 				case event: DiscussionEvent =>
 					producer.offer(event)
 					msg.committableOffset
+				case message =>
+					msg.committableOffset
 			}
 		}
+    consumer.onComplete {
+      case Success(done) =>
+      case Failure(throwable) => println(throwable)
+    }
 	}
 }
 

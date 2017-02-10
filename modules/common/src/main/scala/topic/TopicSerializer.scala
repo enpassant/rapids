@@ -96,6 +96,7 @@ class TopicSerializer extends common.JsonSerializer {
 			classOf[StartDiscussion],
 			classOf[AddComment],
 			classOf[ReplyComment],
+			classOf[DiscussionStarted],
 			classOf[CommentAdded],
 			classOf[CommentReplied],
 			classOf[StartDiscussion]
