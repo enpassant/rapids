@@ -20,7 +20,7 @@ object BaseFormats extends BaseFormats {
   }
 }
 
-//trait Json
+trait Json
 
 trait BaseFormats {
   import BaseFormats._

@@ -4,8 +4,6 @@ import akka.serialization._
 import org.json4s.jackson.Serialization.{ read, write }
 import org.json4s.{ DefaultFormats, Formats, jackson, Serialization }
 
-trait Json
-
 abstract class JsonSerializer extends Serializer {
   implicit val serialization = jackson.Serialization
 	implicit def formats: Formats
@@ -16,7 +14,7 @@ abstract class JsonSerializer extends Serializer {
 		serialization.write(obj)
 	}
 
-	def fromString(json: String) = {
+	def fromString(json: String): AnyRef = {
 		serialization.read(json)
 	}
 

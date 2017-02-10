@@ -12,7 +12,7 @@ sealed trait TopicMessage extends Serializable
 sealed trait TopicCommand extends TopicMessage
 case class CreateTopic(title: String, content: String) extends TopicCommand
 
-trait TopicEvent extends TopicMessage
+sealed trait TopicEvent extends TopicMessage
 case class TopicCreated(id: String, title: String, content: String)
 	extends TopicEvent
 
