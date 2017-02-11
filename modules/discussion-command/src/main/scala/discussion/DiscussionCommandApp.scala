@@ -20,10 +20,10 @@ object DiscussionCommandApp extends App {
 	def start(implicit system: ActorSystem) = {
 		implicit val executionContext = system.dispatcher
 
-		val producer = Kafka.createProducer[(String, String, DiscussionEvent)](
+		val producer = Kafka.createProducer[ProducerData[DiscussionEvent]](
       "localhost:9092")
     {
-			case  (topic, id, event) =>
+			case ProducerData(topic, id, event) =>
 				val value = new TopicSerializer().toString(event)
 				new ProducerRecord[Array[Byte], String](
 					topic, id.getBytes(), value)
@@ -42,11 +42,11 @@ object DiscussionCommandApp extends App {
 			val result = service ? common.ConsumerData(key, consumerRecord.value)
 			result collect {
 				case event: DiscussionStarted =>
-					producer.offer(("topic", event.topicId, event))
-					producer.offer(("discussion", event.id, event))
+					producer.offer(ProducerData("topic", event.topicId, event))
+					producer.offer(ProducerData("discussion", event.id, event))
 					msg.committableOffset
 				case event: DiscussionEvent =>
-					producer.offer(("discussion", event.id, event))
+					producer.offer(ProducerData("discussion", event.id, event))
 					msg.committableOffset
 				case message =>
 					msg.committableOffset
