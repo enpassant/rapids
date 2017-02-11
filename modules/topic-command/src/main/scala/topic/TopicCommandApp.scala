@@ -19,11 +19,13 @@ object TopicCommandApp extends App {
 	def start(implicit system: ActorSystem) = {
 		implicit val executionContext = system.dispatcher
 
-		val producer = Kafka.createProducer[DiscussionCommand]("localhost:9092") {
-			case cmd @ StartDiscussion(id, topicId, title) =>
-				val value = new TopicSerializer().toString(cmd)
+		val producer = Kafka.createProducer[ProducerData[TopicMessage]](
+      "localhost:9092")
+    {
+			case ProducerData(topic, id, event) =>
+				val value = new TopicSerializer().toString(event)
 				new ProducerRecord[Array[Byte], String](
-					"discussion", id.getBytes(), value)
+					topic, id.getBytes(), value)
 		}
 
 		val service = system.actorOf(TopicService.props, s"topic-service")
@@ -38,9 +40,12 @@ object TopicCommandApp extends App {
 			val key = new String(consumerRecord.key)
 			val result = service ? common.ConsumerData(key, consumerRecord.value)
 			result collect {
-				case TopicCreated(topicId, title, content) =>
+				case event @ TopicCreated(topicId, title, content) =>
 					val id = common.CommonUtil.uuid
-					producer.offer(StartDiscussion(id, topicId, title))
+					producer.offer(
+            ProducerData("topic", topicId, event))
+					producer.offer(
+            ProducerData("discussion", id, StartDiscussion(id, topicId, title)))
 					msg.committableOffset
 				case message =>
 					msg.committableOffset
