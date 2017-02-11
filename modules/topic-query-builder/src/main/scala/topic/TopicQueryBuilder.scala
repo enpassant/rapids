@@ -37,14 +37,16 @@ object TopicQueryBuilder extends App {
 			implicit val timeout = Timeout(1000.milliseconds)
 			val key = new String(consumerRecord.key)
 			val jsonTry = Try(new TopicSerializer().fromString(consumerRecord.value))
-      println(jsonTry)
 			val result = Future { jsonTry match {
 				case Success(json) =>
-          println(json)
           json match {
             case TopicCreated(id, title, content) =>
               collection.insert(
                 MongoDBObject("_id"->id, "title"->title, "content"->content))
+            case DiscussionStarted(id, topicId, title) =>
+              collection.update(
+                MongoDBObject("_id"->topicId),
+                $push("discussions"->id))
             case _ => 1
           }
 				case Failure(e) =>
