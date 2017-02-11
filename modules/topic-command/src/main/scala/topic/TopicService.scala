@@ -21,8 +21,7 @@ class TopicService() extends Actor {
 		override val typeHintFieldName = "_t"
 		override val typeHints = ShortTypeHints(List(
 			classOf[CreateTopic],
-			classOf[TopicCommand],
-			classOf[TopicEvent]
+			classOf[DiscussionStarted]
 		))
 	} ++ org.json4s.ext.JodaTimeSerializers.all
 
@@ -30,7 +29,7 @@ class TopicService() extends Actor {
 
   def process(topics: Map[String, ActorRef]): Receive = {
     case message @ ConsumerData(key, value) =>
-			val jsonTry = Try(parse(value).extract[TopicCommand])
+			val jsonTry = Try(parse(value).extract[TopicMessage])
 			jsonTry match {
 				case Success(json) =>
 					val topic = topics get key getOrElse {

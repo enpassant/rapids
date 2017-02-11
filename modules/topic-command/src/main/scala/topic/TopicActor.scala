@@ -16,19 +16,33 @@ class TopicActor(val id: String) extends Actor with PersistentActor {
 
   override def persistenceId = s"topic-$id"
 
-  var state = Topic()
+  var state: Option[Topic] = None
 
-  def updateState(event: TopicEvent): Unit = state = state.updated(event)
+  def updateState(event: TopicMessage): Unit = event match {
+    case TopicCreated(id, title, content) if !state.isDefined =>
+      state = Some(Topic(title, content))
+    case DiscussionStarted(id, topicId, title) =>
+      state = state map { topic =>
+        topic.copy(discussions = DiscussionItem(id, title) :: topic.discussions)
+      }
+    case _ =>
+  }
 
   val receiveRecover: Receive = {
-    case event: TopicEvent =>	updateState(event)
-    case SnapshotOffer(_, snapshot: Topic) => state = snapshot
+    case event: TopicMessage =>	updateState(event)
+    case SnapshotOffer(_, snapshot: Topic) => state = Some(snapshot)
   }
 
   val receiveCommand: Receive = {
     case "snap"  => saveSnapshot(state)
     case CreateTopic(title, content) =>
 			val event = TopicCreated(id, title, content)
+      persistAsync(event) {
+				event =>
+					sender ! event
+					updateState(event)
+			}
+    case event: DiscussionStarted =>
       persistAsync(event) {
 				event =>
 					sender ! event

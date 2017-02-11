@@ -22,12 +22,6 @@ case class Topic(
   content: String = "",
 	discussions: List[DiscussionItem] = Nil
 ) extends TopicMessage
-{
-  def updated(evt: TopicEvent): Topic = evt match {
-		case TopicCreated(id, title, content) =>
-			copy(title = title, content = content)
-	}
-}
 
 trait DiscussionCommand extends TopicMessage
 case class StartDiscussion(
