@@ -27,21 +27,13 @@ object WebApp extends App {
 	def start(implicit system: ActorSystem, materializer: ActorMaterializer) = {
 		implicit val executionContext = system.dispatcher
 
-		val producerSettings = ProducerSettings(
-			system,
-			new ByteArraySerializer,
-			new StringSerializer)
-			.withBootstrapServers("localhost:9092")
-
-		val producer = Source.queue[(String, Int, String, String)](
-			256, OverflowStrategy.backpressure
-		)
-			.map { case (topic, partition, key, value) =>
+		val producer = Kafka.createProducer[ProducerData[String]](
+      "localhost:9092")
+    {
+			case ProducerData(topic, id, value) =>
 				new ProducerRecord[Array[Byte], String](
-					topic, key.getBytes(), value)
-			}
-			.to(Producer.plainSink(producerSettings))
-			.run()
+					topic, id.getBytes(), value)
+		}
 
 		val route =
 			pathPrefix("commands") {
@@ -49,7 +41,7 @@ object WebApp extends App {
 					path(Segment) { id =>
 						post {
 							entity(as[String]) { message =>
-								onSuccess(producer.offer((topic, 0, id, message))) {
+								onSuccess(producer.offer(ProducerData(topic, id, message))) {
 									reply =>
 										complete(
 											HttpEntity(
