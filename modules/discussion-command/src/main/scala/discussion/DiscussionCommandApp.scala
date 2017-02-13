@@ -43,10 +43,10 @@ object DiscussionCommandApp extends App {
 			result collect {
 				case event: DiscussionStarted =>
 					producer.offer(ProducerData("topic", event.topicId, event))
-					producer.offer(ProducerData("discussion", event.id, event))
+					producer.offer(ProducerData("discussion", key, event))
 					msg.committableOffset
 				case event: DiscussionEvent =>
-					producer.offer(ProducerData("discussion", event.id, event))
+					producer.offer(ProducerData("discussion", key, event))
 					msg.committableOffset
 				case message =>
 					msg.committableOffset

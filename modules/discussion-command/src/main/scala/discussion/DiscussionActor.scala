@@ -22,6 +22,12 @@ class DiscussionActor(val id: String) extends Actor with PersistentActor {
   def updateState(event: DiscussionEvent): Unit = event match {
     case DiscussionStarted(id, topicId, title) if state == None =>
       state = Some(Discussion(id, topicId, title))
+    case CommentAdded(id, title, content) =>
+      state = state map { discussion =>
+        discussion.copy(
+          comments = Comment(id, title, content) :: discussion.comments)
+      }
+    case _ =>
   }
 
   val receiveRecover: Receive = {
@@ -38,6 +44,22 @@ class DiscussionActor(val id: String) extends Actor with PersistentActor {
 					sender ! event
 					updateState(event)
 			}
+    case AddComment(id, title, content) =>
+			val event = CommentAdded(id, title, content)
+      persistAsync(event) {
+				event =>
+					sender ! event
+					updateState(event)
+			}
+    case ReplyComment(id, parentId, title, content) =>
+			val event = CommentReplied(id, parentId, title, content)
+      persistAsync(event) {
+				event =>
+					sender ! event
+					updateState(event)
+			}
+    case _ =>
+      sender ! "NOOP"
   }
 }
 

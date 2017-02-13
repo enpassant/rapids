@@ -15,6 +15,7 @@ object Main extends App {
 	topic.TopicCommandApp.start(system)
 	discussion.DiscussionCommandApp.start(system)
 	topic.TopicQueryBuilder.start(system)
+	discussion.DiscussionQueryBuilder.start(system)
 
 	val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
 

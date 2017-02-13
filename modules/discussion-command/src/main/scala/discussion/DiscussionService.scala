@@ -18,20 +18,11 @@ object DiscussionService {
 class DiscussionService() extends Actor {
 	import DiscussionService._
 
-	implicit val formats = new DefaultFormats {
-		override val typeHintFieldName = "_t"
-		override val typeHints = ShortTypeHints(List(
-			classOf[StartDiscussion],
-			classOf[TopicCommand],
-			classOf[TopicEvent]
-		))
-	} ++ org.json4s.ext.JodaTimeSerializers.all
-
   val receive: Receive = process(Map.empty[String, ActorRef])
 
   def process(actors: Map[String, ActorRef]): Receive = {
     case message @ ConsumerData(key, value) =>
-			val jsonTry = Try(parse(value).extract[DiscussionCommand])
+			val jsonTry = Try(new TopicSerializer().fromString(value))
 			jsonTry match {
 				case Success(json) =>
 					val actor = actors get key getOrElse {
