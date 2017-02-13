@@ -7,6 +7,7 @@ import org.json4s.jackson.Serialization.{ read, writePretty }
 import org.json4s.{ DefaultFormats, Formats, jackson, Serialization }
 import org.json4s._
 import org.joda.time.DateTime
+import scala.collection.immutable.TreeMap
 
 sealed trait TopicMessage extends Serializable
 sealed trait TopicCommand extends TopicMessage
@@ -69,13 +70,13 @@ case class CommentReplied(
 case class Comment(
   id: String,
   title: String,
-  content: String,
-  comments: List[Comment] = Nil)
+  content: String
+)
 case class Discussion(
 	id: String = "",
 	topicId: String = "",
 	title: String = "",
-	comments: List[Comment] = Nil
+	comments: TreeMap[String, Comment] = TreeMap()
 ) extends TopicMessage
 
 class TopicSerializer extends common.JsonSerializer {

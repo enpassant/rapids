@@ -20,12 +20,17 @@ class DiscussionActor(val id: String) extends Actor with PersistentActor {
   var state: Option[Discussion] = None
 
   def updateState(event: DiscussionEvent): Unit = event match {
-    case DiscussionStarted(id, topicId, title) if state == None =>
+    case DiscussionStarted(id, topicId, title) =>
       state = Some(Discussion(id, topicId, title))
     case CommentAdded(id, title, content) =>
       state = state map { discussion =>
         discussion.copy(
-          comments = Comment(id, title, content) :: discussion.comments)
+          comments = discussion.comments + (id -> Comment(id, title, content)))
+      }
+    case CommentReplied(id, parentId, title, content) =>
+      state = state map { discussion =>
+        discussion.copy(
+          comments = discussion.comments + (id -> Comment(id, title, content)))
       }
     case _ =>
   }
@@ -37,21 +42,24 @@ class DiscussionActor(val id: String) extends Actor with PersistentActor {
 
   val receiveCommand: Receive = {
     case "snap" if state.isDefined => saveSnapshot(state.get)
-    case StartDiscussion(id, topicId, title) =>
+    case StartDiscussion(id, topicId, title) if !state.isDefined =>
 			val event = DiscussionStarted(id, topicId, title)
       persistAsync(event) {
 				event =>
 					sender ! event
 					updateState(event)
 			}
-    case AddComment(id, title, content) =>
+    case AddComment(id, title, content) if state.isDefined &&
+        !state.get.comments.contains(id) =>
 			val event = CommentAdded(id, title, content)
       persistAsync(event) {
 				event =>
 					sender ! event
 					updateState(event)
 			}
-    case ReplyComment(id, parentId, title, content) =>
+    case ReplyComment(id, parentId, title, content) if state.isDefined &&
+        state.get.comments.contains(parentId) &&
+        !state.get.comments.contains(id) =>
 			val event = CommentReplied(id, parentId, title, content)
       persistAsync(event) {
 				event =>
