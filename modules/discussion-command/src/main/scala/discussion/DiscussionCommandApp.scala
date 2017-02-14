@@ -34,7 +34,7 @@ object DiscussionCommandApp extends App {
 		val consumer = Kafka.createConsumer(
 			"localhost:9092",
 			"discussion-command",
-			"discussion")
+			"discussion-command")
 		{ msg =>
 			val consumerRecord = msg.record
 			implicit val timeout = Timeout(1000.milliseconds)
@@ -42,11 +42,11 @@ object DiscussionCommandApp extends App {
 			val result = service ? common.ConsumerData(key, consumerRecord.value)
 			result collect {
 				case event: DiscussionStarted =>
-					producer.offer(ProducerData("topic", event.topicId, event))
-					producer.offer(ProducerData("discussion", key, event))
+					producer.offer(ProducerData("topic-command", event.topicId, event))
+					producer.offer(ProducerData("discussion-event", key, event))
 					msg.committableOffset
 				case event: DiscussionEvent =>
-					producer.offer(ProducerData("discussion", key, event))
+					producer.offer(ProducerData("discussion-event", key, event))
 					msg.committableOffset
 				case message =>
 					msg.committableOffset

@@ -41,12 +41,13 @@ object WebApp extends App {
 					path(Segment) { id =>
 						post {
 							entity(as[String]) { message =>
-								onSuccess(producer.offer(ProducerData(topic, id, message))) {
-									reply =>
-										complete(
-											HttpEntity(
-												ContentTypes.`text/html(UTF-8)`,
-												s"<h1>Topic: $topic</h1>"))
+								onSuccess(producer.offer(
+                  ProducerData(s"$topic-command", id, message))) {
+                    reply =>
+                      complete(
+                        HttpEntity(
+                          ContentTypes.`text/html(UTF-8)`,
+                          s"<h1>Topic: $topic-command</h1>"))
 								}
 							}
 						}

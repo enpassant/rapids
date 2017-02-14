@@ -31,7 +31,7 @@ object TopicQueryBuilder extends App {
 		val consumer = Kafka.createConsumer(
 			"localhost:9092",
 			"topic-query",
-			"topic")
+			"topic-event")
 		{ msg =>
 			val consumerRecord = msg.record
 			implicit val timeout = Timeout(1000.milliseconds)
