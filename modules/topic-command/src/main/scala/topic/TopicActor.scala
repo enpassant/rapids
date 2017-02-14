@@ -19,7 +19,7 @@ class TopicActor(val id: String) extends Actor with PersistentActor {
   var state: Option[Topic] = None
 
   def updateState(event: TopicMessage): Unit = event match {
-    case TopicCreated(id, title, content) if !state.isDefined =>
+    case TopicCreated(id, title, content) =>
       state = Some(Topic(title, content))
     case DiscussionStarted(id, topicId, title) =>
       state = state map { topic =>
@@ -35,7 +35,7 @@ class TopicActor(val id: String) extends Actor with PersistentActor {
 
   val receiveCommand: Receive = {
     case "snap"  => saveSnapshot(state)
-    case CreateTopic(title, content) =>
+    case CreateTopic(title, content) if !state.isDefined =>
 			val event = TopicCreated(id, title, content)
       persistAsync(event) {
 				event =>
@@ -48,6 +48,8 @@ class TopicActor(val id: String) extends Actor with PersistentActor {
 					sender ! event
 					updateState(event)
 			}
+    case _ =>
+      sender ! "NOOP"
   }
 }
 

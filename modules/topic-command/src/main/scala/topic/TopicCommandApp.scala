@@ -41,7 +41,8 @@ object TopicCommandApp extends App {
 			val result = service ? common.ConsumerData(key, consumerRecord.value)
 			result collect {
 				case event @ TopicCreated(topicId, title, content) =>
-					val id = common.CommonUtil.uuid
+					//val id = common.CommonUtil.uuid
+					val id = s"disc-$topicId"
 					producer.offer(
             ProducerData("topic", topicId, event))
 					producer.offer(
