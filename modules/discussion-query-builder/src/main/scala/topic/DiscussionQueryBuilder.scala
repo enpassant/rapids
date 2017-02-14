@@ -37,7 +37,6 @@ object DiscussionQueryBuilder extends App {
 			val consumerRecord = msg.record
 			implicit val timeout = Timeout(1000.milliseconds)
 			val key = new String(consumerRecord.key)
-      println(consumerRecord.value)
 			val jsonTry = Try(new TopicSerializer().fromString(consumerRecord.value))
 			val result = Future { jsonTry match {
 				case Success(json) =>
@@ -56,9 +55,7 @@ object DiscussionQueryBuilder extends App {
               Try {
                 val parentComment = collection.findOne(
                   MongoDBObject("_id"->parentId))
-                println(parentComment)
                 parentComment map { parent =>
-                  println(parent)
                   val parentPath = parent.getAsOrElse("path", ",")
                   collection.insert(
                     MongoDBObject(
@@ -75,7 +72,6 @@ object DiscussionQueryBuilder extends App {
           println("Wrong json format: " + e)
 					e
 			} }
-      println(s"Result: $result")
       result map { _ => msg.committableOffset }
 		}
     consumer.onComplete {
