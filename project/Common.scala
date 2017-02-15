@@ -21,7 +21,10 @@ object Common {
 			"-language:_",
 			"-target:jvm-1.8",
 			"-encoding", "UTF-8"
-		)
+		),
+    resolvers ++= Seq(
+      Resolver.sonatypeRepo("snapshots")
+    )
 	)
 	// Settings for the app, i.e. the root project
 	val appSettings = settings(appName)
@@ -43,7 +46,7 @@ object Common {
 		"org.json4s"             %% "json4s-ext"            % "3.2.10",
 		"com.github.salat"       %% "salat"                 % "1.10.0",
 		"org.mongodb"            %% "casbah"                % "3.1.1",
-		"com.github.scullxbones" %% "akka-persistence-mongo-casbah" % "1.3.7"
+    "com.github.ironfish"    %% "akka-persistence-mongo" % "1.0.0-SNAPSHOT" % "compile"
 	)
 }
 
