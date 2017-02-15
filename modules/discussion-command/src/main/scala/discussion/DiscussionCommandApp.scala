@@ -20,7 +20,7 @@ object DiscussionCommandApp extends App {
 	def start(implicit system: ActorSystem) = {
 		implicit val executionContext = system.dispatcher
 
-		val producer = Kafka.createProducer[ProducerData[DiscussionEvent]](
+		val producer = Kafka.createProducer[ProducerData[TopicMessage]](
       "localhost:9092")
     {
 			case ProducerData(topic, id, event) =>
@@ -37,7 +37,7 @@ object DiscussionCommandApp extends App {
 			"discussion-command")
 		{ msg =>
 			val consumerRecord = msg.record
-			implicit val timeout = Timeout(1000.milliseconds)
+			implicit val timeout = Timeout(3000.milliseconds)
 			val key = new String(consumerRecord.key)
 			val result = service ? common.ConsumerData(key, consumerRecord.value)
 			result collect {
@@ -48,8 +48,16 @@ object DiscussionCommandApp extends App {
 				case event: DiscussionEvent =>
 					producer.offer(ProducerData("discussion-event", key, event))
 					msg.committableOffset
+				case message: WrongMessage =>
+					producer.offer(ProducerData("error", "FATAL", message))
+					msg.committableOffset
 				case message =>
 					msg.committableOffset
+			} recover {
+        case e: Exception =>
+					producer.offer(
+            ProducerData("error", "FATAL", WrongMessage(e.toString)))
+          msg.committableOffset
 			}
 		}
     consumer.onComplete {

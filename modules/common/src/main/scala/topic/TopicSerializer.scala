@@ -10,6 +10,8 @@ import org.joda.time.DateTime
 import scala.collection.immutable.TreeMap
 
 sealed trait TopicMessage extends Serializable
+case class WrongMessage(message: String) extends TopicMessage
+
 sealed trait TopicCommand extends TopicMessage
 case class CreateTopic(title: String, content: String) extends TopicCommand
 

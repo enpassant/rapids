@@ -31,7 +31,7 @@ class TopicService() extends Actor {
 					}
 					topic.tell(json, sender)
 				case Failure(e) =>
-					sender ! WrongCommand(message)
+					sender ! WrongMessage(message.toString)
 			}
   }
 }

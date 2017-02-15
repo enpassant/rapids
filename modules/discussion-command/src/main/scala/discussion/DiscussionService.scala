@@ -33,7 +33,7 @@ class DiscussionService() extends Actor {
 					}
 					actor.tell(json, sender)
 				case Failure(e) =>
-					sender ! WrongCommand(message)
+					sender ! WrongMessage(message.toString)
 			}
   }
 }

@@ -48,8 +48,8 @@ class TopicActor(val id: String) extends Actor with PersistentActor {
 					sender ! event
 					updateState(event)
 			}
-    case _ =>
-      sender ! "NOOP"
+    case msg =>
+      sender ! WrongMessage(msg.toString)
   }
 }
 

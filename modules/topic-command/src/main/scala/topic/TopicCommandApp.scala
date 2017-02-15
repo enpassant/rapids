@@ -36,7 +36,7 @@ object TopicCommandApp extends App {
 			"topic-command")
 		{ msg =>
 			val consumerRecord = msg.record
-			implicit val timeout = Timeout(1000.milliseconds)
+			implicit val timeout = Timeout(3000.milliseconds)
 			val key = new String(consumerRecord.key)
 			val result = service ? common.ConsumerData(key, consumerRecord.value)
 			result collect {
@@ -49,9 +49,17 @@ object TopicCommandApp extends App {
             ProducerData(
               "discussion-command", id, StartDiscussion(id, topicId, title)))
 					msg.committableOffset
+				case message: WrongMessage =>
+					producer.offer(ProducerData("error", "FATAL", message))
+					msg.committableOffset
 				case message =>
 					msg.committableOffset
-			}
+			} recover {
+        case e: Exception =>
+					producer.offer(
+            ProducerData("error", "FATAL", WrongMessage(e.toString)))
+          msg.committableOffset
+      }
 		}
     consumer.onComplete {
       case Success(done) =>
