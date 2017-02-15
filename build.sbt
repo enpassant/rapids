@@ -27,6 +27,11 @@ lazy val discussionQueryBuilder =
   (project in file("modules/discussion-query-builder")).dependsOn(common)
 
 lazy val root = (project in file("."))
+  .enablePlugins(GatlingPlugin)
+  .settings(libraryDependencies ++= Seq(
+    "io.gatling.highcharts" % "gatling-charts-highcharts" % "2.2.1" % "it",
+    "io.gatling"            % "gatling-test-framework"    % "2.2.1" % "it"
+  ))
   .aggregate(
     common,
     topicCommand,
@@ -48,4 +53,6 @@ lazy val root = (project in file("."))
 
 
 libraryDependencies ++= Common.commonDependencies
+
+javaOptions in GatlingIt := overrideDefaultJavaOptions("-Xms1024m", "-Xmx2048m")
 
