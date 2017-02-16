@@ -1,8 +1,30 @@
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import scala.concurrent.duration._
+import scala.util.Random
 
 class SimpleGatling extends Simulation {
+  val feeder = Iterator.continually(
+    Map(
+      "discId" -> Random.nextInt(10).toString,
+      "parentId" -> Random.nextInt(100).toString
+    )
+  )
+
+  val scn = scenario("SimpleGatling")
+    //.feed(feeder)
+    .repeat(20, "topicId") {
+      exec(Command.createTopic)
+    }
+    .pause(900 milliseconds)
+    .repeat(20, "topicId") {
+      repeat(40, "commentId") {
+        exec(Command.addComment)
+        .repeat(40, "replyId") {
+          exec(Command.replyComment)
+        }
+      }
+    }
 
   val httpConf = http
     .baseURL("http://localhost:8080")
@@ -12,19 +34,24 @@ class SimpleGatling extends Simulation {
     .acceptEncodingHeader("gzip, deflate")
     .userAgentHeader("Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0")
 
-  val scn = scenario("SimpleGatling")
-    .repeat(1000, "id") {
-      exec(Command.createTopic)
-    }
-
   setUp(
     scn.inject(atOnceUsers(1))
   ).protocols(httpConf)
 
   object Command {
     val createTopic = http("CreateTopic")
-      .post("/commands/topic/${id}")
-      .body(StringBody("""{"_t":"CreateTopic", "title": "Blog ${id}", "content": "My ${id}. blog"}"""))
+      .post(s"/commands/topic/$${topicId}")
+      .body(StringBody(s"""{"_t":"CreateTopic", "title": "Blog $${topicId}", "content": "My $${topicId}. blog"}"""))
+      .check(status.is(session => 200))
+
+    val addComment = http("AddComment")
+      .post(s"/commands/discussion/disc-$${topicId}")
+      .body(StringBody(s"""{"_t":"AddComment", "id": "$${topicId}-$${commentId}", "title": "Megjegyzés $${commentId}", "content": "$${commentId}. megjegyzés"}"""))
+      .check(status.is(session => 200))
+
+    val replyComment = http("ReplyComment")
+      .post(s"/commands/discussion/disc-$${topicId}")
+      .body(StringBody(s"""{"_t":"ReplyComment", "id": "$${topicId}-$${commentId}-$${replyId}", "parentId": "$${topicId}-$${commentId}", "title": "Válasz $${replyId}", "content": "$${replyId}. válasz"}"""))
       .check(status.is(session => 200))
   }
 }
