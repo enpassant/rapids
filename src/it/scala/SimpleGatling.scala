@@ -13,11 +13,11 @@ class SimpleGatling extends Simulation {
 
   val scn = scenario("SimpleGatling")
     //.feed(feeder)
-    .repeat(20, "blogId") {
+    .repeat(50, "blogId") {
       exec(Command.createBlog)
     }
     .pause(900 milliseconds)
-    .repeat(20, "blogId") {
+    .repeat(50, "blogId") {
       repeat(40, "commentId") {
         exec(Command.addComment)
         .repeat(40, "replyId") {
