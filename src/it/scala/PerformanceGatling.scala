@@ -3,16 +3,24 @@ import io.gatling.http.Predef._
 import scala.concurrent.duration._
 import scala.util.Random
 
-class SimpleGatling extends Simulation {
+class PerformanceGatling extends Simulation {
+  val feeder = Iterator.continually(
+    Map(
+      "discId" -> Random.nextInt(10).toString,
+      "parentId" -> Random.nextInt(100).toString
+    )
+  )
+
   val scn = scenario("SimpleGatling")
-    .repeat(1, "blogId") {
+    //.feed(feeder)
+    .repeat(50, "blogId") {
       exec(Command.createBlog)
     }
     .pause(900 milliseconds)
-    .repeat(1, "blogId") {
-      repeat(2, "commentId") {
+    .repeat(50, "blogId") {
+      repeat(40, "commentId") {
         exec(Command.addComment)
-        .repeat(2, "replyId") {
+        .repeat(40, "replyId") {
           exec(Command.replyComment)
         }
       }
