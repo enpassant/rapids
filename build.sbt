@@ -8,8 +8,8 @@ libraryDependencies ++= Seq(
 
 lazy val common = (project in file("modules/common"))
 
-lazy val topicCommand =
-  (project in file("modules/topic-command")).dependsOn(common)
+lazy val blogCommand =
+  (project in file("modules/blog-command")).dependsOn(common)
 
 lazy val discussionCommand =
   (project in file("modules/discussion-command")).dependsOn(common)
@@ -20,8 +20,8 @@ lazy val web =
 lazy val websocket =
   (project in file("modules/websocket")).dependsOn(common)
 
-lazy val topicQueryBuilder =
-  (project in file("modules/topic-query-builder")).dependsOn(common)
+lazy val blogQueryBuilder =
+  (project in file("modules/blog-query-builder")).dependsOn(common)
 
 lazy val discussionQueryBuilder =
   (project in file("modules/discussion-query-builder")).dependsOn(common)
@@ -34,20 +34,20 @@ lazy val root = (project in file("."))
   ))
   .aggregate(
     common,
-    topicCommand,
+    blogCommand,
     web,
     websocket,
     discussionCommand,
-    topicQueryBuilder,
+    blogQueryBuilder,
     discussionQueryBuilder
   )
   .dependsOn(
     common,
-    topicCommand,
+    blogCommand,
     web,
     websocket,
     discussionCommand,
-    topicQueryBuilder,
+    blogQueryBuilder,
     discussionQueryBuilder
   )
 

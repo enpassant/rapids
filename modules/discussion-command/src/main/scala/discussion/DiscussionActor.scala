@@ -1,7 +1,7 @@
 package discussion
 
 import common.Json
-import topic._
+import blog._
 
 import akka.actor._
 import akka.persistence._
@@ -20,8 +20,8 @@ class DiscussionActor(val id: String) extends Actor with PersistentActor {
   var state: Option[Discussion] = None
 
   def updateState(event: DiscussionEvent): Unit = event match {
-    case DiscussionStarted(id, topicId, title) =>
-      state = Some(Discussion(id, topicId, title))
+    case DiscussionStarted(id, blogId, title) =>
+      state = Some(Discussion(id, blogId, title))
     case CommentAdded(id, title, content) =>
       state = state map { discussion =>
         discussion.copy(
@@ -42,8 +42,8 @@ class DiscussionActor(val id: String) extends Actor with PersistentActor {
 
   val receiveCommand: Receive = {
     case "snap" if state.isDefined => saveSnapshot(state.get)
-    case StartDiscussion(id, topicId, title) if !state.isDefined =>
-			val event = DiscussionStarted(id, topicId, title)
+    case StartDiscussion(id, blogId, title) if !state.isDefined =>
+			val event = DiscussionStarted(id, blogId, title)
       persistAsync(event) {
 				event =>
 					sender ! event

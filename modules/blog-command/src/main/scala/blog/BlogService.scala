@@ -1,4 +1,4 @@
-package topic
+package blog
 
 import common._
 
@@ -10,26 +10,26 @@ import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import scala.util.{Try, Success, Failure}
 
-object TopicService {
-	def props() = Props(new TopicService())
+object BlogService {
+	def props() = Props(new BlogService())
 }
 
-class TopicService() extends Actor {
-	import TopicService._
+class BlogService() extends Actor {
+	import BlogService._
 
   val receive: Receive = process(Map.empty[String, ActorRef])
 
-  def process(topics: Map[String, ActorRef]): Receive = {
+  def process(blogs: Map[String, ActorRef]): Receive = {
     case message @ ConsumerData(key, value) =>
-			val jsonTry = Try(new TopicSerializer().fromString(value))
+			val jsonTry = Try(new BlogSerializer().fromString(value))
 			jsonTry match {
 				case Success(json) =>
-					val topic = topics get key getOrElse {
-						val actorRef = context.actorOf(TopicActor.props(key), s"topic-$key")
-						context become process(topics + (key -> actorRef))
+					val blog = blogs get key getOrElse {
+						val actorRef = context.actorOf(BlogActor.props(key), s"blog-$key")
+						context become process(blogs + (key -> actorRef))
 						actorRef
 					}
-					topic.tell(json, sender)
+					blog.tell(json, sender)
 				case Failure(e) =>
 					sender ! WrongMessage(message.toString)
 			}

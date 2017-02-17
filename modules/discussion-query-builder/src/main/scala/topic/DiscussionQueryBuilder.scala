@@ -1,7 +1,7 @@
 package discussion
 
 import common._
-import topic._
+import blog._
 import com.mongodb.casbah.Imports._
 import com.typesafe.config.ConfigFactory
 import akka.actor._
@@ -27,7 +27,7 @@ object DiscussionQueryBuilder extends App {
     val config = ConfigFactory.load
     val uri = config.getString("discussion.query.builder.mongodb.uri")
     val mongoClient = MongoClient(MongoClientURI(uri))
-    val collection = mongoClient.getDB("topic")("comment")
+    val collection = mongoClient.getDB("blog")("comment")
 
 		val consumer = Kafka.createConsumer(
 			"localhost:9092",
@@ -37,7 +37,7 @@ object DiscussionQueryBuilder extends App {
 			val consumerRecord = msg.record
 			implicit val timeout = Timeout(1000.milliseconds)
 			val key = new String(consumerRecord.key)
-			val jsonTry = Try(new TopicSerializer().fromString(consumerRecord.value))
+			val jsonTry = Try(new BlogSerializer().fromString(consumerRecord.value))
 			val result = Future { jsonTry match {
 				case Success(json) =>
           json match {

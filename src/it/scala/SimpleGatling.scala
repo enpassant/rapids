@@ -13,11 +13,11 @@ class SimpleGatling extends Simulation {
 
   val scn = scenario("SimpleGatling")
     //.feed(feeder)
-    .repeat(20, "topicId") {
-      exec(Command.createTopic)
+    .repeat(20, "blogId") {
+      exec(Command.createBlog)
     }
     .pause(900 milliseconds)
-    .repeat(20, "topicId") {
+    .repeat(20, "blogId") {
       repeat(40, "commentId") {
         exec(Command.addComment)
         .repeat(40, "replyId") {
@@ -39,19 +39,19 @@ class SimpleGatling extends Simulation {
   ).protocols(httpConf)
 
   object Command {
-    val createTopic = http("CreateTopic")
-      .post(s"/commands/topic/$${topicId}")
-      .body(StringBody(s"""{"_t":"CreateTopic", "title": "Blog $${topicId}", "content": "My $${topicId}. blog"}"""))
+    val createBlog = http("CreateBlog")
+      .post(s"/commands/blog/$${blogId}")
+      .body(StringBody(s"""{"_t":"CreateBlog", "title": "Blog $${blogId}", "content": "My $${blogId}. blog"}"""))
       .check(status.is(session => 200))
 
     val addComment = http("AddComment")
-      .post(s"/commands/discussion/disc-$${topicId}")
-      .body(StringBody(s"""{"_t":"AddComment", "id": "$${topicId}-$${commentId}", "title": "Megjegyzés $${commentId}", "content": "$${commentId}. megjegyzés"}"""))
+      .post(s"/commands/discussion/disc-$${blogId}")
+      .body(StringBody(s"""{"_t":"AddComment", "id": "$${blogId}-$${commentId}", "title": "Megjegyzés $${commentId}", "content": "$${commentId}. megjegyzés"}"""))
       .check(status.is(session => 200))
 
     val replyComment = http("ReplyComment")
-      .post(s"/commands/discussion/disc-$${topicId}")
-      .body(StringBody(s"""{"_t":"ReplyComment", "id": "$${topicId}-$${commentId}-$${replyId}", "parentId": "$${topicId}-$${commentId}", "title": "Válasz $${replyId}", "content": "$${replyId}. válasz"}"""))
+      .post(s"/commands/discussion/disc-$${blogId}")
+      .body(StringBody(s"""{"_t":"ReplyComment", "id": "$${blogId}-$${commentId}-$${replyId}", "parentId": "$${blogId}-$${commentId}", "title": "Válasz $${replyId}", "content": "$${replyId}. válasz"}"""))
       .check(status.is(session => 200))
   }
 }

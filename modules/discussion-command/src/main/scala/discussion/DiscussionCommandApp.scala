@@ -1,7 +1,7 @@
 package discussion
 
 import common._
-import topic._
+import blog._
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
@@ -20,11 +20,11 @@ object DiscussionCommandApp extends App {
 	def start(implicit system: ActorSystem) = {
 		implicit val executionContext = system.dispatcher
 
-		val producer = Kafka.createProducer[ProducerData[TopicMessage]](
+		val producer = Kafka.createProducer[ProducerData[BlogMessage]](
       "localhost:9092")
     {
 			case ProducerData(topic, id, event) =>
-				val value = new TopicSerializer().toString(event)
+				val value = new BlogSerializer().toString(event)
 				new ProducerRecord[Array[Byte], String](
 					topic, id.getBytes(), value)
 		}
@@ -42,7 +42,7 @@ object DiscussionCommandApp extends App {
 			val result = service ? common.ConsumerData(key, consumerRecord.value)
 			result collect {
 				case event: DiscussionStarted =>
-					producer.offer(ProducerData("topic-command", event.topicId, event))
+					producer.offer(ProducerData("blog-command", event.blogId, event))
 					producer.offer(ProducerData("discussion-event", key, event))
 					msg.committableOffset
 				case event: DiscussionEvent =>

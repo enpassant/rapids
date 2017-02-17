@@ -47,7 +47,7 @@ object WebApp extends App {
                       complete(
                         HttpEntity(
                           ContentTypes.`text/html(UTF-8)`,
-                          s"<h1>Topic: $topic-command</h1>"))
+                          s"<h1>Blog: $topic-command</h1>"))
 								}
 							}
 						}

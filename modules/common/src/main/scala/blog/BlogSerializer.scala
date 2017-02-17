@@ -1,4 +1,4 @@
-package topic
+package blog
 
 import akka.actor.{ ActorRef, ActorSystem }
 import akka.serialization._
@@ -9,27 +9,27 @@ import org.json4s._
 import org.joda.time.DateTime
 import scala.collection.immutable.TreeMap
 
-sealed trait TopicMessage extends Serializable
-case class WrongMessage(message: String) extends TopicMessage
+sealed trait BlogMessage extends Serializable
+case class WrongMessage(message: String) extends BlogMessage
 
-sealed trait TopicCommand extends TopicMessage
-case class CreateTopic(title: String, content: String) extends TopicCommand
+sealed trait BlogCommand extends BlogMessage
+case class CreateBlog(title: String, content: String) extends BlogCommand
 
-sealed trait TopicEvent extends TopicMessage
-case class TopicCreated(id: String, title: String, content: String)
-	extends TopicEvent
+sealed trait BlogEvent extends BlogMessage
+case class BlogCreated(id: String, title: String, content: String)
+	extends BlogEvent
 
 case class DiscussionItem(id: String, title: String)
-case class Topic(
+case class Blog(
 	title: String = "",
   content: String = "",
 	discussions: List[DiscussionItem] = Nil
-) extends TopicMessage
+) extends BlogMessage
 
-trait DiscussionCommand extends TopicMessage
+trait DiscussionCommand extends BlogMessage
 case class StartDiscussion(
 	id: String,
-	topicId: String,
+	blogId: String,
 	title: String
 )	extends DiscussionCommand
 
@@ -46,13 +46,13 @@ case class ReplyComment(
   content: String
 )	extends DiscussionCommand
 
-trait DiscussionEvent extends TopicMessage {
+trait DiscussionEvent extends BlogMessage {
   def id: String
 }
 
 case class DiscussionStarted(
 	id: String,
-	topicId: String,
+	blogId: String,
 	title: String
 )	extends DiscussionEvent
 
@@ -76,20 +76,20 @@ case class Comment(
 )
 case class Discussion(
 	id: String = "",
-	topicId: String = "",
+	blogId: String = "",
 	title: String = "",
 	comments: TreeMap[String, Comment] = TreeMap()
-) extends TopicMessage
+) extends BlogMessage
 
-class TopicSerializer extends common.JsonSerializer {
+class BlogSerializer extends common.JsonSerializer {
 	def identifier = 0xfeca
 
 	implicit val formats = new DefaultFormats {
 		override val typeHintFieldName = "_t"
 		override val typeHints = ShortTypeHints(List(
-			classOf[Topic],
-			classOf[CreateTopic],
-			classOf[TopicCreated],
+			classOf[Blog],
+			classOf[CreateBlog],
+			classOf[BlogCreated],
 			classOf[StartDiscussion],
 			classOf[AddComment],
 			classOf[ReplyComment],

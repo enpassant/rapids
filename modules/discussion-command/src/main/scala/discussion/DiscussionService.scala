@@ -1,7 +1,7 @@
 package discussion
 
 import common._
-import topic._
+import blog._
 
 import akka.actor._
 import akka.persistence._
@@ -22,7 +22,7 @@ class DiscussionService() extends Actor {
 
   def process(actors: Map[String, ActorRef]): Receive = {
     case message @ ConsumerData(key, value) =>
-			val jsonTry = Try(new TopicSerializer().fromString(value))
+			val jsonTry = Try(new BlogSerializer().fromString(value))
 			jsonTry match {
 				case Success(json) =>
 					val actor = actors get key getOrElse {

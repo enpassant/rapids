@@ -12,9 +12,9 @@ object Main extends App {
 	val routeWeb = WebApp.start
 	val routeWebSocket = WebSocketApp.start
 	val route = routeWeb ~ routeWebSocket
-	topic.TopicCommandApp.start(system)
+	blog.BlogCommandApp.start(system)
 	discussion.DiscussionCommandApp.start(system)
-	topic.TopicQueryBuilder.start(system)
+	blog.BlogQueryBuilder.start(system)
 	discussion.DiscussionQueryBuilder.start(system)
 
 	val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)

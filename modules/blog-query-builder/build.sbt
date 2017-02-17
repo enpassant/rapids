@@ -1,4 +1,4 @@
-Common.moduleSettings("topic-command")
+Common.moduleSettings("blog-query-builder")
 
 libraryDependencies ++= Common.commonDependencies
 

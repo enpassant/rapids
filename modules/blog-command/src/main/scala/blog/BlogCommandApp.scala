@@ -1,4 +1,4 @@
-package topic
+package blog
 
 import common._
 import akka.actor._
@@ -8,8 +8,8 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
-object TopicCommandApp extends App {
-	val system = ActorSystem("TopicCommandApp")
+object BlogCommandApp extends App {
+	val system = ActorSystem("BlogCommandApp")
 	import common.TypeHintContext._
 
 	start(system)
@@ -19,35 +19,35 @@ object TopicCommandApp extends App {
 	def start(implicit system: ActorSystem) = {
 		implicit val executionContext = system.dispatcher
 
-		val producer = Kafka.createProducer[ProducerData[TopicMessage]](
+		val producer = Kafka.createProducer[ProducerData[BlogMessage]](
       "localhost:9092")
     {
 			case ProducerData(topic, id, event) =>
-				val value = new TopicSerializer().toString(event)
+				val value = new BlogSerializer().toString(event)
 				new ProducerRecord[Array[Byte], String](
 					topic, id.getBytes(), value)
 		}
 
-		val service = system.actorOf(TopicService.props, s"topic-service")
+		val service = system.actorOf(BlogService.props, s"blog-service")
 
 		val consumer = Kafka.createConsumer(
 			"localhost:9092",
-			"topic-command",
-			"topic-command")
+			"blog-command",
+			"blog-command")
 		{ msg =>
 			val consumerRecord = msg.record
 			implicit val timeout = Timeout(3000.milliseconds)
 			val key = new String(consumerRecord.key)
 			val result = service ? common.ConsumerData(key, consumerRecord.value)
 			result collect {
-				case event @ TopicCreated(topicId, title, content) =>
+				case event @ BlogCreated(blogId, title, content) =>
 					//val id = common.CommonUtil.uuid
-					val id = s"disc-$topicId"
+					val id = s"disc-$blogId"
 					producer.offer(
-            ProducerData("topic-event", topicId, event))
+            ProducerData("blog-event", blogId, event))
 					producer.offer(
             ProducerData(
-              "discussion-command", id, StartDiscussion(id, topicId, title)))
+              "discussion-command", id, StartDiscussion(id, blogId, title)))
 					msg.committableOffset
 				case message: WrongMessage =>
 					producer.offer(ProducerData("error", "FATAL", message))

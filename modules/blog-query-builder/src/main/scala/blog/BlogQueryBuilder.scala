@@ -1,4 +1,4 @@
-package topic
+package blog
 
 import common._
 import com.mongodb.casbah.Imports._
@@ -12,8 +12,8 @@ import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 import scala.util.{Try, Success, Failure}
 
-object TopicQueryBuilder extends App {
-	val system = ActorSystem("TopicQueryBuilder")
+object BlogQueryBuilder extends App {
+	val system = ActorSystem("BlogQueryBuilder")
 	import common.TypeHintContext._
 
 	start(system)
@@ -24,28 +24,28 @@ object TopicQueryBuilder extends App {
 		implicit val executionContext = system.dispatcher
 
     val config = ConfigFactory.load
-    val uri = config.getString("topic.query.builder.mongodb.uri")
+    val uri = config.getString("blog.query.builder.mongodb.uri")
     val mongoClient = MongoClient(MongoClientURI(uri))
-    val collection = mongoClient.getDB("topic")("topic")
+    val collection = mongoClient.getDB("blog")("blog")
 
 		val consumer = Kafka.createConsumer(
 			"localhost:9092",
-			"topic-query",
-			"topic-event")
+			"blog-query",
+			"blog-event")
 		{ msg =>
 			val consumerRecord = msg.record
 			implicit val timeout = Timeout(1000.milliseconds)
 			val key = new String(consumerRecord.key)
-			val jsonTry = Try(new TopicSerializer().fromString(consumerRecord.value))
+			val jsonTry = Try(new BlogSerializer().fromString(consumerRecord.value))
 			val result = Future { jsonTry match {
 				case Success(json) =>
           json match {
-            case TopicCreated(id, title, content) =>
+            case BlogCreated(id, title, content) =>
               collection.insert(
                 MongoDBObject("_id"->id, "title"->title, "content"->content))
-            case DiscussionStarted(id, topicId, title) =>
+            case DiscussionStarted(id, blogId, title) =>
               collection.update(
-                MongoDBObject("_id"->topicId),
+                MongoDBObject("_id"->blogId),
                 $push("discussions"->id))
             case _ => 1
           }
