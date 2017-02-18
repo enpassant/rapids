@@ -1,14 +1,15 @@
 package common
 
-import org.json4s.jackson.Serialization.{ read, writePretty }
-import org.json4s.{ DefaultFormats, Formats, jackson, Serialization }
-import org.joda.time.DateTime
 import akka.http.scaladsl.marshalling._
 import akka.http.scaladsl.unmarshalling._
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.marshalling.{ Marshaller, ToEntityMarshaller }
 import akka.http.scaladsl.model.{ HttpCharsets, MediaTypes }
 import akka.http.scaladsl.unmarshalling.{ FromEntityUnmarshaller, Unmarshaller }
+import org.joda.time.DateTime
+import org.json4s._
+import org.json4s.JsonDSL._
+import org.json4s.mongo.JObjectParser._
 
 object BaseFormats extends BaseFormats {
 
@@ -26,6 +27,11 @@ trait BaseFormats {
   import BaseFormats._
 
   implicit val serialization = jackson.Serialization
+  implicit val formats =
+    DefaultFormats ++ org.json4s.ext.JodaTimeSerializers.all
+
+  implicit val SeqBlogMarshaller = BaseFormats.marshaller[Seq[JValue]](
+    MediaTypes.`application/json`)
 
   lazy val `application/collection+json` =
 		customMediaTypeUTF8("collection+json")

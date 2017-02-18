@@ -3,21 +3,15 @@ package blogQuery
 import common._
 
 import akka.actor._
-import akka.kafka._
-import akka.kafka.scaladsl._
-import akka.persistence._
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.ws.{UpgradeToWebSocket, TextMessage}
-import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.unmarshalling._
 import akka.stream._
-import akka.stream.scaladsl._
-import org.apache.kafka.clients.producer.ProducerRecord
-import org.apache.kafka.common.serialization._
+import com.mongodb.casbah.Imports._
+import com.typesafe.config.ConfigFactory
+import org.json4s.mongo.JObjectParser._
 
-object BlogQuery extends App {
+object BlogQuery extends App with BaseFormats {
 	implicit val system = ActorSystem("BlogQuery")
 	implicit val materializer = ActorMaterializer()
 	val route = start
@@ -29,15 +23,27 @@ object BlogQuery extends App {
 	def start(implicit system: ActorSystem, materializer: ActorMaterializer) = {
 		implicit val executionContext = system.dispatcher
 
+    val config = ConfigFactory.load
+    val uri = config.getString("blog.query.mongodb.uri")
+    val mongoClient = MongoClient(MongoClientURI(uri))
+    val collBlog = mongoClient.getDB("blog")("blog")
+
 		val route =
 			pathPrefix("query") {
 				pathPrefix("blog") {
           pathEnd {
 						get {
+              val blogs = collBlog.find(
+                MongoDBObject(),
+                MongoDBObject("content" -> 0)
+              )
+                .map(o => serialize(o)).toList
               complete(
                 HttpEntity(
                   ContentTypes.`text/html(UTF-8)`,
-                  s"<h1>Blog: query list</h1>"))
+                  s"<h1>$blogs</h1>")
+              ) ~
+              complete(blogs)
 						}
           } ~
 					path(Segment) { id =>
