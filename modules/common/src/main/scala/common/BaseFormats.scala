@@ -30,8 +30,11 @@ trait BaseFormats {
   implicit val formats =
     DefaultFormats ++ org.json4s.ext.JodaTimeSerializers.all
 
-  implicit val SeqBlogMarshaller = BaseFormats.marshaller[Seq[JValue]](
-    MediaTypes.`application/json`)
+  implicit val SeqJsonMarshaller =
+    BaseFormats.marshaller[JValue](MediaTypes.`application/json`)
+
+  implicit val SeqJsonCollectionMarshaller =
+    BaseFormats.marshaller[Seq[JValue]](MediaTypes.`application/json`)
 
   lazy val `application/collection+json` =
 		customMediaTypeUTF8("collection+json")

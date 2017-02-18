@@ -48,10 +48,20 @@ object BlogQuery extends App with BaseFormats {
           } ~
 					path(Segment) { id =>
 						get {
-              complete(
-                HttpEntity(
-                  ContentTypes.`text/html(UTF-8)`,
-                  s"<h1>Blog: query $id id</h1>"))
+              rejectEmptyResponse {
+                val blogOption = collBlog.findOne(
+                  MongoDBObject("_id" -> id)
+                )
+                  .map(o => serialize(o))
+                complete(
+                  blogOption map { blog =>
+                    HttpEntity(
+                      ContentTypes.`text/html(UTF-8)`,
+                      s"<h1>$blog</h1>")
+                  }
+                ) ~
+                complete(blogOption)
+              }
 						}
 					}
 				}
