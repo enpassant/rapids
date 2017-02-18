@@ -59,15 +59,19 @@ case class DiscussionStarted(
 case class CommentAdded(
 	id: String,
 	title: String,
-  content: String
+  content: String,
+  index: Int
 )	extends DiscussionEvent
 
 case class CommentReplied(
 	id: String,
 	parentId: String,
 	title: String,
-  content: String
+  content: String,
+  path: List[Int]
 )	extends DiscussionEvent
+
+case class CommentIndex(path: List[Int], childCount: Int)
 
 case class Comment(
   id: String,
@@ -78,7 +82,8 @@ case class Discussion(
 	id: String = "",
 	blogId: String = "",
 	title: String = "",
-	comments: TreeMap[String, Comment] = TreeMap()
+	comments: TreeMap[String, CommentIndex] = TreeMap(),
+  childCount: Int = 0
 ) extends BlogMessage
 
 class BlogSerializer extends common.JsonSerializer {

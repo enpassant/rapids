@@ -27,7 +27,7 @@ object DiscussionQueryBuilder extends App {
     val config = ConfigFactory.load
     val uri = config.getString("discussion.query.builder.mongodb.uri")
     val mongoClient = MongoClient(MongoClientURI(uri))
-    val collection = mongoClient.getDB("blog")("comment")
+    val collDiscussion = mongoClient.getDB("blog")("discussion")
 
 		val consumer = Kafka.createConsumer(
 			"localhost:9092",
@@ -41,30 +41,40 @@ object DiscussionQueryBuilder extends App {
 			val result = Future { jsonTry match {
 				case Success(json) =>
           json match {
-            case CommentAdded(id, title, content) =>
+            case DiscussionStarted(id, blogId, title) =>
               Try {
-                collection.insert(
+                collDiscussion.insert(
                   MongoDBObject(
                     "_id" -> id,
-                    "discussionId" -> key,
+                    "blogId" -> blogId,
+                    "title" -> title,
+                    "comments" -> List()
+                ))
+              }
+            case CommentAdded(id, title, content, index) =>
+              Try {
+                collDiscussion.update(
+                  MongoDBObject("_id" -> key),
+                  $push("comments" -> MongoDBObject(
+                    "_id" -> id,
                     "title" -> title,
                     "content" -> content,
-                    "path" -> ("," + id + ",")))
+                    "comments" -> List()
+                )))
               }
-            case CommentReplied(id, parentId, title, content) =>
+            case CommentReplied(id, parentId, title, content, path) =>
               Try {
-                val parentComment = collection.findOne(
-                  MongoDBObject("_id"->parentId))
-                parentComment map { parent =>
-                  val parentPath = parent.getAsOrElse("path", ",")
-                  collection.insert(
-                    MongoDBObject(
-                      "_id" -> id,
-                      "discussionId" -> key,
-                      "title" -> title,
-                      "content" -> content,
-                      "path" -> (parentPath + id + ",")))
+                val pos = path.tail.foldLeft("comments") {
+                  (p, i) => s"comments.$i.$p"
                 }
+                collDiscussion.update(
+                  MongoDBObject("_id" -> key),
+                  $push(pos -> MongoDBObject(
+                    "_id" -> id,
+                    "title" -> title,
+                    "content" -> content,
+                    "comments" -> List()
+                )))
               }
             case _ => 1
           }

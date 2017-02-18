@@ -9,6 +9,20 @@ import com.mongodb.casbah.commons.Imports._
 
 object DiscussionActor {
 	def props(id: String) = Props(new DiscussionActor(id))
+
+  val PATH_CHARS =
+    "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  val PATH_CHARS_LEN = PATH_CHARS.length
+
+  def indexToPath(index: Int, path: String): String = if (index == 0) {
+    path
+  } else if (index < PATH_CHARS_LEN) {
+    PATH_CHARS(index) + path
+  } else {
+    indexToPath(
+      index / PATH_CHARS_LEN,
+      PATH_CHARS(index % PATH_CHARS_LEN) + path)
+  }
 }
 
 class DiscussionActor(val id: String) extends Actor with PersistentActor {
@@ -22,15 +36,20 @@ class DiscussionActor(val id: String) extends Actor with PersistentActor {
   def updateState(event: DiscussionEvent): Unit = event match {
     case DiscussionStarted(id, blogId, title) =>
       state = Some(Discussion(id, blogId, title))
-    case CommentAdded(id, title, content) =>
+    case CommentAdded(id, title, content, index) =>
       state = state map { discussion =>
         discussion.copy(
-          comments = discussion.comments + (id -> Comment(id, title, content)))
+          childCount = discussion.childCount + 1,
+          comments = discussion.comments + (id -> CommentIndex(List(index), 0)))
       }
-    case CommentReplied(id, parentId, title, content) =>
+    case CommentReplied(id, parentId, title, content, path) =>
       state = state map { discussion =>
+        val parentComment = discussion.comments(parentId)
+        val childCount = parentComment.childCount
         discussion.copy(
-          comments = discussion.comments + (id -> Comment(id, title, content)))
+          comments = (discussion.comments - parentId)
+            + (id -> CommentIndex(path, 0))
+            + (parentId -> parentComment.copy(childCount = childCount + 1)))
       }
     case _ =>
   }
@@ -51,7 +70,8 @@ class DiscussionActor(val id: String) extends Actor with PersistentActor {
 			}
     case AddComment(id, title, content) if state.isDefined &&
         !state.get.comments.contains(id) =>
-			val event = CommentAdded(id, title, content)
+      val index = state.get.childCount
+			val event = CommentAdded(id, title, content, index)
       persistAsync(event) {
 				event =>
 					sender ! event
@@ -60,7 +80,9 @@ class DiscussionActor(val id: String) extends Actor with PersistentActor {
     case ReplyComment(id, parentId, title, content) if state.isDefined &&
         state.get.comments.contains(parentId) &&
         !state.get.comments.contains(id) =>
-			val event = CommentReplied(id, parentId, title, content)
+      val parentComment = state.get.comments(parentId)
+      val path = (parentComment.childCount) :: parentComment.path
+			val event = CommentReplied(id, parentId, title, content, path)
       persistAsync(event) {
 				event =>
 					sender ! event

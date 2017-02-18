@@ -6,17 +6,15 @@ import scala.util.Random
 class SimpleGatling extends Simulation {
   val scn = scenario("SimpleGatling")
     .repeat(1, "blogId") {
-      exec(Command.createBlog)
+      exec(Command.createBlog("simple"))
     }
     .pause(900 milliseconds)
-    .repeat(1, "blogId") {
-      repeat(2, "commentId") {
-        exec(Command.addComment)
-        .repeat(2, "replyId") {
-          exec(Command.replyComment)
-        }
-      }
-    }
+    .exec(Command.addComment("simple", "c1"))
+    .exec(Command.replyComment("simple", "c1", "r1"))
+    .exec(Command.addComment("simple", "c2"))
+    .exec(Command.replyComment("simple", "r1", "r2"))
+    .exec(Command.replyComment("simple", "r1", "r3"))
+    .exec(Command.replyComment("simple", "r2", "r4"))
 
   val httpConf = http
     .baseURL("http://localhost:8080")
@@ -31,19 +29,21 @@ class SimpleGatling extends Simulation {
   ).protocols(httpConf)
 
   object Command {
-    val createBlog = http("CreateBlog")
-      .post(s"/commands/blog/$${blogId}")
-      .body(StringBody(s"""{"_t":"CreateBlog", "title": "Blog $${blogId}", "content": "My $${blogId}. blog"}"""))
+    def createBlog(blogId: String) = http("CreateBlog")
+      .post(s"/commands/blog/${blogId}")
+      .body(StringBody(s"""{"_t":"CreateBlog", "title": "Blog ${blogId}", "content": "My ${blogId}. blog"}"""))
       .check(status.is(session => 200))
 
-    val addComment = http("AddComment")
-      .post(s"/commands/discussion/disc-$${blogId}")
-      .body(StringBody(s"""{"_t":"AddComment", "id": "$${blogId}-$${commentId}", "title": "Megjegyzés $${commentId}", "content": "$${commentId}. megjegyzés"}"""))
+    def addComment(blogId: String, commentId: String) = http("AddComment")
+      .post(s"/commands/discussion/disc-${blogId}")
+      .body(StringBody(s"""{"_t":"AddComment", "id": "${commentId}", "title": "Megjegyzés ${commentId}", "content": "${commentId}. megjegyzés"}"""))
       .check(status.is(session => 200))
 
-    val replyComment = http("ReplyComment")
-      .post(s"/commands/discussion/disc-$${blogId}")
-      .body(StringBody(s"""{"_t":"ReplyComment", "id": "$${blogId}-$${commentId}-$${replyId}", "parentId": "$${blogId}-$${commentId}", "title": "Válasz $${replyId}", "content": "$${replyId}. válasz"}"""))
+    def replyComment(blogId: String, commentId: String, replyId: String) = {
+      http("ReplyComment")
+      .post(s"/commands/discussion/disc-${blogId}")
+      .body(StringBody(s"""{"_t":"ReplyComment", "id": "${replyId}", "parentId": "${commentId}", "title": "Válasz ${replyId}", "content": "${replyId}. válasz"}"""))
       .check(status.is(session => 200))
+    }
   }
 }
