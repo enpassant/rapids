@@ -36,15 +36,21 @@ trait BaseFormats {
   implicit val SeqJsonCollectionMarshaller =
     BaseFormats.marshaller[Seq[JValue]](MediaTypes.`application/json`)
 
+  lazy val `text/html+xml` =
+		customMediaTypeUTF8("html+xml", "text")
+
   lazy val `application/collection+json` =
 		customMediaTypeUTF8("collection+json")
 
-  def customMediaTypeUTF8(name: String): MediaType.WithFixedCharset =
+  def customMediaTypeUTF8(name: String, topLevel: String = "application"):
+    MediaType.WithFixedCharset =
+  {
     MediaType.customWithFixedCharset(
-      "application",
+      topLevel,
       name,
       HttpCharsets.`UTF-8`
     )
+  }
 
   def json4sUnmarshallMediaType[A: Manifest]
 		(mediaType: MediaType)

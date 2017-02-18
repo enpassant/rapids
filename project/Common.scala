@@ -34,6 +34,11 @@ object Common {
 	)
 	// Settings for every service, i.e. for admin and web subprojects
 
+  val webDependencies = Seq(
+    "com.github.spullara.mustache.java" % "compiler" % "0.9.4",
+    "me.lessis" %% "fixie-grips-json4s" % "0.1.0"
+  )
+
 	val commonDependencies = Seq(
 		"com.typesafe.akka"      %% "akka-actor"            % akkaVersion,
 		"com.typesafe.akka"      %% "akka-persistence"      % akkaVersion,
