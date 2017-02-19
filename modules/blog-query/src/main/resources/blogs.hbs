@@ -1,0 +1,12 @@
+{{#each blogs}}
+<div class="blog">
+    <h1>
+        <a href="/query/blog/{{_id}}">{{title}}</a>
+    </h1>
+    {{#each discussions}}
+    <span class="discussion">
+        <a href="/query/discussion/{{_id}}">{{title}}</a>
+    </span>
+    {{/each}}
+</div>
+{{/each}}

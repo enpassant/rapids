@@ -8,8 +8,10 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.stream._
+import com.github.jknack.handlebars.{ Context, Handlebars }
 import com.mongodb.casbah.Imports._
 import com.typesafe.config.ConfigFactory
+import fixiegrips.{ Json4sHelpers, Json4sResolver }
 import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
 import org.json4s.mongo.JObjectParser._
@@ -23,6 +25,16 @@ object BlogQuery extends App with BaseFormats {
     val mongoClient = MongoClient(MongoClientURI(uri))
     val collBlog = mongoClient.getDB("blog")("blog")
 
+    val handlebars = new Handlebars().registerHelpers(Json4sHelpers)
+    def ctx(obj: Object) =
+      Context.newBuilder(obj).resolver(Json4sResolver).build
+
+    val blogs = handlebars.compile("blogs")
+    val renderBlogs = (obj: Object) => blogs(ctx(obj))
+
+    val blog = handlebars.compile("blog")
+    val renderBlog = (obj: Object) => blog(ctx(obj))
+
 		val route =
 			pathPrefix("query") {
 				pathPrefix("blog") {
@@ -34,7 +46,7 @@ object BlogQuery extends App with BaseFormats {
               )
                 .map(o => serialize(o)).toList
               lazy val blogsObj = JObject(JField("blogs", blogs))
-              completePage(blogsObj, Templates.renderBlogs, Templates.strBlogs)
+              completePage(blogsObj, renderBlogs, "blogs")
 						}
           } ~
 					path(Segment) { id =>
@@ -44,7 +56,7 @@ object BlogQuery extends App with BaseFormats {
                   MongoDBObject("_id" -> id)
                 )
                   .map(o => serialize(o))
-                completePage(blogOpt, Templates.renderBlog, Templates.strBlog)
+                completePage(blogOpt, renderBlog, "blog")
               }
 						}
 					}

@@ -28,7 +28,7 @@ object Directives extends BaseFormats {
           render(makeObject))
       ) ~
       complete(makeObject) ~
-      complete( HttpEntity( `text/html+xml`, template))
+			getFromResource(template + ".hbs", `text/html+xml`)
     }
   }
 
@@ -45,7 +45,7 @@ object Directives extends BaseFormats {
             render(obj))
       }) ~
       complete(makeObject) ~
-      complete( HttpEntity( `text/html+xml`, template))
+			getFromResource(template + ".hbs", `text/html+xml`)
     }
   }
 }
