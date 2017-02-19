@@ -10,9 +10,16 @@ object Templates {
 
     val strBlogs = """
       |{{#each blogs}}
-      |<h1>
+      |<div>
+      |<h1 class="blog">
       |  <a href="/query/blog/{{_id}}">{{title}}</a>
       |</h1>
+      |{{#each discussions}}
+      |<span class="discussion">
+      |  <a href="/query/discussion/{{_id}}">{{title}}</a>
+      |</span>
+      |{{/each}}
+      |</div>
       |{{/each}}""".stripMargin
     val blogs = handlebars.compileInline(strBlogs)
     val renderBlogs = (obj: Object) => blogs(ctx(obj))
