@@ -40,14 +40,11 @@ object BlogQuery extends App with BaseFormats {
 					path(Segment) { id =>
 						get {
               rejectEmptyResponse {
-                lazy val blogOption = collBlog.findOne(
+                lazy val blogOpt = collBlog.findOne(
                   MongoDBObject("_id" -> id)
                 )
                   .map(o => serialize(o))
-                completePageWithOption(
-                  blogOption,
-                  Templates.renderBlog,
-                  Templates.strBlog)
+                completePage(blogOpt, Templates.renderBlog, Templates.strBlog)
               }
 						}
 					}

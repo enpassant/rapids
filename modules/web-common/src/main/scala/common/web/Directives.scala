@@ -17,7 +17,7 @@ import org.json4s.mongo.JObjectParser._
 
 object Directives extends BaseFormats {
   def completePage(
-    makeObject: => JObject,
+    makeObject: JObject,
     render: Object => String,
     template: String): Route =
   {
@@ -32,8 +32,8 @@ object Directives extends BaseFormats {
     }
   }
 
-  def completePageWithOption(
-    makeObject: => Option[JValue],
+  def completePage(
+    makeObject: Option[JValue],
     render: Object => String,
     template: String): Route =
   {

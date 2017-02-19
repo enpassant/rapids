@@ -15,7 +15,7 @@ object Templates {
       |</h1>
       |{{/each}}""".stripMargin
     val blogs = handlebars.compileInline(strBlogs)
-    def renderBlogs(obj: Object) = blogs(ctx(obj))
+    val renderBlogs = (obj: Object) => blogs(ctx(obj))
 
     val strBlog = """
       |<h1>
@@ -23,5 +23,5 @@ object Templates {
       |</h1>
       |{{content}}""".stripMargin
     val blog = handlebars.compileInline(strBlog)
-    def renderBlog(obj: Object) = blog(ctx(obj))
+    val renderBlog = (obj: Object) => blog(ctx(obj))
 }
