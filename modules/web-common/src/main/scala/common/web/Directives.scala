@@ -4,7 +4,9 @@ import common._
 
 import akka.actor._
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.marshalling.ToResponseMarshallable
 import akka.http.scaladsl.model._
+import akka.http.scaladsl.model.headers.Accept
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream._
@@ -16,36 +18,32 @@ import org.json4s.JsonDSL._
 import org.json4s.mongo.JObjectParser._
 
 object Directives extends BaseFormats {
-  def completePage(
-    makeObject: JObject,
-    render: Object => String,
-    template: String): Route =
+  def completePage(render: Object => String, template: String)
+    (makeObject: => Option[JValue]): Route =
   {
     get {
-      complete(
-        HttpEntity(
-          ContentTypes.`text/html(UTF-8)`,
-          render(makeObject))
-      ) ~
-      complete(makeObject) ~
-			getFromResource(template + ".hbs", `text/html+xml`)
+      rejectEmptyResponse {
+        handleReq(MediaTypes.`text/html`) {
+          complete {
+            makeObject map { obj =>
+            HttpEntity(
+              ContentTypes.`text/html(UTF-8)`,
+              render(obj))
+            }}
+        } ~
+        handleReq(MediaTypes.`application/json`)(complete(makeObject)) ~
+        getFromResource(template + ".hbs", `text/html+xml`)
+      }
     }
   }
 
-  def completePage(
-    makeObject: Option[JValue],
-    render: Object => String,
-    template: String): Route =
+  def handleReq[T <: ToResponseMarshallable](mediaType: MediaType)
+    (route: Route) =
   {
-    get {
-      complete(
-        makeObject map { obj =>
-          HttpEntity(
-            ContentTypes.`text/html(UTF-8)`,
-            render(obj))
-      }) ~
-      complete(makeObject) ~
-			getFromResource(template + ".hbs", `text/html+xml`)
+    extractRequest { request =>
+      request.header[Accept].map(_.mediaRanges).flatMap { r =>
+        r.find(_.matches(mediaType)).map(_ => route)
+      }.getOrElse(reject)
     }
   }
 }

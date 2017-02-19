@@ -39,49 +39,22 @@ object BlogQuery extends App with BaseFormats {
 			pathPrefix("query") {
 				pathPrefix("blog") {
           pathEnd {
-						get {
-              lazy val blogs = collBlog.find(
+            completePage(renderBlogs, "blogs") {
+              val blogs = collBlog.find(
                 MongoDBObject(),
                 MongoDBObject("content" -> 0)
               )
                 .map(o => serialize(o)).toList
-              lazy val blogsObj = JObject(JField("blogs", blogs))
-              completePage(blogsObj, renderBlogs, "blogs")
-						}
+              Some(JObject(JField("blogs", blogs)))
+            }
           } ~
 					path(Segment) { id =>
-						get {
-              rejectEmptyResponse {
-                lazy val blogOpt = collBlog.findOne(
-                  MongoDBObject("_id" -> id)
-                )
-                  .map(o => serialize(o))
-                completePage(blogOpt, renderBlog, "blog")
-              }
-						}
+            completePage(renderBlog, "blog") {
+              collBlog.findOne(MongoDBObject("_id" -> id))
+                .map(o => serialize(o))
+            }
 					}
 				}
-			} ~
-			path("system") {
-				post {
-					entity(as[String]) {
-						case "shutdown" =>
-							system.terminate
-							complete(
-								HttpEntity(
-									ContentTypes.`text/plain(UTF-8)`,
-									"System shut down"))
-						}
-				}
-			} ~
-			path("") {
-				getFromResource(s"public/html/index.html")
-			} ~
-			path("""([^/]+\.html).*""".r) { path =>
-				getFromResource(s"public/html/$path")
-			} ~
-			path(Remaining) { path =>
-				getFromResource(s"public/$path")
 			}
 
 		route
