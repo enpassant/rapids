@@ -1,4 +1,4 @@
-package blogQuery
+package blog.query
 
 import common._
 
@@ -7,23 +7,13 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.stream._
-import com.github.jknack.handlebars.{ Context, Handlebars }
 import com.mongodb.casbah.Imports._
 import com.typesafe.config.ConfigFactory
-import fixiegrips.{ Json4sHelpers, Json4sResolver }
 import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
 import org.json4s.mongo.JObjectParser._
 
 object BlogQuery extends App with BaseFormats {
-	implicit val system = ActorSystem("BlogQuery")
-	implicit val materializer = ActorMaterializer()
-	val route = start
-	val bindingFuture = Http().bindAndHandle(route, "localhost", 8083)
-
-	scala.io.StdIn.readLine()
-	system.terminate
-
 	def start(implicit system: ActorSystem, materializer: ActorMaterializer) = {
 		implicit val executionContext = system.dispatcher
 
@@ -31,24 +21,6 @@ object BlogQuery extends App with BaseFormats {
     val uri = config.getString("blog.query.mongodb.uri")
     val mongoClient = MongoClient(MongoClientURI(uri))
     val collBlog = mongoClient.getDB("blog")("blog")
-    val handlebars = new Handlebars().registerHelpers(Json4sHelpers)
-    def ctx(obj: Object) =
-      Context.newBuilder(obj).resolver(Json4sResolver).build
-
-    val strBlogs = """
-      |{{#each blogs}}
-      |<h1>
-      |  <a href="/query/blog/{{_id}}">{{title}}</a>
-      |</h1>
-      |{{/each}}""".stripMargin
-    val templateBlogs = handlebars.compileInline(strBlogs)
-
-    val strBlog = """
-      |<h1>
-      |  {{title}}
-      |</h1>
-      |{{content}}""".stripMargin
-    val templateBlog = handlebars.compileInline(strBlog)
 
 		val route =
 			pathPrefix("query") {
@@ -64,10 +36,10 @@ object BlogQuery extends App with BaseFormats {
               complete(
                 HttpEntity(
                   ContentTypes.`text/html(UTF-8)`,
-                  templateBlogs(ctx(blogsObj)))
+                  Templates.renderBlogs(blogsObj))
               ) ~
               complete(blogs) ~
-              complete( HttpEntity( `text/html+xml`, strBlogs))
+              complete( HttpEntity( `text/html+xml`, Templates.strBlogs))
 						}
           } ~
 					path(Segment) { id =>
@@ -81,11 +53,11 @@ object BlogQuery extends App with BaseFormats {
                   blogOption map { blog =>
                     HttpEntity(
                       ContentTypes.`text/html(UTF-8)`,
-                      templateBlog(ctx(blog)))
+                      Templates.renderBlog(blog))
                   }
                 ) ~
                 complete(blogOption) ~
-                complete(HttpEntity(`text/html+xml`, strBlog))
+                complete(HttpEntity(`text/html+xml`, Templates.strBlog))
               }
 						}
 					}
@@ -115,5 +87,13 @@ object BlogQuery extends App with BaseFormats {
 
 		route
 	}
+
+	implicit val system = ActorSystem("BlogQuery")
+	implicit val materializer = ActorMaterializer()
+	val route = start
+	val bindingFuture = Http().bindAndHandle(route, "localhost", 8083)
+
+	scala.io.StdIn.readLine()
+	system.terminate
 }
 

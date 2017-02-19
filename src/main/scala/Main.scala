@@ -11,7 +11,7 @@ object Main extends App {
 
 	val routeWeb = WebApp.start
 	val routeWebSocket = WebSocketApp.start
-	val routeBlogQuery = blogQuery.BlogQuery.start
+	val routeBlogQuery = blog.query.BlogQuery.start
 	val route = routeWeb ~ routeWebSocket ~ routeBlogQuery
 	blog.BlogCommandApp.start(system)
 	discussion.DiscussionCommandApp.start(system)
