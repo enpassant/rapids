@@ -8,27 +8,35 @@ libraryDependencies ++= Seq(
 
 lazy val common = (project in file("modules/common"))
 
-lazy val blogCommand =
-  (project in file("modules/blog-command")).dependsOn(common)
+lazy val webCommon = (project in file("modules/web-common"))
+  .settings(libraryDependencies ++= Common.webDependencies)
+  .aggregate(common)
+  .dependsOn(common)
 
-lazy val discussionCommand =
-  (project in file("modules/discussion-command")).dependsOn(common)
+lazy val blogCommand = (project in file("modules/blog-command"))
+  .dependsOn(common)
 
-lazy val web =
-  (project in file("modules/web")).dependsOn(common)
+lazy val discussionCommand = (project in file("modules/discussion-command"))
+  .dependsOn(common)
 
-lazy val websocket =
-  (project in file("modules/websocket")).dependsOn(common)
+lazy val web = (project in file("modules/web"))
+  .aggregate(webCommon)
+  .dependsOn(webCommon)
 
-lazy val blogQueryBuilder =
-  (project in file("modules/blog-query-builder")).dependsOn(common)
+lazy val websocket = (project in file("modules/websocket"))
+  .aggregate(webCommon)
+  .dependsOn(webCommon)
+
+lazy val blogQueryBuilder = (project in file("modules/blog-query-builder"))
+  .dependsOn(common)
 
 lazy val discussionQueryBuilder =
-  (project in file("modules/discussion-query-builder")).dependsOn(common)
+  (project in file("modules/discussion-query-builder"))
+    .dependsOn(common)
 
 lazy val blogQuery = (project in file("modules/blog-query"))
-  .settings(libraryDependencies ++= Common.webDependencies)
-  .dependsOn(common)
+  .aggregate(webCommon)
+  .dependsOn(webCommon)
 
 lazy val root = (project in file("."))
   .enablePlugins(GatlingPlugin)
@@ -38,6 +46,7 @@ lazy val root = (project in file("."))
   ))
   .aggregate(
     common,
+    webCommon,
     blogCommand,
     web,
     websocket,
@@ -48,6 +57,7 @@ lazy val root = (project in file("."))
   )
   .dependsOn(
     common,
+    webCommon,
     blogCommand,
     web,
     websocket,

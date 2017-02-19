@@ -1,6 +1,7 @@
 package blog.query
 
 import common._
+import common.web.Directives._
 
 import akka.actor._
 import akka.http.scaladsl.Http
@@ -27,37 +28,26 @@ object BlogQuery extends App with BaseFormats {
 				pathPrefix("blog") {
           pathEnd {
 						get {
-              val blogs = collBlog.find(
+              lazy val blogs = collBlog.find(
                 MongoDBObject(),
                 MongoDBObject("content" -> 0)
               )
                 .map(o => serialize(o)).toList
-              val blogsObj = JObject(JField("blogs", blogs))
-              complete(
-                HttpEntity(
-                  ContentTypes.`text/html(UTF-8)`,
-                  Templates.renderBlogs(blogsObj))
-              ) ~
-              complete(blogs) ~
-              complete( HttpEntity( `text/html+xml`, Templates.strBlogs))
+              lazy val blogsObj = JObject(JField("blogs", blogs))
+              completePage(blogsObj, Templates.renderBlogs, Templates.strBlogs)
 						}
           } ~
 					path(Segment) { id =>
 						get {
               rejectEmptyResponse {
-                val blogOption = collBlog.findOne(
+                lazy val blogOption = collBlog.findOne(
                   MongoDBObject("_id" -> id)
                 )
                   .map(o => serialize(o))
-                complete(
-                  blogOption map { blog =>
-                    HttpEntity(
-                      ContentTypes.`text/html(UTF-8)`,
-                      Templates.renderBlog(blog))
-                  }
-                ) ~
-                complete(blogOption) ~
-                complete(HttpEntity(`text/html+xml`, Templates.strBlog))
+                completePageWithOption(
+                  blogOption,
+                  Templates.renderBlog,
+                  Templates.strBlog)
               }
 						}
 					}
