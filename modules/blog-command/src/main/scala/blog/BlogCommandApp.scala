@@ -49,6 +49,10 @@ object BlogCommandApp extends App {
             ProducerData(
               "discussion-command", id, StartDiscussion(id, blogId, title)))
 					msg.committableOffset
+				case event @ DiscussionStarted(id, blogId, title) =>
+					producer.offer(
+            ProducerData("blog-event", blogId, event))
+					msg.committableOffset
 				case message: WrongMessage =>
 					producer.offer(ProducerData("error", "FATAL", message))
 					msg.committableOffset

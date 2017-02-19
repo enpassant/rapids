@@ -42,11 +42,16 @@ object BlogQueryBuilder extends App {
           json match {
             case BlogCreated(id, title, content) =>
               collection.insert(
-                MongoDBObject("_id"->id, "title"->title, "content"->content))
+                MongoDBObject(
+                  "_id" -> id,
+                  "title" -> title,
+                  "content" -> content,
+                  "discussions" -> Seq()))
             case DiscussionStarted(id, blogId, title) =>
               collection.update(
-                MongoDBObject("_id"->blogId),
-                $push("discussions"->id))
+                MongoDBObject("_id" -> blogId),
+                $push("discussions" ->
+                  MongoDBObject("id" -> id, "title" -> title)))
             case _ => 1
           }
 				case Failure(e) =>
