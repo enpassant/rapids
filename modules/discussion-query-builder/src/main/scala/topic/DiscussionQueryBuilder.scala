@@ -56,7 +56,7 @@ object DiscussionQueryBuilder extends App {
                 collDiscussion.update(
                   MongoDBObject("_id" -> key),
                   $push("comments" -> MongoDBObject(
-                    "_id" -> id,
+                    "commentId" -> id,
                     "title" -> title,
                     "content" -> content,
                     "comments" -> List()
@@ -70,7 +70,7 @@ object DiscussionQueryBuilder extends App {
                 collDiscussion.update(
                   MongoDBObject("_id" -> key),
                   $push(pos -> MongoDBObject(
-                    "_id" -> id,
+                    "commentId" -> id,
                     "title" -> title,
                     "content" -> content,
                     "comments" -> List()
