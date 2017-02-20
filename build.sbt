@@ -38,6 +38,10 @@ lazy val blogQuery = (project in file("modules/blog-query"))
   .aggregate(webCommon)
   .dependsOn(webCommon)
 
+lazy val discussionQuery = (project in file("modules/discussion-query"))
+  .aggregate(webCommon)
+  .dependsOn(webCommon)
+
 lazy val root = (project in file("."))
   .enablePlugins(GatlingPlugin)
   .settings(libraryDependencies ++= Seq(
@@ -53,7 +57,8 @@ lazy val root = (project in file("."))
     discussionCommand,
     blogQueryBuilder,
     discussionQueryBuilder,
-    blogQuery
+    blogQuery,
+    discussionQuery
   )
   .dependsOn(
     common,
@@ -64,7 +69,8 @@ lazy val root = (project in file("."))
     discussionCommand,
     blogQueryBuilder,
     discussionQueryBuilder,
-    blogQuery
+    blogQuery,
+    discussionQuery
   )
 
 
