@@ -10,13 +10,6 @@ import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
 object DiscussionCommandApp extends App {
-	val system = ActorSystem("DiscussionCommandApp")
-	import common.TypeHintContext._
-
-	start(system)
-	scala.io.StdIn.readLine()
-	system.terminate
-
 	def start(implicit system: ActorSystem) = {
 		implicit val executionContext = system.dispatcher
 
@@ -65,5 +58,11 @@ object DiscussionCommandApp extends App {
       case Failure(throwable) => println(throwable)
     }
 	}
-}
 
+	val system = ActorSystem("DiscussionCommandApp")
+	import common.TypeHintContext._
+
+	start(system)
+	scala.io.StdIn.readLine()
+	system.terminate
+}

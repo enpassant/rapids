@@ -14,13 +14,6 @@ import scala.util.{Failure, Success}
 import scala.util.{Try, Success, Failure}
 
 object DiscussionQueryBuilder extends App {
-	val system = ActorSystem("DiscussionQueryBuilder")
-	import common.TypeHintContext._
-
-	start(system)
-	scala.io.StdIn.readLine()
-	system.terminate
-
 	def start(implicit system: ActorSystem) = {
 		implicit val executionContext = system.dispatcher
 
@@ -89,5 +82,11 @@ object DiscussionQueryBuilder extends App {
       case Failure(throwable) => println(throwable)
     }
 	}
-}
 
+	val system = ActorSystem("DiscussionQueryBuilder")
+	import common.TypeHintContext._
+
+	start(system)
+	scala.io.StdIn.readLine()
+	system.terminate
+}
