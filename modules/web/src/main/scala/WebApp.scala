@@ -76,7 +76,7 @@ object WebApp extends App {
 				getFromResource(s"public/$path")
 			}
 
-		route
+		encodeResponse { route }
 	}
 }
 
