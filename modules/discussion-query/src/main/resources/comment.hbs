@@ -1,14 +1,18 @@
 {{#each comments}}
 <div class="comment">
-    <h2 id="{{this.commentId}}">
-        {{title}}
-    </h2>
     <div>
-        {{content}}
-        <a href="/query/discussion/{{_id}}#{{this.commentId}}">permalink</a>
-        {{#if ../commentId}}
-        <a href="/query/discussion/{{_id}}#{{../commentId}}">szülő</a>
-        {{/if}}
+        <h2 id="{{this.commentId}}">
+            {{title}}
+        </h2>
+        <div>
+            {{content}}
+            <div>
+                <a href="/query/discussion/{{_id}}#{{this.commentId}}">permalink</a>
+                {{#if ../commentId}}
+                <a href="/query/discussion/{{_id}}#{{../commentId}}">szülő</a>
+                {{/if}}
+            </div>
+        </div>
     </div>
     {{#if comments}}
         {{> comment}}
