@@ -16,14 +16,6 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization._
 
 object WebApp extends App {
-	implicit val system = ActorSystem("WebApp")
-	implicit val materializer = ActorMaterializer()
-	val route = start
-	val bindingFuture = Http().bindAndHandle(route, "localhost", 8081)
-
-	scala.io.StdIn.readLine()
-	system.terminate
-
 	def start(implicit system: ActorSystem, materializer: ActorMaterializer) = {
 		implicit val executionContext = system.dispatcher
 
@@ -78,5 +70,13 @@ object WebApp extends App {
 
 		encodeResponse { route }
 	}
+
+	implicit val system = ActorSystem("WebApp")
+	implicit val materializer = ActorMaterializer()
+	val route = start
+	val bindingFuture = Http().bindAndHandle(route, "localhost", 8081)
+
+	scala.io.StdIn.readLine()
+	system.terminate
 }
 
