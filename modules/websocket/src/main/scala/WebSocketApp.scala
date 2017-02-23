@@ -18,15 +18,6 @@ import org.apache.kafka.common.serialization._
 import scala.concurrent.Future
 
 object WebSocketApp extends App {
-	implicit val system = ActorSystem("WebSocketApp")
-	implicit val materializer = ActorMaterializer()
-	val route = start
-
-	val bindingFuture = Http().bindAndHandle(route, "localhost", 8082)
-
-	scala.io.StdIn.readLine()
-	system.terminate
-
 	def start(implicit system: ActorSystem, materializer: ActorMaterializer) = {
 		implicit val executionContext = system.dispatcher
 
@@ -73,5 +64,14 @@ object WebSocketApp extends App {
 			}
 		route
 	}
+
+	implicit val system = ActorSystem("WebSocketApp")
+	implicit val materializer = ActorMaterializer()
+	val route = start
+
+	val bindingFuture = Http().bindAndHandle(route, "localhost", 8082)
+
+	scala.io.StdIn.readLine()
+	system.terminate
 }
 
