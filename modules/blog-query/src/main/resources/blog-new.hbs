@@ -1,0 +1,31 @@
+<form id="createBlog">
+    <div>
+        <h1 class="blog">
+            <input id="title"/>
+        </h1>
+    </div>
+    <div>
+        <textarea id="content">
+Ez az első blogom.
+
+Mindjárt több sorral.
+        </textarea>
+    </div>
+    <div>
+        <input type="button" value="Létrehoz"
+            onClick="document.getElementById('createBlog').createBlog();"/>
+    </div>
+</form>
+
+<script type="text/javascript">
+    this.createBlog = function() {
+        var title = document.getElementById("title").value;
+        var content = document.getElementById("content").value;
+        var data = {
+            "_t": "CreateBlog",
+            "title": title,
+            "content": content
+        };
+        ajaxPost("/commands/blog/{{uuid}}", data);
+    };
+</script>

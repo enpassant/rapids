@@ -8,7 +8,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.stream._
-import com.github.jknack.handlebars.{ Context, Handlebars }
+import com.github.jknack.handlebars.{ Context, Handlebars, Template }
 import com.mongodb.casbah.Imports._
 import com.typesafe.config.ConfigFactory
 import fixiegrips.{ Json4sHelpers, Json4sResolver }
@@ -28,18 +28,17 @@ object BlogQuery extends App with BaseFormats {
     val handlebars = new Handlebars().registerHelpers(Json4sHelpers)
     def ctx(obj: Object) =
       Context.newBuilder(obj).resolver(Json4sResolver).build
+    val render = (template: Template) => (obj: Object) => template(ctx(obj))
 
     val blogs = handlebars.compile("blogs")
-    val renderBlogs = (obj: Object) => blogs(ctx(obj))
-
     val blog = handlebars.compile("blog")
-    val renderBlog = (obj: Object) => blog(ctx(obj))
+    val blogNew = handlebars.compile("blog-new")
 
 		val route =
 			pathPrefix("query") {
 				pathPrefix("blog") {
           pathEnd {
-            completePage(renderBlogs, "blogs") {
+            completePage(render(blogs), "blogs") {
               val blogs = collBlog.find(
                 MongoDBObject(),
                 MongoDBObject("content" -> 0)
@@ -48,8 +47,13 @@ object BlogQuery extends App with BaseFormats {
               Some(JObject(JField("blogs", blogs)))
             }
           } ~
+					path("new") {
+            completePage(render(blogNew), "blog-new") {
+              Some(JObject(JField("uuid", CommonUtil.uuid)))
+            }
+          } ~
 					path(Segment) { id =>
-            completePage(renderBlog, "blog") {
+            completePage(render(blog), "blog") {
               collBlog.findOne(MongoDBObject("_id" -> id))
                 .map(o => serialize(o))
             }
