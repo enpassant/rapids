@@ -23,10 +23,6 @@ lazy val web = (project in file("modules/web"))
   .aggregate(webCommon)
   .dependsOn(webCommon)
 
-lazy val websocket = (project in file("modules/websocket"))
-  .aggregate(webCommon)
-  .dependsOn(webCommon)
-
 lazy val blogQueryBuilder = (project in file("modules/blog-query-builder"))
   .dependsOn(common)
 
@@ -53,7 +49,6 @@ lazy val root = (project in file("."))
     webCommon,
     blogCommand,
     web,
-    websocket,
     discussionCommand,
     blogQueryBuilder,
     discussionQueryBuilder,
@@ -65,7 +60,6 @@ lazy val root = (project in file("."))
     webCommon,
     blogCommand,
     web,
-    websocket,
     discussionCommand,
     blogQueryBuilder,
     discussionQueryBuilder,

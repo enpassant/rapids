@@ -10,10 +10,9 @@ object Main extends App {
 	implicit val materializer = ActorMaterializer()
 
 	val routeWeb = WebApp.start
-	val routeWebSocket = WebSocketApp.start
 	val routeBlogQuery = blog.query.BlogQuery.start
 	val routeDiscussionQuery = discussion.query.DiscussionQuery.start
-	val route = routeWeb ~ routeWebSocket ~ routeBlogQuery ~ routeDiscussionQuery
+	val route = routeWeb ~ routeBlogQuery ~ routeDiscussionQuery
 	blog.BlogCommandApp.start(system)
 	discussion.DiscussionCommandApp.start(system)
 	blog.BlogQueryBuilder.start(system)

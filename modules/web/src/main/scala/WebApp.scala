@@ -12,8 +12,12 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.unmarshalling._
 import akka.stream._
 import akka.stream.scaladsl._
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization._
+import scala.concurrent.Future
 
 object WebApp extends App {
 	def start(implicit system: ActorSystem, materializer: ActorMaterializer) = {
@@ -26,6 +30,35 @@ object WebApp extends App {
 				new ProducerRecord[Array[Byte], String](
 					topic, id.getBytes(), value)
 		}
+
+		val consumerSettings = ConsumerSettings(
+			system,
+			new ByteArrayDeserializer,
+			new StringDeserializer
+		)
+			.withBootstrapServers("localhost:9092")
+			.withGroupId("webapp-1")
+			.withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
+
+		val fromOffset = 0L
+		val partition = 0
+		val subscription = Subscriptions.assignmentWithOffset(
+			new TopicPartition("client-commands", partition) -> fromOffset
+		)
+		def process(consumerRecord: ConsumerRecord[Array[Byte], String]) = Future {
+			TextMessage(consumerRecord.toString)
+		}
+
+		def filter(clientId: String)
+			(consumerRecord: ConsumerRecord[Array[Byte], String]) =
+		{
+			new String(consumerRecord.key) == clientId
+		}
+
+		def consumer(clientId: String) =
+			Consumer.plainSource(consumerSettings, subscription)
+				.filter(filter(clientId))
+				.mapAsync(1)(process)
 
 		val route =
 			pathPrefix("commands") {
@@ -46,16 +79,15 @@ object WebApp extends App {
 					}
 				}
 			} ~
-			path("system") {
-				post {
-					entity(as[String]) {
-						case "shutdown" =>
-							system.terminate
+			pathPrefix("updates") {
+				path(Segment) { id =>
+					optionalHeaderValueByType[UpgradeToWebSocket]() {
+						case Some(upgrade) =>
 							complete(
-								HttpEntity(
-									ContentTypes.`text/plain(UTF-8)`,
-									"System shut down"))
-						}
+								upgrade.handleMessagesWithSinkSource(Sink.ignore, consumer(id)))
+						case None =>
+							reject(ExpectedWebSocketRequestRejection)
+					}
 				}
 			} ~
 			path("") {
