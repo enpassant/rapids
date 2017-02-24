@@ -1,61 +1,104 @@
 <!DOCTYPE HTML>
 <html>
     <head>
-
-        <script type="text/javascript">
-            function WebSocketTest()
-            {
-                if ("WebSocket" in window)
-                {
-                    console.log("WebSocket is supported by your Browser!");
-
-                    var clientId = Math.floor(Math.random() * (10 - 1) + 1)
-                        console.log("WebSocket clientId: " + clientId);
-
-                    var self = this;
-
-                    var open = function() {
-                        console.log("Connection is opened...");
-                        self.ws = new WebSocket("ws://localhost:8080/updates/" + clientId);
-
-                        self.ws.onopen = function()
-                        {
-                            // Web Socket is connected, send data using send()
-                            ws.send("Message to send");
-                            console.log("Message is sent...");
-                        };
-
-                        self.ws.onmessage = function (evt)
-                        {
-                            var received_msg = evt.data;
-                            console.log("Message is received:\n" + received_msg);
-                        };
-
-                        self.ws.onclose = function()
-                        {
-                            // websocket is closed.
-                            console.log("Connection is closed...");
-                            open();
-                        };
-                    }
-
-                    open();
-                }
-
-                else
-                {
-                    // The browser doesn't support WebSocket
-                    console.log("WebSocket NOT supported by your Browser!");
-                }
-            }
-        </script>
-
     </head>
     <body>
 
-        <div id="sse">
-            <a href="javascript:WebSocketTest()">Run WebSocket</a>
-        </div>
+        <div id="view"></div>
 
     </body>
+
+        <script type="text/javascript">
+            (function(){
+                function WebSocketTest()
+                {
+                    if ("WebSocket" in window)
+                    {
+                        console.log("WebSocket is supported by your Browser!");
+
+                        var clientId = Math.floor(Math.random() * (10 - 1) + 1)
+                            console.log("WebSocket clientId: " + clientId);
+
+                        var self = this;
+
+                        var open = function() {
+                            console.log("Connection is opened...");
+                            self.ws = new WebSocket("ws://localhost:8080/updates/" + clientId);
+
+                            self.ws.onopen = function()
+                            {
+                                // Web Socket is connected, send data using send()
+                                ws.send("Message to send");
+                                console.log("Message is sent...");
+                            };
+
+                            self.ws.onmessage = function (evt)
+                            {
+                                var received_msg = evt.data;
+                                console.log("Message is received:\n" + received_msg);
+                            };
+
+                            self.ws.onclose = function()
+                            {
+                                // websocket is closed.
+                                console.log("Connection is closed...");
+                                open();
+                            };
+                        }
+
+                        open();
+                    }
+
+                    else
+                    {
+                        // The browser doesn't support WebSocket
+                        console.log("WebSocket NOT supported by your Browser!");
+                    }
+                }
+
+                function ajaxGet(url) {
+                    return new Promise(function(resolve, reject) {
+                        let req = new XMLHttpRequest();
+                        req.open("GET", url);
+                        req.onload = function() {
+                            if (req.status === 200) {
+                                resolve(req.response);
+                            } else {
+                                reject(new Error(req.statusText));
+                            }
+                        };
+
+                        req.onerror = function() {
+                            reject(new Error("Network error"));
+                        };
+
+                        req.send();
+                    });
+                }
+
+                var el = null;
+                function router () {
+                    el = el || document.getElementById('view');
+                    var url = location.hash.slice(1) || '/query/blog';
+
+                    if (el && url) {
+                        ajaxGet(url)
+                            .then(function(data) {
+                                el.innerHTML =
+                                    data.replace(/(\s+href=")\//g, "$1#/");
+                                var pos = url.indexOf("#");
+                                if (pos >= 0) {
+                                    var goal = url.substring(pos + 1);
+                                    document.getElementById(goal)
+                                        .scrollIntoView();
+                                }
+                            });
+                    }
+                }
+                window.addEventListener('hashchange', router);
+                window.addEventListener('load', router);
+                WebSocketTest();
+            })();
+        </script>
+
 </html>
