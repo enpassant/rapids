@@ -30,14 +30,9 @@ object Kafka {
 			.run()
 	}
 
-	def createConsumer(server: String, groupId: String, topic: String)
-		(mapper:
-			CommittableMessage[Array[Byte], String] => Future[CommittableOffset])
+	def createBaseConsumerSource(server: String, groupId: String, topic: String)
 		(implicit system: ActorSystem) =
 	{
-		implicit val materializer = ActorMaterializer()
-		implicit val executionContext = system.dispatcher
-
 		val consumerSettings = ConsumerSettings(
 			system,
 			new ByteArrayDeserializer,
@@ -50,12 +45,39 @@ object Kafka {
 			consumerSettings,
 			Subscriptions.topics(topic)
 		)
+	}
+
+	def createConsumerSource[T](server: String, groupId: String, topic: String)
+		(mapper:
+			CommittableMessage[Array[Byte], String] =>
+        Future[(T, CommittableMessage[Array[Byte], String])])
+		(implicit system: ActorSystem) =
+	{
+		implicit val executionContext = system.dispatcher
+
+    createBaseConsumerSource(server, groupId, topic)
+			.mapAsync(1)(mapper)
+      .mapAsync(1) { msg =>
+        msg._2.committableOffset.commitScaladsl() map {
+          _ => (new String(msg._2.record.key), msg._1)
+        }
+      }
+  }
+
+	def createConsumer(server: String, groupId: String, topic: String)
+		(mapper:
+			CommittableMessage[Array[Byte], String] => Future[CommittableOffset])
+		(implicit system: ActorSystem) =
+	{
+		implicit val materializer = ActorMaterializer()
+
+    createBaseConsumerSource(server, groupId, topic)
 			.mapAsync(1)(mapper)
 			.batch(
 				max = 20,
 				first => CommittableOffsetBatch.empty.updated(first)
 			)((batch, elem) => batch.updated(elem))
 			.mapAsync(3)(_.commitScaladsl())
-			.runWith(Sink.ignore)
+      .runWith(Sink.ignore)
 	}
 }

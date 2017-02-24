@@ -2,6 +2,7 @@ import common._
 
 import akka.actor._
 import akka.kafka._
+import akka.kafka.ConsumerMessage._
 import akka.kafka.scaladsl._
 import akka.persistence._
 import akka.http.scaladsl.Http
@@ -31,34 +32,19 @@ object WebApp extends App {
 					topic, id.getBytes(), value)
 		}
 
-		val consumerSettings = ConsumerSettings(
-			system,
-			new ByteArrayDeserializer,
-			new StringDeserializer
-		)
-			.withBootstrapServers("localhost:9092")
-			.withGroupId("webapp-1")
-			.withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
-
-		val fromOffset = 0L
-		val partition = 0
-		val subscription = Subscriptions.assignmentWithOffset(
-			new TopicPartition("client-commands", partition) -> fromOffset
-		)
-		def process(consumerRecord: ConsumerRecord[Array[Byte], String]) = Future {
-			TextMessage(consumerRecord.toString)
-		}
-
-		def filter(clientId: String)
-			(consumerRecord: ConsumerRecord[Array[Byte], String]) =
+		val consumerSource = Kafka.createConsumerSource(
+			"localhost:9092",
+			"webapp",
+			"client-commands")
 		{
-			new String(consumerRecord.key) == clientId
-		}
+      msg => Future {
+        (TextMessage(msg.record.value), msg)
+      }
+    }.toMat(BroadcastHub.sink(bufferSize = 256))(Keep.right).run()
 
-		def consumer(clientId: String) =
-			Consumer.plainSource(consumerSettings, subscription)
-				.filter(filter(clientId))
-				.mapAsync(1)(process)
+		def consumer(clientId: String) = consumerSource.filter {
+      msg => msg._1 == clientId
+    }.map(_._2)
 
 		val route =
 			pathPrefix("commands") {
@@ -69,10 +55,7 @@ object WebApp extends App {
 								onSuccess(producer.offer(
                   ProducerData(s"$topic-command", id, message))) {
                     reply =>
-                      complete(
-                        HttpEntity(
-                          ContentTypes.`text/html(UTF-8)`,
-                          s"<h1>Blog: $topic-command</h1>"))
+                      complete(s"Succesfully send command to $topic topic")
 								}
 							}
 						}
