@@ -9,129 +9,129 @@
     </body>
 
         <script type="text/javascript">
-            (function(){
-                function WebSocketTest()
+            function WebSocketTest()
+            {
+                if ("WebSocket" in window)
                 {
-                    if ("WebSocket" in window)
-                    {
-                        console.log("WebSocket is supported by your Browser!");
+                    console.log("WebSocket is supported by your Browser!");
 
-                        var clientId = Math.floor(Math.random() * (10 - 1) + 1)
-                            console.log("WebSocket clientId: " + clientId);
+                    var clientId = Math.floor(Math.random() * (10 - 1) + 1)
+                        console.log("WebSocket clientId: " + clientId);
 
-                        var self = this;
+                    var self = this;
 
-                        var open = function() {
-                            console.log("Connection is opened...");
-                            self.ws = new WebSocket("ws://localhost:8080/updates/" + clientId);
+                    var open = function() {
+                        console.log("Connection is opened...");
+                        self.ws = new WebSocket("ws://localhost:8080/updates/" + clientId);
 
-                            self.ws.onopen = function()
-                            {
-                                // Web Socket is connected, send data using send()
-                                ws.send("Message to send");
-                                console.log("Message is sent...");
-                            };
+                        self.ws.onopen = function()
+                        {
+                            // Web Socket is connected, send data using send()
+                            ws.send("Message to send");
+                            console.log("Message is sent...");
+                        };
 
-                            self.ws.onmessage = function (evt)
-                            {
-                                var received_msg = evt.data;
-                                console.log("Message is received:\n" + received_msg);
-                            };
+                        self.ws.onmessage = function (evt)
+                        {
+                            var received_msg = evt.data;
+                            console.log("Message is received:\n" + received_msg);
+                        };
 
-                            self.ws.onclose = function()
-                            {
-                                // websocket is closed.
-                                console.log("Connection is closed...");
-                                open();
-                            };
+                        self.ws.onclose = function()
+                        {
+                            // websocket is closed.
+                            console.log("Connection is closed...");
+                            open();
+                        };
+                    }
+
+                    open();
+                }
+
+                else
+                {
+                    // The browser doesn't support WebSocket
+                    console.log("WebSocket NOT supported by your Browser!");
+                }
+            }
+
+            function ajaxGet(url) {
+                return new Promise(function(resolve, reject) {
+                    let req = new XMLHttpRequest();
+                    req.open("GET", url);
+                    req.onload = function() {
+                        if (req.status === 200) {
+                            resolve(req.response);
+                        } else {
+                            reject(new Error(req.statusText));
                         }
+                    };
 
-                        open();
-                    }
+                    req.onerror = function() {
+                        reject(new Error("Network error"));
+                    };
 
-                    else
-                    {
-                        // The browser doesn't support WebSocket
-                        console.log("WebSocket NOT supported by your Browser!");
-                    }
+                    req.send();
+                });
+            }
+
+            function ajaxPost(url, data) {
+                return new Promise(function(resolve, reject) {
+                    let req = new XMLHttpRequest();
+                    req.open("POST", url);
+                    req.setRequestHeader("Content-type", "application/json");
+                    req.onload = function() {
+                        if (req.status === 200) {
+                            resolve(req.response);
+                        } else {
+                            reject(new Error(req.statusText));
+                        }
+                    };
+
+                    req.onerror = function() {
+                        reject(new Error("Network error"));
+                    };
+
+                    req.send(JSON.stringify(data));
+                });
+            }
+
+            function addScripts(el) {
+                var scripts = el.getElementsByTagName("script");
+                var form = el.firstElementChild;
+                for (i = 0; i < scripts.length; i++) {
+                    var evalFn = function() {
+                        return eval(scripts[i].innerHTML);
+                    };
+                    evalFn.call(form);
                 }
+            }
 
-                function ajaxGet(url) {
-                    return new Promise(function(resolve, reject) {
-                        let req = new XMLHttpRequest();
-                        req.open("GET", url);
-                        req.onload = function() {
-                            if (req.status === 200) {
-                                resolve(req.response);
-                            } else {
-                                reject(new Error(req.statusText));
+            var el = null;
+            function router () {
+                el = el || byId('view');
+                var url = location.hash.slice(1) || '/query/blog';
+
+                if (el && url) {
+                    ajaxGet(url)
+                        .then(function(data) {
+                            el.innerHTML =
+                                data.replace(/(\s+href=")\//g, "$1#/");
+                            addScripts(el);
+                            var pos = url.indexOf("#");
+                            if (pos >= 0) {
+                                var goal = url.substring(pos + 1);
+                                byId(goal).scrollIntoView();
                             }
-                        };
-
-                        req.onerror = function() {
-                            reject(new Error("Network error"));
-                        };
-
-                        req.send();
-                    });
+                        });
                 }
+            }
 
-                function ajaxPost(url, data) {
-                    return new Promise(function(resolve, reject) {
-                        let req = new XMLHttpRequest();
-                        req.open("POST", url);
-                        req.setRequestHeader("Content-type", "application/json");
-                        req.onload = function() {
-                            if (req.status === 200) {
-                                resolve(req.response);
-                            } else {
-                                reject(new Error(req.statusText));
-                            }
-                        };
+            function byId(id) {
+                return document.getElementById(id);
+            }
 
-                        req.onerror = function() {
-                            reject(new Error("Network error"));
-                        };
-
-                        req.send(JSON.stringify(data));
-                    });
-                }
-
-                function addScripts(el) {
-                    var scripts = el.getElementsByTagName("script");
-                    var form = el.firstElementChild;
-                    for (i = 0; i < scripts.length; i++) {
-                        var evalFn = function() {
-                            return eval(scripts[i].innerHTML);
-                        };
-                        evalFn.call(form);
-                    }
-                }
-
-                var el = null;
-                function router () {
-                    el = el || byId('view');
-                    var url = location.hash.slice(1) || '/query/blog';
-
-                    if (el && url) {
-                        ajaxGet(url)
-                            .then(function(data) {
-                                el.innerHTML =
-                                    data.replace(/(\s+href=")\//g, "$1#/");
-                                addScripts(el);
-                                var pos = url.indexOf("#");
-                                if (pos >= 0) {
-                                    var goal = url.substring(pos + 1);
-                                    byId(goal).scrollIntoView();
-                                }
-                            });
-                    }
-                }
-
-                function byId(id) {
-                    return document.getElementById(id);
-                }
-
+            (function(){
                 window.addEventListener('hashchange', router);
                 window.addEventListener('load', router);
                 WebSocketTest();
