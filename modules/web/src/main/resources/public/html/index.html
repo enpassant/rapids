@@ -110,7 +110,7 @@
 
                 var el = null;
                 function router () {
-                    el = el || document.getElementById('view');
+                    el = el || byId('view');
                     var url = location.hash.slice(1) || '/query/blog';
 
                     if (el && url) {
@@ -122,12 +122,16 @@
                                 var pos = url.indexOf("#");
                                 if (pos >= 0) {
                                     var goal = url.substring(pos + 1);
-                                    document.getElementById(goal)
-                                        .scrollIntoView();
+                                    byId(goal).scrollIntoView();
                                 }
                             });
                     }
                 }
+
+                function byId(id) {
+                    return document.getElementById(id);
+                }
+
                 window.addEventListener('hashchange', router);
                 window.addEventListener('load', router);
                 WebSocketTest();

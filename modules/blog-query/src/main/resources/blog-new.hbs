@@ -13,14 +13,14 @@ Mindjárt több sorral.
     </div>
     <div>
         <input type="button" value="Létrehoz"
-            onClick="document.getElementById('createBlog').createBlog();"/>
+            onClick="byId('createBlog').createBlog();"/>
     </div>
 </form>
 
 <script type="text/javascript">
     this.createBlog = function() {
-        var title = document.getElementById("title").value;
-        var content = document.getElementById("content").value;
+        var title = byId("title").value;
+        var content = byId("content").value;
         var data = {
             "_t": "CreateBlog",
             "title": title,
