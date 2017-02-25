@@ -8,7 +8,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.stream._
-import com.github.jknack.handlebars.{ Context, Handlebars }
+import com.github.jknack.handlebars.{ Context, Handlebars, Template }
 import com.mongodb.casbah.Imports._
 import com.typesafe.config.ConfigFactory
 import fixiegrips.{ Json4sHelpers, Json4sResolver }
@@ -29,20 +29,31 @@ object DiscussionQuery extends App with BaseFormats {
     handlebars.setInfiniteLoops(true)
     def ctx(obj: Object) =
       Context.newBuilder(obj).resolver(Json4sResolver).build
+    val render = (template: Template) => (obj: Object) => template(ctx(obj))
 
     val comment = handlebars.compile("comment")
+    val commentNew = handlebars.compile("comment-new")
     val discussion = handlebars.compile("discussion")
-    val renderDiscussion = (obj: Object) => discussion(ctx(obj))
 
 		val route =
 			pathPrefix("query") {
 				pathPrefix("discussion") {
-					path(Segment) { id =>
-            completePage(renderDiscussion, "discussion") {
-              collDiscussion.findOne(MongoDBObject("_id" -> id))
-                .map(o => serialize(o))
+					pathPrefix(Segment) { id =>
+            path("new") {
+              completePage(render(commentNew), "comment-new") {
+                Some(JObject(
+                  JField("_id", id),
+                  JField("uuid", CommonUtil.uuid)
+                ))
+              }
+            } ~
+            pathEnd {
+              completePage(render(discussion), "discussion") {
+                collDiscussion.findOne(MongoDBObject("_id" -> id))
+                  .map(o => serialize(o))
+              }
             }
-					}
+          }
 				}
 			}
 
