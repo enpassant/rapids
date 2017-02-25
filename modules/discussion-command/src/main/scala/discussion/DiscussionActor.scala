@@ -36,13 +36,13 @@ class DiscussionActor(val id: String) extends Actor with PersistentActor {
   def updateState(event: DiscussionEvent): Unit = event match {
     case DiscussionStarted(id, blogId, title) =>
       state = Some(Discussion(id, blogId, title))
-    case CommentAdded(id, title, content, index) =>
+    case CommentAdded(id, content, index) =>
       state = state map { discussion =>
         discussion.copy(
           childCount = discussion.childCount + 1,
           comments = discussion.comments + (id -> CommentIndex(List(index), 0)))
       }
-    case CommentReplied(id, parentId, title, content, path) =>
+    case CommentReplied(id, parentId, content, path) =>
       state = state map { discussion =>
         val parentComment = discussion.comments(parentId)
         val childCount = parentComment.childCount
@@ -68,21 +68,21 @@ class DiscussionActor(val id: String) extends Actor with PersistentActor {
 					sender ! event
 					updateState(event)
 			}
-    case AddComment(id, title, content) if state.isDefined &&
+    case AddComment(id, content) if state.isDefined &&
         !state.get.comments.contains(id) =>
       val index = state.get.childCount
-			val event = CommentAdded(id, title, content, index)
+			val event = CommentAdded(id, content, index)
       persistAsync(event) {
 				event =>
 					sender ! event
 					updateState(event)
 			}
-    case ReplyComment(id, parentId, title, content) if state.isDefined &&
+    case ReplyComment(id, parentId, content) if state.isDefined &&
         state.get.comments.contains(parentId) &&
         !state.get.comments.contains(id) =>
       val parentComment = state.get.comments(parentId)
       val path = (parentComment.childCount) :: parentComment.path
-			val event = CommentReplied(id, parentId, title, content, path)
+			val event = CommentReplied(id, parentId, content, path)
       persistAsync(event) {
 				event =>
 					sender ! event

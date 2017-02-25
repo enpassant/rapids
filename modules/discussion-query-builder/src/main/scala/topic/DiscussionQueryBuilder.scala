@@ -44,18 +44,17 @@ object DiscussionQueryBuilder extends App {
                     "comments" -> List()
                 ))
               }
-            case CommentAdded(id, title, content, index) =>
+            case CommentAdded(id, content, index) =>
               Try {
                 collDiscussion.update(
                   MongoDBObject("_id" -> key),
                   $push("comments" -> MongoDBObject(
                     "commentId" -> id,
-                    "title" -> title,
                     "content" -> content,
                     "comments" -> List()
                 )))
               }
-            case CommentReplied(id, parentId, title, content, path) =>
+            case CommentReplied(id, parentId, content, path) =>
               Try {
                 val pos = path.tail.foldLeft("comments") {
                   (p, i) => s"comments.$i.$p"
@@ -64,7 +63,6 @@ object DiscussionQueryBuilder extends App {
                   MongoDBObject("_id" -> key),
                   $push(pos -> MongoDBObject(
                     "commentId" -> id,
-                    "title" -> title,
                     "content" -> content,
                     "comments" -> List()
                 )))

@@ -35,14 +35,12 @@ case class StartDiscussion(
 
 case class AddComment(
 	id: String,
-	title: String,
   content: String
 )	extends DiscussionCommand
 
 case class ReplyComment(
 	id: String,
 	parentId: String,
-	title: String,
   content: String
 )	extends DiscussionCommand
 
@@ -58,7 +56,6 @@ case class DiscussionStarted(
 
 case class CommentAdded(
 	id: String,
-	title: String,
   content: String,
   index: Int
 )	extends DiscussionEvent
@@ -66,7 +63,6 @@ case class CommentAdded(
 case class CommentReplied(
 	id: String,
 	parentId: String,
-	title: String,
   content: String,
   path: List[Int]
 )	extends DiscussionEvent
@@ -75,7 +71,6 @@ case class CommentIndex(path: List[Int], childCount: Int)
 
 case class Comment(
   id: String,
-  title: String,
   content: String
 )
 case class Discussion(
