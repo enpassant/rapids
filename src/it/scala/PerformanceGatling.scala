@@ -46,12 +46,12 @@ class PerformanceGatling extends Simulation {
 
     val addComment = http("AddComment")
       .post(s"/commands/discussion/disc-$${blogId}")
-      .body(StringBody(s"""{"_t":"AddComment", "id": "$${blogId}-$${commentId}", "title": "Megjegyzés $${commentId}", "content": "$${commentId}. megjegyzés"}"""))
+      .body(StringBody(s"""{"_t":"AddComment", "id": "$${blogId}-$${commentId}", "content": "$${commentId}. megjegyzés"}"""))
       .check(status.is(session => 200))
 
     val replyComment = http("ReplyComment")
       .post(s"/commands/discussion/disc-$${blogId}")
-      .body(StringBody(s"""{"_t":"ReplyComment", "id": "$${blogId}-$${commentId}-$${replyId}", "parentId": "$${blogId}-$${commentId}", "title": "Válasz $${replyId}", "content": "$${replyId}. válasz"}"""))
+      .body(StringBody(s"""{"_t":"ReplyComment", "id": "$${blogId}-$${commentId}-$${replyId}", "parentId": "$${blogId}-$${commentId}", "content": "$${replyId}. válasz"}"""))
       .check(status.is(session => 200))
   }
 }

@@ -36,13 +36,13 @@ class SimpleGatling extends Simulation {
 
     def addComment(blogId: String, commentId: String) = http("AddComment")
       .post(s"/commands/discussion/disc-${blogId}")
-      .body(StringBody(s"""{"_t":"AddComment", "id": "${commentId}", "title": "Megjegyzés ${commentId}", "content": "${commentId}. megjegyzés"}"""))
+      .body(StringBody(s"""{"_t":"AddComment", "id": "${commentId}", "content": "${commentId}. megjegyzés"}"""))
       .check(status.is(session => 200))
 
     def replyComment(blogId: String, commentId: String, replyId: String) = {
       http("ReplyComment")
       .post(s"/commands/discussion/disc-${blogId}")
-      .body(StringBody(s"""{"_t":"ReplyComment", "id": "${replyId}", "parentId": "${commentId}", "title": "Válasz ${replyId}", "content": "${replyId}. válasz"}"""))
+      .body(StringBody(s"""{"_t":"ReplyComment", "id": "${replyId}", "parentId": "${commentId}", "content": "${replyId}. válasz"}"""))
       .check(status.is(session => 200))
     }
   }
