@@ -89,7 +89,7 @@ object WebApp extends App {
 	implicit val system = ActorSystem("WebApp")
 	implicit val materializer = ActorMaterializer()
 	val route = start
-	val bindingFuture = Http().bindAndHandle(route, "localhost", 8081)
+	val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8081)
 
 	scala.io.StdIn.readLine()
 	system.terminate

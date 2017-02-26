@@ -77,7 +77,7 @@ object DiscussionQuery extends App with BaseFormats {
 	implicit val system = ActorSystem("DiscussionQuery")
 	implicit val materializer = ActorMaterializer()
 	val route = start
-	val bindingFuture = Http().bindAndHandle(route, "localhost", 8083)
+	val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8083)
 
 	scala.io.StdIn.readLine()
 	system.terminate

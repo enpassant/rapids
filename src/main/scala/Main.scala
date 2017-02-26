@@ -18,7 +18,7 @@ object Main extends App {
 	blog.BlogQueryBuilder.start(system)
 	discussion.DiscussionQueryBuilder.start(system)
 
-	val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
+	val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8080)
 
 	scala.io.StdIn.readLine()
 	system.terminate
