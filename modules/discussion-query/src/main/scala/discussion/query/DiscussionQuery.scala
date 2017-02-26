@@ -33,6 +33,7 @@ object DiscussionQuery extends App with BaseFormats {
 
     val comment = handlebars.compile("comment")
     val commentNew = handlebars.compile("comment-new")
+    val commentReply = handlebars.compile("comment-reply")
     val discussion = handlebars.compile("discussion")
 
 		val route =
@@ -45,6 +46,19 @@ object DiscussionQuery extends App with BaseFormats {
                   JField("_id", id),
                   JField("uuid", CommonUtil.uuid)
                 ))
+              }
+            } ~
+            pathPrefix("comment") {
+              pathPrefix(Segment) { commentId =>
+                path("new") {
+                  completePage(render(commentReply), "comment-reply") {
+                    Some(JObject(
+                      JField("_id", id),
+                      JField("commentId", commentId),
+                      JField("uuid", CommonUtil.uuid)
+                    ))
+                  }
+                }
               }
             } ~
             pathEnd {
