@@ -163,7 +163,7 @@
             var el = null;
             function router () {
                 el = el || byId('view');
-                var url = location.hash.slice(1) || '/query/blog';
+                var url = location.hash.slice(1) || '/blog';
 
                 if (el && url) {
                     ajaxGet(url)

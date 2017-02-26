@@ -35,31 +35,29 @@ object BlogQuery extends App with BaseFormats {
     val blogNew = handlebars.compile("blog-new")
 
 		val route =
-			pathPrefix("query") {
-				pathPrefix("blog") {
-          pathEnd {
-            completePage(render(blogs), "blogs") {
-              val blogs = collBlog.find(
-                MongoDBObject(),
-                MongoDBObject("content" -> 0)
-              )
-                .map(o => serialize(o)).toList
-              Some(JObject(JField("blogs", blogs)))
-            }
-          } ~
-					path("new") {
-            completePage(render(blogNew), "blog-new") {
-              Some(JObject(JField("uuid", CommonUtil.uuid)))
-            }
-          } ~
-					path(Segment) { id =>
-            completePage(render(blog), "blog") {
-              collBlog.findOne(MongoDBObject("_id" -> id))
-                .map(o => serialize(o))
-            }
-					}
-				}
-			}
+      pathPrefix("blog") {
+        pathEnd {
+          completePage(render(blogs), "blogs") {
+            val blogs = collBlog.find(
+              MongoDBObject(),
+              MongoDBObject("content" -> 0)
+            )
+              .map(o => serialize(o)).toList
+            Some(JObject(JField("blogs", blogs)))
+          }
+        } ~
+        path("new") {
+          completePage(render(blogNew), "blog-new") {
+            Some(JObject(JField("uuid", CommonUtil.uuid)))
+          }
+        } ~
+        path(Segment) { id =>
+          completePage(render(blog), "blog") {
+            collBlog.findOne(MongoDBObject("_id" -> id))
+              .map(o => serialize(o))
+          }
+        }
+      }
 
 		route
 	}

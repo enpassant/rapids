@@ -37,39 +37,37 @@ object DiscussionQuery extends App with BaseFormats {
     val discussion = handlebars.compile("discussion")
 
 		val route =
-			pathPrefix("query") {
-				pathPrefix("discussion") {
-					pathPrefix(Segment) { id =>
-            path("new") {
-              completePage(render(commentNew), "comment-new") {
-                Some(JObject(
-                  JField("_id", id),
-                  JField("uuid", CommonUtil.uuid)
-                ))
-              }
-            } ~
-            pathPrefix("comment") {
-              pathPrefix(Segment) { commentId =>
-                path("new") {
-                  completePage(render(commentReply), "comment-reply") {
-                    Some(JObject(
-                      JField("_id", id),
-                      JField("commentId", commentId),
-                      JField("uuid", CommonUtil.uuid)
-                    ))
-                  }
+      pathPrefix("discussion") {
+        pathPrefix(Segment) { id =>
+          path("new") {
+            completePage(render(commentNew), "comment-new") {
+              Some(JObject(
+                JField("_id", id),
+                JField("uuid", CommonUtil.uuid)
+              ))
+            }
+          } ~
+          pathPrefix("comment") {
+            pathPrefix(Segment) { commentId =>
+              path("new") {
+                completePage(render(commentReply), "comment-reply") {
+                  Some(JObject(
+                    JField("_id", id),
+                    JField("commentId", commentId),
+                    JField("uuid", CommonUtil.uuid)
+                  ))
                 }
               }
-            } ~
-            pathEnd {
-              completePage(render(discussion), "discussion") {
-                collDiscussion.findOne(MongoDBObject("_id" -> id))
-                  .map(o => serialize(o))
-              }
+            }
+          } ~
+          pathEnd {
+            completePage(render(discussion), "discussion") {
+              collDiscussion.findOne(MongoDBObject("_id" -> id))
+                .map(o => serialize(o))
             }
           }
-				}
-			}
+        }
+      }
 
 		route
 	}

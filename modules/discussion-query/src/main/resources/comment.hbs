@@ -4,11 +4,11 @@
         <div>
             {{content}}
             <div>
-                <a href="/query/discussion/{{_id}}#{{this.commentId}}">permalink</a>
+                <a href="/discussion/{{_id}}#{{this.commentId}}">permalink</a>
                 {{#if ../commentId}}
-                <a href="/query/discussion/{{_id}}#{{../commentId}}">szülő</a>
+                <a href="/discussion/{{_id}}#{{../commentId}}">szülő</a>
                 {{/if}}
-                <a href="/query/discussion/{{_id}}/comment/{{this.commentId}}/new">Válasz</a>
+                <a href="/discussion/{{_id}}/comment/{{this.commentId}}/new">Válasz</a>
             </div>
         </div>
     </div>
