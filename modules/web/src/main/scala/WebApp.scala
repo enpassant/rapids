@@ -32,7 +32,7 @@ object WebApp extends App {
 					topic, id.getBytes(), value)
 		}
 
-		val consumerSource = Kafka.createConsumerSource(
+		lazy val consumerSource = Kafka.createConsumerSource(
 			"localhost:9092",
 			"webapp",
 			"client-commands")
