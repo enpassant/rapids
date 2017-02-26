@@ -4,13 +4,45 @@
     </head>
     <body>
 
+        <div class="logo">
+            Logo
+        </div>
+        <div class="login">
+            Login
+        </div>
         <div id="view"></div>
 
     </body>
         <style>
+            body {
+                margin: 0px;
+                padding: 0px;
+                display: flex;
+                flex-flow: row wrap;
+            }
+
             textarea {
               width: 400px;
               height: 250px;
+            }
+
+            .logo, .login, #view {
+                flex: 1 100%;
+            }
+
+            @media all and (min-width: 600px) {
+              .logo { flex: 8 auto; }
+              .login { flex: 1 auto; }
+            }
+
+            .logo {
+                background: #d8d8ff;
+                padding: 8px;
+            }
+
+            .login {
+                background: #6060ff;
+                padding: 8px;
             }
         </style>
 
