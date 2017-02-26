@@ -10,6 +10,9 @@
         <div class="login">
             Login
         </div>
+        <div id="messages">
+            Messages
+        </div>
         <div id="view"></div>
 
     </body>
@@ -26,23 +29,28 @@
               height: 250px;
             }
 
-            .logo, .login, #view {
+            .logo, .login, #messages, #view {
                 flex: 1 100%;
             }
 
             @media all and (min-width: 600px) {
-              .logo { flex: 8 auto; }
-              .login { flex: 1 auto; }
+              .logo { flex: 1 80%; }
+              .login { flex: 1 20%; }
+            }
+
+            @media all and (min-width: 900px) {
+              .logo { flex: 1 80%; order: 1; }
+              .login { flex: 1 20%; order: 2; }
+              #view { flex: 2 80%; order: 3; }
+              #messages { flex: 1 20%; order: 4; }
             }
 
             .logo {
                 background: #d8d8ff;
-                padding: 8px;
             }
 
             .login {
                 background: #6060ff;
-                padding: 8px;
             }
         </style>
 
@@ -62,22 +70,25 @@
                         console.log("Connection is opened...");
                         self.ws = new WebSocket("ws://localhost:8080/updates/" + clientId);
 
+                        /*
                         self.ws.onopen = function()
                         {
-                            // Web Socket is connected, send data using send()
                             ws.send("Message to send");
                             console.log("Message is sent...");
                         };
+                        */
 
                         self.ws.onmessage = function (evt)
                         {
-                            var received_msg = evt.data;
-                            console.log("Message is received:\n" + received_msg);
+                            var msg = evt.data;
+                            var textnode = document.createTextNode(msg);
+                            byId("messages").appendChild(textnode);
+                            var br = document.createElement("br");
+                            byId("messages").appendChild(br);
                         };
 
                         self.ws.onclose = function()
                         {
-                            // websocket is closed.
                             console.log("Connection is closed...");
                             open();
                         };
