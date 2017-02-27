@@ -12,7 +12,18 @@
             Logo
         </div>
         <div class="login">
-            Login
+            <a href="#" onClick="toggleLogin()">Login</a>
+            <form id="login-data">
+                <div>
+                    <label for="login">Felhasználó</label>
+                    <input id="user"/>
+                </div>
+                <div>
+                    <label for="password">Jelszó</label>
+                    <input id="password" type="password"/>
+                </div>
+                <input id="bt-login" value="Belépés" type="button"/>
+            </form>
         </div>
         <div id="messages">
             Messages
@@ -43,10 +54,10 @@
             }
 
             @media all and (min-width: 900px) {
-              .logo { flex: 1 80%; order: 1; }
-              .login { flex: 1 20%; order: 2; }
-              #view { flex: 2 80%; order: 3; }
-              #messages { flex: 1 20%; order: 4; }
+              .logo { flex: 1 70%; order: 1; }
+              .login { flex: 1 30%; order: 2; }
+              #view { flex: 2 70%; order: 3; }
+              #messages { flex: 1 30%; order: 4; }
             }
 
             .logo {
@@ -55,6 +66,30 @@
 
             .login {
                 background: #6060ff;
+            }
+
+            #login-data {
+                display: none;
+                background: #ffffff;
+                border: 1px solid #808080;
+            }
+
+            .login > a {
+                width: 100%;
+                cursor: pointer;
+            }
+
+            .login > * {
+                text-align: center;
+                width: 100%;
+            }
+
+            #login-data > div > label {
+                flex: 1 100%;
+                display: block;
+                text-align: center;
+                font-weight: 700;
+                font-size: 12px;
             }
         </style>
 
@@ -184,10 +219,21 @@
                 return document.getElementById(id);
             }
 
+            function isHidden(el) {
+                var style = window.getComputedStyle(el);
+                return (style.display === 'none')
+            }
+
+            function toggleLogin() {
+                const loginData = byId("login-data");
+                if (isHidden(loginData)) loginData.style.display = "block";
+                else loginData.style.display = "none";
+            }
+
             (function(){
                 window.addEventListener('hashchange', router);
                 window.addEventListener('load', router);
-                WebSocketTest();
+                <!--WebSocketTest();-->
             })();
         </script>
 
