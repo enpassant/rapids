@@ -30,7 +30,7 @@ object Kafka {
 			.run()
 	}
 
-	def createBaseConsumerSource(server: String, groupId: String, topic: String)
+	def createBaseConsumerSource(server: String, groupId: String, topic: String*)
 		(implicit system: ActorSystem) =
 	{
 		val consumerSettings = ConsumerSettings(
@@ -43,11 +43,11 @@ object Kafka {
 
 		Consumer.committableSource(
 			consumerSettings,
-			Subscriptions.topics(topic)
+			Subscriptions.topics(topic :_*)
 		)
 	}
 
-	def createConsumerSource[T](server: String, groupId: String, topic: String)
+	def createConsumerSource[T](server: String, groupId: String, topic: String*)
 		(mapper:
 			CommittableMessage[Array[Byte], String] =>
         Future[(T, CommittableMessage[Array[Byte], String])])
@@ -55,7 +55,7 @@ object Kafka {
 	{
 		implicit val executionContext = system.dispatcher
 
-    createBaseConsumerSource(server, groupId, topic)
+    createBaseConsumerSource(server, groupId, topic :_*)
 			.mapAsync(1)(mapper)
       .mapAsync(1) { msg =>
         msg._2.committableOffset.commitScaladsl() map {
@@ -64,14 +64,14 @@ object Kafka {
       }
   }
 
-	def createConsumer(server: String, groupId: String, topic: String)
+	def createConsumer(server: String, groupId: String, topic: String*)
 		(mapper:
 			CommittableMessage[Array[Byte], String] => Future[CommittableOffset])
 		(implicit system: ActorSystem) =
 	{
 		implicit val materializer = ActorMaterializer()
 
-    createBaseConsumerSource(server, groupId, topic)
+    createBaseConsumerSource(server, groupId, topic :_*)
 			.mapAsync(1)(mapper)
 			.batch(
 				max = 20,
