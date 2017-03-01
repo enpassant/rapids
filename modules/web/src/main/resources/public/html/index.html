@@ -13,7 +13,7 @@
         </div>
         <div class="login">
             <a href="#" onClick="toggleLogin()">Login</a>
-            <form id="login-data">
+            <div id="login-data">
                 <div>
                     <label for="login">Felhasználó</label>
                     <input id="user"/>
@@ -22,8 +22,9 @@
                     <label for="password">Jelszó</label>
                     <input id="password" type="password"/>
                 </div>
-                <input id="bt-login" value="Belépés" type="button"/>
-            </form>
+                <input id="bt-login" value="Belépés" type="button"
+                    onClick="btLogin()"/>
+            </div>
         </div>
         <div id="messages">
             Messages
@@ -222,6 +223,20 @@
             function isHidden(el) {
                 var style = window.getComputedStyle(el);
                 return (style.display === 'none')
+            }
+
+            function btLogin() {
+                const user = byId("user").value;
+                const password = byId("password").value;
+                var data = {
+                    "_t": "Login",
+                    "user": user,
+                    "password": password
+                };
+                ajaxPost("/commands/auth/0", data)
+                    .then(function(reply) {
+                        toggleLogin();
+                    });
             }
 
             function toggleLogin() {
