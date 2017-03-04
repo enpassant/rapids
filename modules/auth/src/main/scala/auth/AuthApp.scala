@@ -6,8 +6,9 @@ import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
 import org.apache.kafka.clients.producer.ProducerRecord
+import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.util.{Failure, Success}
+import scala.util.{Try, Success, Failure}
 
 object AuthApp extends App {
 	def start(implicit system: ActorSystem) = {
@@ -32,7 +33,13 @@ object AuthApp extends App {
 			val consumerRecord = msg.record
 			implicit val timeout = Timeout(3000.milliseconds)
 			val key = new String(consumerRecord.key)
-			val result = service ? common.ConsumerData(key, consumerRecord.value)
+			val jsonTry = Try(new AuthSerializer().fromString(consumerRecord.value))
+			val result = jsonTry match {
+				case Success(command) =>
+          service ? command
+				case Failure(e) =>
+					Future(WrongMessage(consumerRecord.value))
+			}
 			result collect {
 				case event: AuthEvent =>
 					producer.offer(ProducerData("auth-event", key, event))

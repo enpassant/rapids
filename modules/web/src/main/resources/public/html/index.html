@@ -95,160 +95,171 @@
         </style>
 
         <script type="text/javascript">
-            function WebSocketTest()
-            {
-                if ("WebSocket" in window)
+            (function() {
+                var clientId = Math.floor(Math.random() * (10 - 1) + 1)
+                console.log("WebSocket clientId: " + clientId);
+
+                var token = undefined;
+
+                function WebSocketTest()
                 {
-                    console.log("WebSocket is supported by your Browser!");
+                    if ("WebSocket" in window)
+                    {
+                        console.log("WebSocket is supported by your Browser!");
 
-                    var clientId = Math.floor(Math.random() * (10 - 1) + 1)
-                        console.log("WebSocket clientId: " + clientId);
+                        var self = this;
 
-                    var self = this;
+                        var open = function() {
+                            console.log("Connection is opened...");
+                            self.ws = new WebSocket("ws://localhost:8080/updates/"
+                                + clientId);
 
-                    var open = function() {
-                        console.log("Connection is opened...");
-                        self.ws = new WebSocket("ws://localhost:8080/updates/" + clientId);
+                            /*
+                            self.ws.onopen = function()
+                            {
+                                ws.send("Message to send");
+                                console.log("Message is sent...");
+                            };
+                            */
 
-                        /*
-                        self.ws.onopen = function()
-                        {
-                            ws.send("Message to send");
-                            console.log("Message is sent...");
-                        };
-                        */
+                            self.ws.onmessage = function (evt)
+                            {
+                                var msg = JSON.parse(evt.data).value;
+                                console.log(msg);
+                                if (msg._t === "LoggedIn") {
+                                    token = msg.userId + "." + msg.validTo +
+                                        "." + msg.token;
+                                    console.log("Token: " + token);
+                                    msg = msg.userId + " has logged in";
+                                }
+                                var br = document.createElement("br");
+                                byId("messages").appendChild(br);
+                                var textnode = document.createTextNode(msg);
+                                byId("messages").appendChild(textnode);
+                            };
 
-                        self.ws.onmessage = function (evt)
-                        {
-                            var msg = evt.data;
-                            var textnode = document.createTextNode(msg);
-                            byId("messages").appendChild(textnode);
-                            var br = document.createElement("br");
-                            byId("messages").appendChild(br);
-                        };
+                            self.ws.onclose = function()
+                            {
+                                console.log("Connection is closed...");
+                                open();
+                            };
+                        }
 
-                        self.ws.onclose = function()
-                        {
-                            console.log("Connection is closed...");
-                            open();
-                        };
+                        open();
                     }
 
-                    open();
+                    else
+                    {
+                        // The browser doesn't support WebSocket
+                        console.log("WebSocket NOT supported by your Browser!");
+                    }
                 }
 
-                else
-                {
-                    // The browser doesn't support WebSocket
-                    console.log("WebSocket NOT supported by your Browser!");
-                }
-            }
-
-            function ajaxGet(url) {
-                return new Promise(function(resolve, reject) {
-                    let req = new XMLHttpRequest();
-                    req.open("GET", url);
-                    req.onload = function() {
-                        if (req.status === 200) {
-                            resolve(req.response);
-                        } else {
-                            reject(new Error(req.statusText));
-                        }
-                    };
-
-                    req.onerror = function() {
-                        reject(new Error("Network error"));
-                    };
-
-                    req.send();
-                });
-            }
-
-            function ajaxPost(url, data) {
-                return new Promise(function(resolve, reject) {
-                    let req = new XMLHttpRequest();
-                    req.open("POST", url);
-                    req.setRequestHeader("Content-type", "application/json");
-                    req.onload = function() {
-                        if (req.status === 200) {
-                            resolve(req.response);
-                        } else {
-                            reject(new Error(req.statusText));
-                        }
-                    };
-
-                    req.onerror = function() {
-                        reject(new Error("Network error"));
-                    };
-
-                    req.send(JSON.stringify(data));
-                });
-            }
-
-            function addScripts(el) {
-                var scripts = el.getElementsByTagName("script");
-                var form = el.firstElementChild;
-                for (i = 0; i < scripts.length; i++) {
-                    var evalFn = function() {
-                        return eval(scripts[i].innerHTML);
-                    };
-                    evalFn.call(form);
-                }
-            }
-
-            var el = null;
-            function router () {
-                el = el || byId('view');
-                var url = location.hash.slice(1) || '/blog';
-
-                if (el && url) {
-                    ajaxGet(url)
-                        .then(function(data) {
-                            el.innerHTML =
-                                data.replace(/(\s+href=")\//g, "$1#/");
-                            addScripts(el);
-                            var pos = url.indexOf("#");
-                            if (pos >= 0) {
-                                var goal = url.substring(pos + 1);
-                                byId(goal).scrollIntoView();
+                window.ajaxGet = function(url) {
+                    return new Promise(function(resolve, reject) {
+                        let req = new XMLHttpRequest();
+                        req.open("GET", url);
+                        req.onload = function() {
+                            if (req.status === 200) {
+                                resolve(req.response);
+                            } else {
+                                reject(new Error(req.statusText));
                             }
+                        };
+
+                        req.onerror = function() {
+                            reject(new Error("Network error"));
+                        };
+
+                        req.send();
+                    });
+                }
+
+                window.ajaxPost = function(url, data) {
+                    return new Promise(function(resolve, reject) {
+                        let req = new XMLHttpRequest();
+                        req.open("POST", url);
+                        req.setRequestHeader("Content-type", "application/json");
+                        req.setRequestHeader("Authorization", token);
+                        req.onload = function() {
+                            if (req.status === 200) {
+                                resolve(req.response);
+                            } else {
+                                reject(new Error(req.statusText));
+                            }
+                        };
+
+                        req.onerror = function() {
+                            reject(new Error("Network error"));
+                        };
+
+                        req.send(JSON.stringify(data));
+                    });
+                }
+
+                function addScripts(el) {
+                    var scripts = el.getElementsByTagName("script");
+                    var form = el.firstElementChild;
+                    for (i = 0; i < scripts.length; i++) {
+                        var evalFn = function() {
+                            return eval(scripts[i].innerHTML);
+                        };
+                        evalFn.call(form);
+                    }
+                }
+
+                var el = null;
+                function router () {
+                    el = el || byId('view');
+                    var url = location.hash.slice(1) || '/blog';
+
+                    if (el && url) {
+                        ajaxGet(url)
+                            .then(function(data) {
+                                el.innerHTML =
+                                    data.replace(/(\s+href=")\//g, "$1#/");
+                                addScripts(el);
+                                var pos = url.indexOf("#");
+                                if (pos >= 0) {
+                                    var goal = url.substring(pos + 1);
+                                    byId(goal).scrollIntoView();
+                                }
+                            });
+                    }
+                }
+
+                window.byId = function(id) {
+                    return document.getElementById(id);
+                }
+
+                window.isHidden = function(el) {
+                    var style = window.getComputedStyle(el);
+                    return (style.display === 'none')
+                }
+
+                window.btLogin = function() {
+                    const user = byId("user").value;
+                    const password = byId("password").value;
+                    var data = {
+                        "_t": "Login",
+                        "user": user,
+                        "password": password
+                    };
+                    ajaxPost("/commands/auth/" + clientId, data)
+                        .then(function(reply) {
+                            toggleLogin();
                         });
                 }
-            }
 
-            function byId(id) {
-                return document.getElementById(id);
-            }
+                window.toggleLogin = function() {
+                    const loginData = byId("login-data");
+                    if (isHidden(loginData)) loginData.style.display = "block";
+                    else loginData.style.display = "none";
+                }
 
-            function isHidden(el) {
-                var style = window.getComputedStyle(el);
-                return (style.display === 'none')
-            }
-
-            function btLogin() {
-                const user = byId("user").value;
-                const password = byId("password").value;
-                var data = {
-                    "_t": "Login",
-                    "user": user,
-                    "password": password
-                };
-                ajaxPost("/commands/auth/0", data)
-                    .then(function(reply) {
-                        toggleLogin();
-                    });
-            }
-
-            function toggleLogin() {
-                const loginData = byId("login-data");
-                if (isHidden(loginData)) loginData.style.display = "block";
-                else loginData.style.display = "none";
-            }
-
-            (function(){
                 window.addEventListener('hashchange', router);
                 window.addEventListener('load', router);
-                <!--WebSocketTest();-->
+                var webSocket = WebSocketTest();
             })();
         </script>
 

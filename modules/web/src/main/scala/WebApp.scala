@@ -1,4 +1,5 @@
 import common._
+import auth._
 
 import akka.actor._
 import akka.kafka._
@@ -19,6 +20,7 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization._
 import scala.concurrent.Future
+import scala.util.{Try, Success, Failure}
 
 object WebApp extends App {
 	def start(implicit system: ActorSystem, materializer: ActorMaterializer) = {
@@ -31,6 +33,26 @@ object WebApp extends App {
 				new ProducerRecord[Array[Byte], String](
 					topic, id.getBytes(), value)
 		}
+
+		val consumerAuth = Kafka.createConsumer(
+			"localhost:9092",
+			"webapp",
+			"auth-event")
+		{ msg =>
+			val key = new String(msg.record.key)
+			val jsonTry = Try(new AuthSerializer().fromString(msg.record.value))
+			val result = jsonTry match {
+				case event @ Success(LoggedIn(userId, token, validTo)) =>
+          val value = new AuthSerializer().toString(event)
+          producer.offer(ProducerData(s"client-commands", key, value))
+				case Failure(e) =>
+          val value = new AuthSerializer().toString(
+  					WrongMessage(msg.record.value))
+          producer.offer(ProducerData(s"error", "FATAL", value))
+        case _ =>
+      }
+      Future(msg.committableOffset)
+    }
 
 		lazy val consumerSource = Kafka.createConsumerSource(
 			"localhost:9092",

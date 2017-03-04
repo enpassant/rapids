@@ -7,7 +7,6 @@ import akka.actor._
 import akka.persistence._
 import akka.stream._
 import akka.stream.scaladsl._
-import org.joda.time.DateTime
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import scala.util.{Try, Success, Failure}
@@ -20,19 +19,24 @@ class AuthService() extends Actor {
   val receive: Receive = process(Map.empty[String, ActorRef])
 
   def process(actors: Map[String, ActorRef]): Receive = {
-    case message @ ConsumerData(key, value) =>
-			val jsonTry = Try(new AuthSerializer().fromString(value))
-			jsonTry match {
-				case Success(Login(user, password)) =>
-          if (user == password) {
-  					sender ! LoggedIn(getUserId(user), "token", DateTime.now)
-          } else {
-  					sender ! WrongMessage(message.toString)
-          }
-				case Success(json) =>
-				case Failure(e) =>
-					sender ! WrongMessage(message.toString)
-			}
+    case Login(user, password) =>
+      if (user == password) {
+        val userId = getUserId(user)
+        val validTo = System.currentTimeMillis + 5 * 60 * 1000
+        val tokenTry = CommonUtil.encode("secret", s"$userId.$validTo")
+        val result = tokenTry match {
+          case Success(token) =>
+            LoggedIn(userId, token, validTo)
+          case Failure(e) =>
+            WrongMessage(e.toString)
+        }
+
+        sender ! result
+      } else {
+        sender ! WrongMessage("Wrong credentials")
+      }
+    case json =>
+      sender ! None
   }
 
   def getUserId(user: String) = user
