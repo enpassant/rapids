@@ -11,6 +11,7 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.ws.{UpgradeToWebSocket, TextMessage}
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.directives.Credentials
 import akka.http.scaladsl.unmarshalling._
 import akka.stream._
 import akka.stream.scaladsl._
@@ -68,21 +69,59 @@ object WebApp extends App {
       msg => msg._1 == clientId
     }.map(_._2)
 
+    def authenticate(credentials: Credentials): Option[LoggedIn] = {
+      println(s"Credentials: $Credentials");
+      None
+    }
+
 		val route =
 			pathPrefix("commands") {
 				pathPrefix(Segment) { topic =>
 					path(Segment) { id =>
-						post {
-							entity(as[String]) { message =>
-								onSuccess(producer.offer(
-                  ProducerData(s"$topic-command", id, message))) {
-                    reply =>
-                      complete(s"Succesfully send command to $topic topic")
-								}
-							}
-						}
+            post {
+              authenticateOAuth2("rapids", authenticate) { loggedIn =>
+                entity(as[String]) { message =>
+                  onSuccess(producer.offer(
+                    ProducerData(s"$topic-command", id, message))) {
+                      reply =>
+                        complete(s"Succesfully send command to $topic topic")
+                  }
+                }
+              }
+            }
 					}
 				}
+			} ~
+			path("login") {
+        post {
+          entity(as[String]) { message =>
+            val jsonTry = Try(new AuthSerializer().fromString(message))
+            println(s"$jsonTry")
+            val result = jsonTry match {
+              case Success(Login(user, password)) =>
+                if (user == password) {
+                  val userId = user
+                  val validTo = System.currentTimeMillis + 5 * 60 * 1000
+                  val tokenTry = CommonUtil.encode("secret", s"$userId.$validTo")
+                  val result = tokenTry match {
+                    case Success(token) =>
+                      complete(new AuthSerializer().toString(
+                        LoggedIn(userId, token, validTo)))
+                    case Failure(e) =>
+                      reject()
+                  }
+                  result
+                } else {
+                  reject()
+                }
+              case Success(command) =>
+                reject()
+              case Failure(e) =>
+                reject()
+            }
+            result
+          }
+        }
 			} ~
 			pathPrefix("updates") {
 				path(Segment) { id =>

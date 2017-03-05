@@ -180,7 +180,9 @@
                         let req = new XMLHttpRequest();
                         req.open("POST", url);
                         req.setRequestHeader("Content-type", "application/json");
-                        req.setRequestHeader("Authorization", token);
+                        if (typeof token !== "undefined") {
+                            req.setRequestHeader("Authorization", token);
+                        }
                         req.onload = function() {
                             if (req.status === 200) {
                                 resolve(req.response);
@@ -245,9 +247,18 @@
                         "user": user,
                         "password": password
                     };
-                    ajaxPost("/commands/auth/" + clientId, data)
+                    <!--ajaxPost("/commands/auth/" + clientId, data)-->
+                    ajaxPost("/login", data)
                         .then(function(reply) {
-                            toggleLogin();
+                            var msg = JSON.parse(reply)
+                            console.log(msg);
+                            if (msg._t === "LoggedIn") {
+                                toggleLogin();
+                                token = msg.userId + "." + msg.validTo +
+                                    "." + msg.token;
+                                console.log("Token: " + token);
+                                msg = msg.userId + " has logged in";
+                            }
                         });
                 }
 
