@@ -35,26 +35,6 @@ object WebApp extends App {
 					topic, id.getBytes(), value)
 		}
 
-		val consumerAuth = Kafka.createConsumer(
-			"localhost:9092",
-			"webapp",
-			"auth-event")
-		{ msg =>
-			val key = new String(msg.record.key)
-			val jsonTry = Try(new AuthSerializer().fromString(msg.record.value))
-			val result = jsonTry match {
-				case event @ Success(LoggedIn(userId, token, validTo)) =>
-          val value = new AuthSerializer().toString(event)
-          producer.offer(ProducerData(s"client-commands", key, value))
-				case Failure(e) =>
-          val value = new AuthSerializer().toString(
-  					WrongMessage(msg.record.value))
-          producer.offer(ProducerData(s"error", "FATAL", value))
-        case _ =>
-      }
-      Future(msg.committableOffset)
-    }
-
 		lazy val consumerSource = Kafka.createConsumerSource(
 			"localhost:9092",
 			"webapp",
@@ -96,7 +76,6 @@ object WebApp extends App {
         post {
           entity(as[String]) { message =>
             val jsonTry = Try(new AuthSerializer().fromString(message))
-            println(s"$jsonTry")
             val result = jsonTry match {
               case Success(Login(user, password)) =>
                 if (user == password) {

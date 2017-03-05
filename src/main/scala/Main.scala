@@ -17,7 +17,6 @@ object Main extends App {
 	discussion.DiscussionCommandApp.start(system)
 	blog.BlogQueryBuilder.start(system)
 	discussion.DiscussionQueryBuilder.start(system)
-	auth.AuthApp.start(system)
 
 	val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8080)
 
