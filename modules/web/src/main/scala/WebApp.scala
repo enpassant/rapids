@@ -25,9 +25,6 @@ import org.apache.kafka.common.serialization._
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import scala.concurrent.Future
-import scala.util.{Try, Success, Failure}
-
-case class Payload(sub: String, exp: String)
 
 object WebApp extends App {
 	def start(implicit system: ActorSystem, materializer: ActorMaterializer) = {
@@ -55,43 +52,28 @@ object WebApp extends App {
       msg => msg._1 == clientId
     }.map(_._2)
 
+    val encoder = Base64.getEncoder()
+    val decoder = Base64.getDecoder()
+
     def authenticateJwt(credentials: Credentials): Option[LoggedIn] = {
       credentials match {
         case Credentials.Provided(id) =>
-          println(id)
-          val encoder = Base64.getEncoder()
-          val decoder = Base64.getDecoder()
           val parts = id.split('.')
           if (parts.length == 3) {
             val header = parts(0)
-            val tokenTry = CommonUtil.encode("secret", s"$header.${parts(1)}")
-            tokenTry match {
-              case Success(t) if encoder.encodeToString(t) == parts(2) =>
+            CommonUtil.encodeOpt("secret", s"$header.${parts(1)}") { t =>
+              if (encoder.encodeToString(t) == parts(2)) {
                 implicit val formats = DefaultFormats
                 val json = parse(new String(decoder.decode(parts(1))))
                   .extract[Payload]
-                val exp = json.exp.toLong
-                if (System.currentTimeMillis / 1000 <= exp) {
-                  val userId = json.sub
-                  val validTo = System.currentTimeMillis / 1000 + 5 * 60
-                  val payload = encoder.encodeToString(
-                    s"""{"sub":"${userId}","exp":"${validTo}"}""".getBytes)
-                  val tokenTry2 = CommonUtil.encode("secret", s"$header.$payload")
-                  tokenTry2 match {
-                    case Success(t) =>
-                      val token = encoder.encodeToString(t)
-                      Some(LoggedIn(userId, s"Bearer $header.$payload.$token", validTo))
-                    case Failure(e) =>
-                      None
-                  }
+                if (System.currentTimeMillis / 1000 <= json.exp) {
+                  CommonUtil.createJwt(json.sub, 5 * 60)
                 } else {
                   None
                 }
-              case Success(token) =>
-                println(s"$token =?= ${parts(2)}")
+              } else {
                 None
-              case Failure(e) =>
-                None
+              }
             }
           } else {
             None
@@ -103,27 +85,13 @@ object WebApp extends App {
     def authenticate(credentials: Credentials): Option[LoggedIn] = {
       credentials match {
         case p @ Credentials.Provided(id) if p.verify(id) =>
-          val userId = id
-          val validTo = System.currentTimeMillis / 1000 + 5 * 60
-          val encoder = Base64.getEncoder()
-          val header = encoder.encodeToString(
-            s"""{"typ":"JWT","alg":"HS256"}""".getBytes)
-          val payload = encoder.encodeToString(
-            s"""{"sub":"${userId}","exp":"${validTo}"}""".getBytes)
-          val tokenTry = CommonUtil.encode("secret", s"$header.$payload")
-          tokenTry match {
-            case Success(t) =>
-              val token = encoder.encodeToString(t)
-              Some(LoggedIn(userId, s"Bearer $header.$payload.$token", validTo))
-            case Failure(e) =>
-              None
-          }
+          CommonUtil.createJwt(id, 5 * 60)
         case _ => None
       }
     }
 
     val authenticates =
-      authenticateOAuth2("rapids-oauth", authenticateJwt) |
+      authenticateOAuth2("rapids", authenticateJwt) |
         authenticateBasic(realm = "rapids", authenticate)
 
 		val route =
