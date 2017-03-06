@@ -8,6 +8,7 @@ import akka.kafka.scaladsl._
 import akka.persistence._
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
+import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.model.ws.{UpgradeToWebSocket, TextMessage}
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.Directives._
@@ -15,13 +16,18 @@ import akka.http.scaladsl.server.directives.Credentials
 import akka.http.scaladsl.unmarshalling._
 import akka.stream._
 import akka.stream.scaladsl._
+import java.util.Base64
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization._
+import org.json4s._
+import org.json4s.jackson.JsonMethods._
 import scala.concurrent.Future
 import scala.util.{Try, Success, Failure}
+
+case class Payload(sub: String, exp: String)
 
 object WebApp extends App {
 	def start(implicit system: ActorSystem, materializer: ActorMaterializer) = {
@@ -49,58 +55,96 @@ object WebApp extends App {
       msg => msg._1 == clientId
     }.map(_._2)
 
-    def authenticate(credentials: Credentials): Option[LoggedIn] = {
-      println(s"Credentials: $Credentials");
-      None
+    def authenticateJwt(credentials: Credentials): Option[LoggedIn] = {
+      credentials match {
+        case Credentials.Provided(id) =>
+          println(id)
+          val encoder = Base64.getEncoder()
+          val decoder = Base64.getDecoder()
+          val parts = id.split('.')
+          if (parts.length == 3) {
+            val header = parts(0)
+            val tokenTry = CommonUtil.encode("secret", s"$header.${parts(1)}")
+            tokenTry match {
+              case Success(t) if encoder.encodeToString(t) == parts(2) =>
+                implicit val formats = DefaultFormats
+                val json = parse(new String(decoder.decode(parts(1))))
+                  .extract[Payload]
+                val exp = json.exp.toLong
+                if (System.currentTimeMillis / 1000 <= exp) {
+                  val userId = json.sub
+                  val validTo = System.currentTimeMillis / 1000 + 5 * 60
+                  val payload = encoder.encodeToString(
+                    s"""{"sub":"${userId}","exp":"${validTo}"}""".getBytes)
+                  val tokenTry2 = CommonUtil.encode("secret", s"$header.$payload")
+                  tokenTry2 match {
+                    case Success(t) =>
+                      val token = encoder.encodeToString(t)
+                      Some(LoggedIn(userId, s"Bearer $header.$payload.$token", validTo))
+                    case Failure(e) =>
+                      None
+                  }
+                } else {
+                  None
+                }
+              case Success(token) =>
+                println(s"$token =?= ${parts(2)}")
+                None
+              case Failure(e) =>
+                None
+            }
+          } else {
+            None
+          }
+        case _ => None
+      }
     }
+
+    def authenticate(credentials: Credentials): Option[LoggedIn] = {
+      credentials match {
+        case p @ Credentials.Provided(id) if p.verify(id) =>
+          val userId = id
+          val validTo = System.currentTimeMillis / 1000 + 5 * 60
+          val encoder = Base64.getEncoder()
+          val header = encoder.encodeToString(
+            s"""{"typ":"JWT","alg":"HS256"}""".getBytes)
+          val payload = encoder.encodeToString(
+            s"""{"sub":"${userId}","exp":"${validTo}"}""".getBytes)
+          val tokenTry = CommonUtil.encode("secret", s"$header.$payload")
+          tokenTry match {
+            case Success(t) =>
+              val token = encoder.encodeToString(t)
+              Some(LoggedIn(userId, s"Bearer $header.$payload.$token", validTo))
+            case Failure(e) =>
+              None
+          }
+        case _ => None
+      }
+    }
+
+    val authenticates =
+      authenticateOAuth2("rapids-oauth", authenticateJwt) |
+        authenticateBasic(realm = "rapids", authenticate)
 
 		val route =
 			pathPrefix("commands") {
 				pathPrefix(Segment) { topic =>
 					path(Segment) { id =>
             post {
-              authenticateOAuth2("rapids", authenticate) { loggedIn =>
-                entity(as[String]) { message =>
-                  onSuccess(producer.offer(
-                    ProducerData(s"$topic-command", id, message))) {
-                      reply =>
-                        complete(s"Succesfully send command to $topic topic")
+              authenticates { loggedIn =>
+                respondWithHeader(RawHeader("X-Token", loggedIn.token)) {
+                  entity(as[String]) { message =>
+                    onSuccess(producer.offer(
+                      ProducerData(s"$topic-command", id, message))) {
+                        reply =>
+                          complete(s"Succesfully send command to $topic topic")
+                    }
                   }
                 }
               }
             }
 					}
 				}
-			} ~
-			path("login") {
-        post {
-          entity(as[String]) { message =>
-            val jsonTry = Try(new AuthSerializer().fromString(message))
-            val result = jsonTry match {
-              case Success(Login(user, password)) =>
-                if (user == password) {
-                  val userId = user
-                  val validTo = System.currentTimeMillis + 5 * 60 * 1000
-                  val tokenTry = CommonUtil.encode("secret", s"$userId.$validTo")
-                  val result = tokenTry match {
-                    case Success(token) =>
-                      complete(new AuthSerializer().toString(
-                        LoggedIn(userId, token, validTo)))
-                    case Failure(e) =>
-                      reject()
-                  }
-                  result
-                } else {
-                  reject()
-                }
-              case Success(command) =>
-                reject()
-              case Failure(e) =>
-                reject()
-            }
-            result
-          }
-        }
 			} ~
 			pathPrefix("updates") {
 				path(Segment) { id =>
@@ -134,4 +178,3 @@ object WebApp extends App {
 	scala.io.StdIn.readLine()
 	system.terminate
 }
-

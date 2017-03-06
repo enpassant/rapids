@@ -178,6 +178,13 @@
                         }
                         req.onload = function() {
                             if (req.status === 200) {
+                                var t = req.getResponseHeader("X-Token");
+                                if (typeof t !== "undefined") {
+                                    token = t;
+                                    if (typeof(Storage) !== "undefined") {
+                                        localStorage.token = token;
+                                    }
+                                }
                                 resolve(req.response);
                             } else {
                                 reject(new Error(req.statusText));
@@ -258,9 +265,13 @@
                     else loginData.style.display = "none";
                 }
 
+                if (typeof(Storage) !== "undefined") {
+                    token = localStorage.token;
+                }
+
                 window.addEventListener('hashchange', router);
                 window.addEventListener('load', router);
-                var webSocket = WebSocketTest();
+                <!--var webSocket = WebSocketTest();-->
             })();
         </script>
 
