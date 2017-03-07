@@ -9,23 +9,28 @@ case class ConsumerData(key: String, value: String)
 case class ProducerData[A](topic: String, key: String, value: A)
 case class WrongCommand(consumerData: ConsumerData)
 
-case class Payload(sub: String, exp: Long)
+case class User(id: String, name: String, roles: String*)
+case class Payload(sub: String, exp: Long, jti: String,
+  name: String, roles: String*)
 
 object CommonUtil {
 	def uuid = java.util.UUID.randomUUID.toString
 
   val encoder = Base64.getEncoder()
 
-  def createJwt(userId: String, duration: Long) = {
+  def createJwt(user: User, duration: Long) = {
     val validTo = System.currentTimeMillis / 1000 + duration
     val header = encoder.encodeToString(
       s"""{"typ":"JWT","alg":"HS256"}""".getBytes)
-    val payload = s"""{"sub":"${userId}","exp":${validTo}}"""
+    val jti = CommonUtil.uuid
+    val roles = "[\"" + user.roles.mkString("\",\"") + "\"]"
+    val payload = s"""{"sub":"${user.id}","exp":$validTo,"jti":"$jti",""" +
+      s""""name":"${user.name}","roles":$roles}"""
     val len = payload.length + ((3 - payload.length % 3) % 3)
     val payload64 = encoder.encodeToString(payload.padTo(len, ' ').getBytes)
     CommonUtil.encodeOpt("secret", s"$header.$payload64") { t =>
       val token = encoder.encodeToString(t)
-      Some(auth.LoggedIn(userId, s"Bearer $header.$payload64.$token", validTo))
+      Some(auth.LoggedIn(user.id, s"Bearer $header.$payload64.$token", validTo))
     }
   }
 

@@ -48,7 +48,7 @@ object WebApp extends App {
 				pathPrefix(Segment) { topic =>
 					path(Segment) { id =>
             post {
-              authenticates { loggedIn =>
+              authenticates(getUser) { loggedIn =>
                 respondWithHeader(RawHeader("X-Token", loggedIn.token)) {
                   entity(as[String]) { message =>
                     onSuccess(producer.offer(
@@ -86,6 +86,11 @@ object WebApp extends App {
 
 		encodeResponse { route }
 	}
+
+  def getUser(id: String) = {
+    User(id, id.capitalize,
+      if (scala.util.Random.nextBoolean) "admin" else "user", "checker")
+  }
 
 	implicit val system = ActorSystem("WebApp")
 	implicit val materializer = ActorMaterializer()
