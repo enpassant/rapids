@@ -68,10 +68,9 @@ object Directives extends BaseFormats {
               implicit val formats = DefaultFormats
               val payload = jparse(new String(decoder.decode(parts(1))))
                 .extract[Payload]
-              println(payload.toString)
               if (System.currentTimeMillis / 1000 <= payload.exp) {
                 val user = User(payload.sub, payload.name, payload.roles:_*)
-                CommonUtil.createJwt(user, 5 * 60)
+                CommonUtil.createJwt(user, 5 * 60, 0)
               } else {
                 None
               }
@@ -92,7 +91,7 @@ object Directives extends BaseFormats {
     credentials match {
       case p @ Credentials.Provided(id) if p.verify(id) =>
         val user = getUser(id)
-        CommonUtil.createJwt(user, 5 * 60)
+        CommonUtil.createJwt(user, 5 * 60, System.currentTimeMillis / 1000)
       case _ => None
     }
   }

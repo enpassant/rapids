@@ -15,7 +15,7 @@ sealed trait AuthCommand extends AuthMessage
 case class Login(user: String, password: String) extends AuthCommand
 
 sealed trait AuthEvent extends AuthMessage
-case class LoggedIn(userId: String, token: String, validTo: Long)
+case class LoggedIn(userId: String, token: String, validTo: Long, created: Long)
 	extends AuthEvent
 
 class AuthSerializer extends common.JsonSerializer {

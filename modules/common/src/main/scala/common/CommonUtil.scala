@@ -18,19 +18,19 @@ object CommonUtil {
 
   val encoder = Base64.getEncoder()
 
-  def createJwt(user: User, duration: Long) = {
+  def createJwt(user: User, duration: Long, created: Long) = {
     val validTo = System.currentTimeMillis / 1000 + duration
     val header = encoder.encodeToString(
       s"""{"typ":"JWT","alg":"HS256"}""".getBytes)
-    val jti = CommonUtil.uuid
     val roles = "[\"" + user.roles.mkString("\",\"") + "\"]"
-    val payload = s"""{"sub":"${user.id}","exp":$validTo,"jti":"$jti",""" +
+    val payload = s"""{"sub":"${user.id}","exp":$validTo,"jti":"$uuid",""" +
       s""""name":"${user.name}","roles":$roles}"""
     val len = payload.length + ((3 - payload.length % 3) % 3)
     val payload64 = encoder.encodeToString(payload.padTo(len, ' ').getBytes)
     CommonUtil.encodeOpt("secret", s"$header.$payload64") { t =>
       val token = encoder.encodeToString(t)
-      Some(auth.LoggedIn(user.id, s"Bearer $header.$payload64.$token", validTo))
+      Some(auth.LoggedIn(
+        user.id, s"Bearer $header.$payload64.$token", validTo, created))
     }
   }
 

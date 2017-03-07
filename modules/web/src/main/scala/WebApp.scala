@@ -51,10 +51,20 @@ object WebApp extends App {
               authenticates(getUser) { loggedIn =>
                 respondWithHeader(RawHeader("X-Token", loggedIn.token)) {
                   entity(as[String]) { message =>
-                    onSuccess(producer.offer(
-                      ProducerData(s"$topic-command", id, message))) {
-                        reply =>
-                          complete(s"Succesfully send command to $topic topic")
+                    onSuccess {
+                      if (loggedIn.created > 0) {
+                        val msgLogged = new AuthSerializer().toString(loggedIn)
+                        producer.offer(
+                          ProducerData("user", loggedIn.userId, msgLogged))
+                      }
+                      producer.offer(
+                        ProducerData("user", loggedIn.userId, message))
+                      producer.offer(
+                        ProducerData(s"$topic-command", id, message))
+                    }
+                    {
+                      reply =>
+                        complete(s"Succesfully send command to $topic topic")
                     }
                   }
                 }
