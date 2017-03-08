@@ -33,7 +33,7 @@ object BlogCommandApp extends App {
 			val key = new String(consumerRecord.key)
 			val result = service ? common.ConsumerData(key, consumerRecord.value)
 			result collect {
-				case event @ BlogCreated(blogId, title, content) =>
+				case event @ BlogCreated(blogId, userId, userName, title, content) =>
 					//val id = common.CommonUtil.uuid
 					val id = s"disc-$blogId"
 					producer.offer(

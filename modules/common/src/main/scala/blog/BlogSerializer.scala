@@ -1,5 +1,7 @@
 package blog
 
+import auth._
+
 import akka.actor.{ ActorRef, ActorSystem }
 import akka.serialization._
 import com.typesafe.config.ConfigFactory
@@ -13,11 +15,17 @@ sealed trait BlogMessage extends Serializable
 case class WrongMessage(message: String) extends BlogMessage
 
 sealed trait BlogCommand extends BlogMessage
-case class CreateBlog(title: String, content: String) extends BlogCommand
+case class CreateBlog(title: String, content: String, loggedIn: LoggedIn)
+  extends BlogCommand with UserCommand
 
 sealed trait BlogEvent extends BlogMessage
-case class BlogCreated(id: String, title: String, content: String)
-	extends BlogEvent
+case class BlogCreated(
+  id: String,
+  userId: String,
+  userName: String,
+  title: String,
+  content: String
+)	extends BlogEvent
 
 case class DiscussionItem(id: String, title: String)
 case class Blog(
@@ -87,6 +95,7 @@ class BlogSerializer extends common.JsonSerializer {
 	implicit val formats = new DefaultFormats {
 		override val typeHintFieldName = "_t"
 		override val typeHints = ShortTypeHints(List(
+			classOf[LoggedIn],
 			classOf[Blog],
 			classOf[CreateBlog],
 			classOf[BlogCreated],

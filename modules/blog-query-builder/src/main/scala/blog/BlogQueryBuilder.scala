@@ -33,10 +33,12 @@ object BlogQueryBuilder extends App {
 			val result = Future { jsonTry match {
 				case Success(json) =>
           json match {
-            case BlogCreated(id, title, content) =>
+            case BlogCreated(id, userId, userName, title, content) =>
               collection.insert(
                 MongoDBObject(
                   "_id" -> id,
+                  "userId" -> userId,
+                  "userName" -> userName,
                   "title" -> title,
                   "content" -> content,
                   "discussions" -> Seq()))

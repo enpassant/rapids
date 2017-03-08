@@ -31,7 +31,7 @@ class BlogService() extends Actor {
 					}
 					blog.tell(json, sender)
 				case Failure(e) =>
-					sender ! WrongMessage(message.toString)
+					sender ! WrongMessage(e + ": " + message.toString)
 			}
   }
 }

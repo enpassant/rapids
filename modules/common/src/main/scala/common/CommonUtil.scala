@@ -3,6 +3,8 @@ package common
 import java.util.Base64
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
+import org.json4s._
+import org.json4s.jackson.JsonMethods.{parse => jparse}
 import scala.util.{Try, Success}
 
 case class ConsumerData(key: String, value: String)
@@ -17,6 +19,7 @@ object CommonUtil {
 	def uuid = java.util.UUID.randomUUID.toString
 
   val encoder = Base64.getEncoder()
+  val decoder = Base64.getDecoder()
 
   def createJwt(user: User, duration: Long, created: Long) = {
     val validTo = System.currentTimeMillis / 1000 + duration
@@ -31,6 +34,17 @@ object CommonUtil {
       val token = encoder.encodeToString(t)
       Some(auth.LoggedIn(
         user.id, s"Bearer $header.$payload64.$token", validTo, created))
+    }
+  }
+
+  def extractPayload(token: String): Option[Payload] = {
+    val parts = token.split('.')
+    if (parts.length == 3) {
+      val header = parts(0)
+      implicit val formats = DefaultFormats
+      Option(jparse(new String(decoder.decode(parts(1)))).extract[Payload])
+    } else {
+      None
     }
   }
 

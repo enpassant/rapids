@@ -8,6 +8,10 @@ import org.json4s.{ DefaultFormats, Formats, jackson, Serialization }
 import org.json4s._
 import scala.collection.immutable.TreeMap
 
+trait UserCommand {
+  def loggedIn: LoggedIn
+}
+
 sealed trait AuthMessage extends Serializable
 case class WrongMessage(message: String) extends AuthMessage
 

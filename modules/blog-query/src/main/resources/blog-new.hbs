@@ -24,7 +24,8 @@ Mindjárt több sorral.
         var data = {
             "_t": "CreateBlog",
             "title": title,
-            "content": content
+            "content": content,
+            "loggedIn": ""
         };
         ajaxPost("/commands/blog/{{uuid}}", data);
     };

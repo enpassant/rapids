@@ -1,6 +1,6 @@
 package blog
 
-import common.Json
+import common._
 
 import akka.actor._
 import akka.persistence._
@@ -19,7 +19,7 @@ class BlogActor(val id: String) extends Actor with PersistentActor {
   var state: Option[Blog] = None
 
   def updateState(event: BlogMessage): Unit = event match {
-    case BlogCreated(id, title, content) =>
+    case BlogCreated(id, userId, userName, title, content) =>
       state = Some(Blog(title, content))
     case DiscussionStarted(id, blogId, title) =>
       state = state map { blog =>
@@ -35,12 +35,17 @@ class BlogActor(val id: String) extends Actor with PersistentActor {
 
   val receiveCommand: Receive = {
     case "snap"  => saveSnapshot(state)
-    case CreateBlog(title, content) if !state.isDefined =>
-			val event = BlogCreated(id, title, content)
-      persistAsync(event) {
-				event =>
-					sender ! event
-					updateState(event)
+    case CreateBlog(title, content, loggedIn) if !state.isDefined =>
+      println(loggedIn)
+      val payload = CommonUtil.extractPayload(loggedIn.token)
+      println(payload)
+      payload foreach { p =>
+        val event = BlogCreated(id, p.sub, p.name, title, content)
+        persistAsync(event) {
+          event =>
+            sender ! event
+            updateState(event)
+        }
 			}
     case event: DiscussionStarted =>
       persistAsync(event) {

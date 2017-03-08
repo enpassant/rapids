@@ -15,6 +15,8 @@ import akka.http.scaladsl.server.Directives._
 import akka.stream._
 import akka.stream.scaladsl._
 import org.apache.kafka.clients.producer.ProducerRecord
+import org.json4s._
+import org.json4s.jackson.JsonMethods._
 import scala.concurrent.Future
 
 object WebApp extends App {
@@ -52,15 +54,26 @@ object WebApp extends App {
                 respondWithHeader(RawHeader("X-Token", loggedIn.token)) {
                   entity(as[String]) { message =>
                     onSuccess {
+                      val msgLogged = new AuthSerializer().toString(loggedIn)
                       if (loggedIn.created > 0) {
-                        val msgLogged = new AuthSerializer().toString(loggedIn)
                         producer.offer(
                           ProducerData("user", loggedIn.userId, msgLogged))
                       }
                       producer.offer(
                         ProducerData("user", loggedIn.userId, message))
+                      val json = parse(message)
+                      val result = json.values match {
+                        case m: Map[String, _] @unchecked
+                          if m.contains("loggedIn")
+                        =>
+                          compact(render(
+                            json merge
+                              JObject(JField("loggedIn", parse(msgLogged)))
+                            ))
+                        case _ => message
+                      }
                       producer.offer(
-                        ProducerData(s"$topic-command", id, message))
+                        ProducerData(s"$topic-command", id, result))
                     }
                     {
                       reply =>
