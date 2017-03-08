@@ -12,19 +12,6 @@
             Logo
         </div>
         <div class="login">
-            <a href="#" onClick="toggleLogin()">Login</a>
-            <div id="login-data">
-                <div>
-                    <label for="login">Felhasználó</label>
-                    <input id="user"/>
-                </div>
-                <div>
-                    <label for="password">Jelszó</label>
-                    <input id="password" type="password"/>
-                </div>
-                <input id="bt-login" value="Belépés" type="button"
-                    onClick="btLogin()"/>
-            </div>
         </div>
         <div id="messages">
             Messages
@@ -237,32 +224,6 @@
                 window.isHidden = function(el) {
                     var style = window.getComputedStyle(el);
                     return (style.display === 'none')
-                }
-
-                window.btLogin = function() {
-                    const user = byId("user").value;
-                    const password = byId("password").value;
-                    var data = {
-                        "_t": "Login",
-                        "user": user,
-                        "password": password
-                    };
-                    ajaxPost("/login", data)
-                        .then(function(reply) {
-                            var msg = JSON.parse(reply)
-                            if (msg._t === "LoggedIn") {
-                                toggleLogin();
-                                token = msg.userId + "." + msg.validTo +
-                                    "." + msg.token;
-                                msg = msg.userId + " has logged in";
-                            }
-                        });
-                }
-
-                window.toggleLogin = function() {
-                    const loginData = byId("login-data");
-                    if (isHidden(loginData)) loginData.style.display = "block";
-                    else loginData.style.display = "none";
                 }
 
                 if (typeof(Storage) !== "undefined") {
