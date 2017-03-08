@@ -232,6 +232,9 @@
                                     var goal = url.substring(pos + 1);
                                     byId(goal).scrollIntoView();
                                 }
+                            })
+                            .catch(function(e) {
+                                el.innerHTML = e;
                             });
                     }
                 }
