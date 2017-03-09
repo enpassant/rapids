@@ -1,6 +1,6 @@
 package blog
 
-import auth._
+import common._
 
 import akka.actor.{ ActorRef, ActorSystem }
 import akka.serialization._

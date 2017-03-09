@@ -1,5 +1,5 @@
-import auth._
 import common._
+import blog.BlogSerializer
 import common.web.Directives._
 
 import akka.actor._
@@ -54,7 +54,7 @@ object WebApp extends App {
                 respondWithHeader(RawHeader("X-Token", loggedIn.token)) {
                   entity(as[String]) { message =>
                     onSuccess {
-                      val msgLogged = new AuthSerializer().toString(loggedIn)
+                      val msgLogged = new BlogSerializer().toString(loggedIn)
                       if (loggedIn.created > 0) {
                         producer.offer(
                           ProducerData("user", loggedIn.userId, msgLogged))

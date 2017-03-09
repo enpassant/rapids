@@ -15,6 +15,12 @@ case class User(id: String, name: String, roles: String*)
 case class Payload(sub: String, exp: Long, jti: String,
   name: String, roles: String*)
 
+trait UserCommand {
+  def loggedIn: LoggedIn
+}
+
+case class LoggedIn(userId: String, token: String, validTo: Long, created: Long)
+
 object CommonUtil {
 	def uuid = java.util.UUID.randomUUID.toString
 
@@ -32,7 +38,7 @@ object CommonUtil {
     val payload64 = encoder.encodeToString(payload.padTo(len, ' ').getBytes)
     CommonUtil.encodeOpt("secret", s"$header.$payload64") { t =>
       val token = encoder.encodeToString(t)
-      Some(auth.LoggedIn(
+      Some(LoggedIn(
         user.id, s"Bearer $header.$payload64.$token", validTo, created))
     }
   }
