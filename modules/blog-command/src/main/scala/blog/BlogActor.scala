@@ -36,9 +36,7 @@ class BlogActor(val id: String) extends Actor with PersistentActor {
   val receiveCommand: Receive = {
     case "snap"  => saveSnapshot(state)
     case CreateBlog(title, content, loggedIn) if !state.isDefined =>
-      println(loggedIn)
       val payload = CommonUtil.extractPayload(loggedIn.token)
-      println(payload)
       payload foreach { p =>
         val event = BlogCreated(id, p.sub, p.name, title, content)
         persistAsync(event) {
