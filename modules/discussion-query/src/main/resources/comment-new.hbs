@@ -14,7 +14,8 @@
         var data = {
             "_t": "AddComment",
             "id": "{{uuid}}",
-            "content": byId("content").value
+            "content": byId("content").value,
+            "loggedIn": ""
         };
         ajaxPost("/commands/discussion/{{_id}}", data);
     };

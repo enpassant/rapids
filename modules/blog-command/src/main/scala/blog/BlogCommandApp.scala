@@ -40,9 +40,11 @@ object BlogCommandApp extends App {
             ProducerData("blog-event", blogId, event))
 					producer.offer(
             ProducerData(
-              "discussion-command", id, StartDiscussion(id, blogId, title)))
+              "discussion-command",
+              id,
+              StartDiscussion(id, blogId, title, userId, userName)))
 					msg.committableOffset
-				case event @ DiscussionStarted(id, blogId, title) =>
+				case event @ DiscussionStarted(id, userId, userName, blogId, title) =>
 					producer.offer(
             ProducerData("blog-event", blogId, event))
 					msg.committableOffset

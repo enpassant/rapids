@@ -21,7 +21,7 @@ class BlogActor(val id: String) extends Actor with PersistentActor {
   def updateState(event: BlogMessage): Unit = event match {
     case BlogCreated(id, userId, userName, title, content) =>
       state = Some(Blog(title, content))
-    case DiscussionStarted(id, blogId, title) =>
+    case DiscussionStarted(id, userId, userName, blogId, title) =>
       state = state map { blog =>
         blog.copy(discussions = DiscussionItem(id, title) :: blog.discussions)
       }

@@ -29,6 +29,8 @@ case class BlogCreated(
 
 case class DiscussionItem(id: String, title: String)
 case class Blog(
+  userId: String = "",
+  userName: String = "",
 	title: String = "",
   content: String = "",
 	discussions: List[DiscussionItem] = Nil
@@ -38,18 +40,22 @@ trait DiscussionCommand extends BlogMessage
 case class StartDiscussion(
 	id: String,
 	blogId: String,
-	title: String
+	title: String,
+  userId: String,
+  userName: String
 )	extends DiscussionCommand
 
 case class AddComment(
 	id: String,
-  content: String
+  content: String,
+  loggedIn: LoggedIn
 )	extends DiscussionCommand
 
 case class ReplyComment(
 	id: String,
 	parentId: String,
-  content: String
+  content: String,
+  loggedIn: LoggedIn
 )	extends DiscussionCommand
 
 trait DiscussionEvent extends BlogMessage {
@@ -58,18 +64,24 @@ trait DiscussionEvent extends BlogMessage {
 
 case class DiscussionStarted(
 	id: String,
+  userId: String,
+  userName: String,
 	blogId: String,
 	title: String
 )	extends DiscussionEvent
 
 case class CommentAdded(
 	id: String,
+  userId: String,
+  userName: String,
   content: String,
   index: Int
 )	extends DiscussionEvent
 
 case class CommentReplied(
 	id: String,
+  userId: String,
+  userName: String,
 	parentId: String,
   content: String,
   path: List[Int]
@@ -79,10 +91,14 @@ case class CommentIndex(path: List[Int], childCount: Int)
 
 case class Comment(
   id: String,
+  userId: String,
+  userName: String,
   content: String
 )
 case class Discussion(
 	id: String = "",
+  userId: String,
+  userName: String,
 	blogId: String = "",
 	title: String = "",
 	comments: TreeMap[String, CommentIndex] = TreeMap(),

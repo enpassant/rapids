@@ -1,6 +1,6 @@
 package discussion
 
-import common.Json
+import common._
 import blog._
 
 import akka.actor._
@@ -34,15 +34,15 @@ class DiscussionActor(val id: String) extends Actor with PersistentActor {
   var state: Option[Discussion] = None
 
   def updateState(event: DiscussionEvent): Unit = event match {
-    case DiscussionStarted(id, blogId, title) =>
+    case DiscussionStarted(id, userId, userName, blogId, title) =>
       state = Some(Discussion(id, blogId, title))
-    case CommentAdded(id, content, index) =>
+    case CommentAdded(id, userId, userName, content, index) =>
       state = state map { discussion =>
         discussion.copy(
           childCount = discussion.childCount + 1,
           comments = discussion.comments + (id -> CommentIndex(List(index), 0)))
       }
-    case CommentReplied(id, parentId, content, path) =>
+    case CommentReplied(id, userId, userName, parentId, content, path) =>
       state = state map { discussion =>
         val parentComment = discussion.comments(parentId)
         val childCount = parentComment.childCount
@@ -61,34 +61,42 @@ class DiscussionActor(val id: String) extends Actor with PersistentActor {
 
   val receiveCommand: Receive = {
     case "snap" if state.isDefined => saveSnapshot(state.get)
-    case StartDiscussion(id, blogId, title) if !state.isDefined =>
-			val event = DiscussionStarted(id, blogId, title)
+    case StartDiscussion(id, blogId, title, userId, userName)
+        if !state.isDefined =>
+			val event = DiscussionStarted(id, userId, userName, blogId, title)
       persistAsync(event) {
 				event =>
 					sender ! event
 					updateState(event)
 			}
-    case AddComment(id, content) if state.isDefined &&
+    case AddComment(id, content, loggedIn) if state.isDefined &&
         !state.get.comments.contains(id) =>
-      val index = state.get.childCount
-			val event = CommentAdded(id, content, index)
-      persistAsync(event) {
-				event =>
-					sender ! event
-					updateState(event)
-			}
-    case ReplyComment(id, parentId, content) if state.isDefined &&
+      val payload = CommonUtil.extractPayload(loggedIn.token)
+      payload foreach { p =>
+        val index = state.get.childCount
+        val event = CommentAdded(id, p.sub, p.name, content, index)
+        persistAsync(event) {
+          event =>
+            sender ! event
+            updateState(event)
+        }
+      }
+    case ReplyComment(id, parentId, content, loggedIn) if state.isDefined &&
         state.get.comments.contains(parentId) &&
         !state.get.comments.contains(id) =>
-      val parentComment = state.get.comments(parentId)
-      val path = (parentComment.childCount) :: parentComment.path
-			val event = CommentReplied(id, parentId, content, path)
-      persistAsync(event) {
-				event =>
-					sender ! event
-					updateState(event)
-			}
+      val payload = CommonUtil.extractPayload(loggedIn.token)
+      payload foreach { p =>
+        val parentComment = state.get.comments(parentId)
+        val path = (parentComment.childCount) :: parentComment.path
+        val event = CommentReplied(id, p.sub, p.name, parentId, content, path)
+        persistAsync(event) {
+          event =>
+            sender ! event
+            updateState(event)
+        }
+      }
     case msg =>
+      println(msg.toString)
       sender ! WrongMessage(msg.toString)
   }
 }

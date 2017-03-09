@@ -15,7 +15,8 @@
             "_t": "ReplyComment",
             "id": "{{uuid}}",
             "parentId": "{{commentId}}",
-            "content": byId("content").value
+            "content": byId("content").value,
+            "loggedIn": ""
         };
         ajaxPost("/commands/discussion/{{_id}}", data);
     };

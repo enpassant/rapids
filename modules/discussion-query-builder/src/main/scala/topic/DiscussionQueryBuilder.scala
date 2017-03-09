@@ -34,27 +34,31 @@ object DiscussionQueryBuilder extends App {
 			val result = Future { jsonTry match {
 				case Success(json) =>
           json match {
-            case DiscussionStarted(id, blogId, title) =>
+            case DiscussionStarted(id, userId, userName, blogId, title) =>
               Try {
                 collDiscussion.insert(
                   MongoDBObject(
                     "_id" -> id,
+                    "userId" -> userId,
+                    "userName" -> userName,
                     "blogId" -> blogId,
                     "title" -> title,
                     "comments" -> List()
                 ))
               }
-            case CommentAdded(id, content, index) =>
+            case CommentAdded(id, userId, userName, content, index) =>
               Try {
                 collDiscussion.update(
                   MongoDBObject("_id" -> key),
                   $push("comments" -> MongoDBObject(
                     "commentId" -> id,
+                    "userId" -> userId,
+                    "userName" -> userName,
                     "content" -> content,
                     "comments" -> List()
                 )))
               }
-            case CommentReplied(id, parentId, content, path) =>
+            case CommentReplied(id, userId, userName, parentId, content, path) =>
               Try {
                 val pos = path.tail.foldLeft("comments") {
                   (p, i) => s"comments.$i.$p"
@@ -63,6 +67,8 @@ object DiscussionQueryBuilder extends App {
                   MongoDBObject("_id" -> key),
                   $push(pos -> MongoDBObject(
                     "commentId" -> id,
+                    "userId" -> userId,
+                    "userName" -> userName,
                     "content" -> content,
                     "comments" -> List()
                 )))

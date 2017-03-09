@@ -49,7 +49,7 @@ object DiscussionCommandApp extends App {
 			} recover {
         case e: Exception =>
 					producer.offer(
-            ProducerData("error", "FATAL", WrongMessage(e.toString)))
+            ProducerData("error", "FATAL", WrongMessage(e + " " + e.toString)))
           msg.committableOffset
 			}
 		}
