@@ -19,6 +19,7 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import scala.concurrent.Future
+import scala.collection.SortedSet
 
 object WebApp extends App {
 	def start(implicit system: ActorSystem, materializer: ActorMaterializer) = {
@@ -35,7 +36,7 @@ object WebApp extends App {
 		lazy val consumerSource = Kafka.createConsumerSource(
 			"localhost:9092",
 			"webapp",
-			"client-commands", "webapp")
+			"client-commands")
 		{
       msg => Future {
         (TextMessage(msg.record.value), msg)
@@ -45,6 +46,30 @@ object WebApp extends App {
 		def consumer(clientId: String) = consumerSource.filter {
       msg => msg._1 == clientId
     }.map(_._2)
+
+    var links = SortedSet.empty[FunctionLink]
+
+		val webAppConsumer = Kafka.createConsumer(
+			"localhost:9092",
+			"web-app",
+			"web-app")
+		{ msg =>
+			val json = CommonSerializer.fromString(msg.record.value)
+      json match {
+        case link: FunctionLink =>
+          links = links + link
+        case _ =>
+      }
+      Future { msg.committableOffset }
+    }
+
+    def getLink() = {
+      Link(
+        links.toList map { functionLink =>
+          LinkValue(Uri(functionLink.url), title(functionLink.title))
+        }
+      )
+    }
 
 		val route =
 			pathPrefix("commands") {
@@ -100,7 +125,7 @@ object WebApp extends App {
 			} ~
 			path("") {
         (get | head) {
-          respondWithHeader(Link(LinkValue(Uri("/blog"), title("Blog")))) {
+          respondWithHeader(getLink()) {
             getFromResource(s"public/html/index.html")
           }
         }

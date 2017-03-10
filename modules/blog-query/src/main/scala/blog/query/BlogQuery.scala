@@ -12,6 +12,7 @@ import com.github.jknack.handlebars.{ Context, Handlebars, Template }
 import com.mongodb.casbah.Imports._
 import com.typesafe.config.ConfigFactory
 import fixiegrips.{ Json4sHelpers, Json4sResolver }
+import org.apache.kafka.clients.producer.ProducerRecord
 import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
 import org.json4s.mongo.JObjectParser._
@@ -33,6 +34,16 @@ object BlogQuery extends App with BaseFormats {
     val blogs = handlebars.compile("blogs")
     val blog = handlebars.compile("blog")
     val blogNew = handlebars.compile("blog-new")
+
+		val producer = Kafka.createProducer[ProducerData[String]]("localhost:9092")
+    {
+			case ProducerData(topic, id, value) =>
+				new ProducerRecord[Array[Byte], String](
+					topic, id.getBytes(), value)
+		}
+
+    val link = CommonSerializer.toString(FunctionLink(0, "/blog", "Blogs"))
+    producer.offer(ProducerData("web-app", "blog-query", link))
 
 		val route =
       pathPrefix("blog") {
