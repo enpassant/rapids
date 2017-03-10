@@ -21,7 +21,7 @@ class BlogService() extends Actor {
 
   def process(blogs: Map[String, ActorRef]): Receive = {
     case message @ ConsumerData(key, value) =>
-			val jsonTry = Try(new BlogSerializer().fromString(value))
+			val jsonTry = Try(BlogSerializer.fromString(value))
 			jsonTry match {
 				case Success(json) =>
 					val blog = blogs get key getOrElse {

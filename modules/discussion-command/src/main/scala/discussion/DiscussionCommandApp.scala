@@ -17,7 +17,7 @@ object DiscussionCommandApp extends App {
       "localhost:9092")
     {
 			case ProducerData(topic, id, event) =>
-				val value = new BlogSerializer().toString(event)
+				val value = BlogSerializer.toString(event)
 				new ProducerRecord[Array[Byte], String](
 					topic, id.getBytes(), value)
 		}

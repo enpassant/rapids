@@ -105,8 +105,8 @@ case class Discussion(
   childCount: Int = 0
 ) extends BlogMessage
 
-class BlogSerializer extends common.JsonSerializer {
-	def identifier = 0xfeca
+object BlogSerializer extends common.JsonSerializer {
+	def identifier = 0xfecb
 
 	implicit val formats = new DefaultFormats {
 		override val typeHintFieldName = "_t"

@@ -30,7 +30,7 @@ object DiscussionQueryBuilder extends App {
 			val consumerRecord = msg.record
 			implicit val timeout = Timeout(1000.milliseconds)
 			val key = new String(consumerRecord.key)
-			val jsonTry = Try(new BlogSerializer().fromString(consumerRecord.value))
+			val jsonTry = Try(BlogSerializer.fromString(consumerRecord.value))
 			val result = Future { jsonTry match {
 				case Success(json) =>
           json match {

@@ -22,7 +22,7 @@ class DiscussionService() extends Actor {
 
   def process(actors: Map[String, ActorRef]): Receive = {
     case message @ ConsumerData(key, value) =>
-			val jsonTry = Try(new BlogSerializer().fromString(value))
+			val jsonTry = Try(BlogSerializer.fromString(value))
 			jsonTry match {
 				case Success(json) =>
 					val actor = actors get key getOrElse {

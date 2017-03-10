@@ -35,7 +35,7 @@ object WebApp extends App {
 		lazy val consumerSource = Kafka.createConsumerSource(
 			"localhost:9092",
 			"webapp",
-			"client-commands")
+			"client-commands", "webapp")
 		{
       msg => Future {
         (TextMessage(msg.record.value), msg)
@@ -55,7 +55,7 @@ object WebApp extends App {
                 respondWithHeader(RawHeader("X-Token", loggedIn.token)) {
                   entity(as[String]) { message =>
                     onSuccess {
-                      val msgLogged = new BlogSerializer().toString(loggedIn)
+                      val msgLogged = BlogSerializer.toString(loggedIn)
                       if (loggedIn.created > 0) {
                         producer.offer(
                           ProducerData("user", loggedIn.userId, msgLogged))
