@@ -8,7 +8,8 @@ import akka.kafka.ConsumerMessage._
 import akka.kafka.scaladsl._
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.RawHeader
+import akka.http.scaladsl.model.headers._
+import akka.http.scaladsl.model.headers.LinkParams._
 import akka.http.scaladsl.model.ws.{UpgradeToWebSocket, TextMessage}
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.Directives._
@@ -98,7 +99,11 @@ object WebApp extends App {
 				}
 			} ~
 			path("") {
-				getFromResource(s"public/html/index.html")
+        (get | head) {
+          respondWithHeader(Link(LinkValue(Uri("/blog"), title("Blog")))) {
+            getFromResource(s"public/html/index.html")
+          }
+        }
 			} ~
 			path("""([^/]+\.html).*""".r) { path =>
 				getFromResource(s"public/html/$path")

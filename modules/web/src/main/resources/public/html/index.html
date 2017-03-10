@@ -87,6 +87,8 @@
                 console.log("WebSocket clientId: " + clientId);
 
                 var token = undefined;
+                var baseUrl = undefined;
+                var linkObjs = undefined;
 
                 function WebSocketTest()
                 {
@@ -135,12 +137,19 @@
                     }
                 }
 
-                window.ajaxGet = function(url) {
+                window.ajaxGet = function(url, method) {
                     return new Promise(function(resolve, reject) {
                         let req = new XMLHttpRequest();
-                        req.open("GET", url);
+                        req.open(method || "GET", url);
                         req.onload = function() {
                             if (req.status === 200) {
+                                const links = req.getResponseHeader("Link");
+                                if (links) {
+                                    linkObjs = links.split(",").map(parseLink);
+                                    baseUrl = linkObjs[0].url;
+                                } else {
+                                    linkObjs = [];
+                                }
                                 resolve(req.response);
                             } else {
                                 reject(new Error(req.statusText));
@@ -214,7 +223,16 @@
                 var el = null;
                 function router () {
                     el = el || byId('view');
-                    var url = location.hash.slice(1) || '/blog';
+                    var url = location.hash.slice(1) || baseUrl;
+                    if (!url && !linkObjs) {
+                        ajaxGet(window.location.href, "HEAD").then(
+                            function(data) {
+                                url = baseUrl;
+                                router();
+                            }
+                        );
+                        return;
+                    }
 
                     if (el && url) {
                         ajaxGet(url)
@@ -233,6 +251,28 @@
                             });
                     }
                 }
+
+                const dequote = function(str) {
+                    return str.replace(/"/g, '');
+                };
+
+                const parseLink = function(link) {
+                    const linkObj = {};
+                    const re = /<([^>]+)>(.*)/g;
+                    const result = re.exec(link.trim());
+                    if (result && result.length >= 3) {
+                        linkObj.url = result[1];
+                        const linkArr = result[2].split(";");
+                        const linkObjArr = linkArr.map(function(linkItem) {
+                            const linkItemArr = linkItem.trim().split("=");
+                            if (linkItemArr.length >= 2) {
+                                const value = dequote(linkItemArr[1]);
+                                linkObj[linkItemArr[0]] = value;
+                            }
+                        });
+                    }
+                    return linkObj;
+                };
 
                 window.byId = function(id) {
                     return document.getElementById(id);
