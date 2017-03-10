@@ -164,12 +164,10 @@
                         if (typeof payload !== "undefined") {
                             const now = new Date().getTime() / 1000;
                             if (now <= payload.exp) {
-                                req.setRequestHeader("Authorization", token);
+                                req.setRequestHeader("Authorization",
+                                    "Bearer " + token);
                             } else {
                                 token = undefined;
-                                if (typeof(Storage) !== "undefined") {
-                                    localStorage.removeItem("token");
-                                }
                             }
                         }
                         req.onload = function() {
@@ -177,9 +175,6 @@
                                 var t = req.getResponseHeader("X-Token");
                                 if (typeof t !== "undefined") {
                                     token = t;
-                                    if (typeof(Storage) !== "undefined") {
-                                        localStorage.token = token;
-                                    }
                                 }
                                 resolve(req.response);
                             } else {
@@ -246,10 +241,6 @@
                 window.isHidden = function(el) {
                     var style = window.getComputedStyle(el);
                     return (style.display === 'none')
-                }
-
-                if (typeof(Storage) !== "undefined") {
-                    token = localStorage.token;
                 }
 
                 window.addEventListener('hashchange', router);

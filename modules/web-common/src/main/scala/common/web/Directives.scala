@@ -1,6 +1,5 @@
 package common.web
 
-import auth._
 import common._
 
 import akka.actor._

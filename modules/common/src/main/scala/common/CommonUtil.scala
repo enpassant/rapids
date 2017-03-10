@@ -38,8 +38,7 @@ object CommonUtil {
     val payload64 = encoder.encodeToString(payload.padTo(len, ' ').getBytes)
     CommonUtil.encodeOpt("secret", s"$header.$payload64") { t =>
       val token = encoder.encodeToString(t)
-      Some(LoggedIn(
-        user.id, s"Bearer $header.$payload64.$token", validTo, created))
+      Some(LoggedIn(user.id, s"$header.$payload64.$token", validTo, created))
     }
   }
 
