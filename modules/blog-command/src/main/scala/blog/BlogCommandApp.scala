@@ -21,43 +21,56 @@ object BlogCommandApp extends App {
 					topic, id.getBytes(), value)
 		}
 
+		val producerStat = Kafka.createProducer[ProducerData[String]](
+      "localhost:9092")
+    {
+			case ProducerData(topic, id, event) =>
+				new ProducerRecord[Array[Byte], String](
+					topic, id.getBytes(), event)
+		}
+
 		val service = system.actorOf(BlogService.props, s"blog-service")
+
+    val statActor = system.actorOf(
+      Performance.props("blog-command", producerStat))
 
 		val consumer = Kafka.createConsumer(
 			"localhost:9092",
 			"blog-command",
 			"blog-command")
 		{ msg =>
-			val consumerRecord = msg.record
-			implicit val timeout = Timeout(3000.milliseconds)
-			val key = new String(consumerRecord.key)
-			val result = service ? common.ConsumerData(key, consumerRecord.value)
-			result collect {
-				case event @ BlogCreated(blogId, userId, userName, title, content) =>
-					//val id = common.CommonUtil.uuid
-					val id = s"disc-$blogId"
-					producer.offer(
-            ProducerData("blog-event", blogId, event))
-					producer.offer(
-            ProducerData(
-              "discussion-command",
-              id,
-              StartDiscussion(id, blogId, title, userId, userName)))
-					msg.committableOffset
-				case event @ DiscussionStarted(id, userId, userName, blogId, title) =>
-					producer.offer(
-            ProducerData("blog-event", blogId, event))
-					msg.committableOffset
-				case message: WrongMessage =>
-					producer.offer(ProducerData("error", "FATAL", message))
-					msg.committableOffset
-				case message =>
-					msg.committableOffset
-			} recover {
-        case e: Exception =>
-					producer.offer(
-            ProducerData("error", "FATAL", WrongMessage(e.toString)))
-          msg.committableOffset
+      Performance.statF(statActor) {
+        val consumerRecord = msg.record
+        implicit val timeout = Timeout(3000.milliseconds)
+        val key = new String(consumerRecord.key)
+        val result = service ? common.ConsumerData(key, consumerRecord.value)
+        result collect {
+          case event @ BlogCreated(blogId, userId, userName, title, content) =>
+            //val id = common.CommonUtil.uuid
+            val id = s"disc-$blogId"
+            producer.offer(
+              ProducerData("blog-event", blogId, event))
+            producer.offer(
+              ProducerData(
+                "discussion-command",
+                id,
+                StartDiscussion(id, blogId, title, userId, userName)))
+            msg.committableOffset
+          case event @ DiscussionStarted(id, userId, userName, blogId, title) =>
+            producer.offer(
+              ProducerData("blog-event", blogId, event))
+            msg.committableOffset
+          case message: WrongMessage =>
+            producer.offer(ProducerData("error", "FATAL", message))
+            msg.committableOffset
+          case message =>
+            msg.committableOffset
+        } recover {
+          case e: Exception =>
+            producer.offer(
+              ProducerData("error", "FATAL", WrongMessage(e.toString)))
+            msg.committableOffset
+        }
       }
 		}
     consumer.onComplete {

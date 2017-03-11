@@ -22,36 +22,49 @@ object DiscussionCommandApp extends App {
 					topic, id.getBytes(), value)
 		}
 
+		val producerStat = Kafka.createProducer[ProducerData[String]](
+      "localhost:9092")
+    {
+			case ProducerData(topic, id, event) =>
+				new ProducerRecord[Array[Byte], String](
+					topic, id.getBytes(), event)
+		}
+
 		val service = system.actorOf(DiscussionService.props, s"discussion-service")
+
+    val statActor = system.actorOf(
+      Performance.props("disc-command", producerStat))
 
 		val consumer = Kafka.createConsumer(
 			"localhost:9092",
 			"discussion-command",
 			"discussion-command")
 		{ msg =>
-			val consumerRecord = msg.record
-			implicit val timeout = Timeout(3000.milliseconds)
-			val key = new String(consumerRecord.key)
-			val result = service ? common.ConsumerData(key, consumerRecord.value)
-			result collect {
-				case event: DiscussionStarted =>
-					producer.offer(ProducerData("blog-command", event.blogId, event))
-					producer.offer(ProducerData("discussion-event", key, event))
-					msg.committableOffset
-				case event: DiscussionEvent =>
-					producer.offer(ProducerData("discussion-event", key, event))
-					msg.committableOffset
-				case message: WrongMessage =>
-					producer.offer(ProducerData("error", "FATAL", message))
-					msg.committableOffset
-				case message =>
-					msg.committableOffset
-			} recover {
-        case e: Exception =>
-					producer.offer(
-            ProducerData("error", "FATAL", WrongMessage(e + " " + e.toString)))
-          msg.committableOffset
-			}
+      Performance.statF(statActor) {
+        val consumerRecord = msg.record
+        implicit val timeout = Timeout(3000.milliseconds)
+        val key = new String(consumerRecord.key)
+        val result = service ? common.ConsumerData(key, consumerRecord.value)
+        result collect {
+          case event: DiscussionStarted =>
+            producer.offer(ProducerData("blog-command", event.blogId, event))
+            producer.offer(ProducerData("discussion-event", key, event))
+            msg.committableOffset
+          case event: DiscussionEvent =>
+            producer.offer(ProducerData("discussion-event", key, event))
+            msg.committableOffset
+          case message: WrongMessage =>
+            producer.offer(ProducerData("error", "FATAL", message))
+            msg.committableOffset
+          case message =>
+            msg.committableOffset
+        } recover {
+          case e: Exception =>
+            producer.offer(
+              ProducerData("error", "FATAL", WrongMessage(e + " " + e.toString)))
+            msg.committableOffset
+        }
+      }
 		}
     consumer.onComplete {
       case Success(done) =>
