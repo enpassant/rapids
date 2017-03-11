@@ -18,12 +18,15 @@ case class IntervalData(reqNum: Long, min: Long, max: Long, sum: Long) {
   }
 }
 
+case object Tick
+
 class StatActor(msId: String, producer: SourceQueue[ProducerData[String]])
   extends Actor
 {
   import context.dispatcher
+
   val tick =
-    context.system.scheduler.schedule(10000 millis, 10000 millis, self, "tick")
+    context.system.scheduler.schedule(1000 millis, 1000 millis, self, Tick)
 
   override def postStop() = tick.cancel()
 
@@ -34,7 +37,7 @@ class StatActor(msId: String, producer: SourceQueue[ProducerData[String]])
   def collect(intervalData: IntervalData): Receive = {
     case StatData(time) =>
       context become collect(intervalData.add(time))
-    case "tick" =>
+    case Tick =>
       val reqNum = intervalData.reqNum
       val stat = Stat(
         reqNum,
