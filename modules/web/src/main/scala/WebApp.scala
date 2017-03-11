@@ -63,6 +63,8 @@ object WebApp extends App {
       Future { msg.committableOffset }
     }
 
+    val statActor = system.actorOf(Performance.props("web-app", producer))
+
     def getLink() = {
       Link(
         links.toList map { functionLink =>
@@ -137,7 +139,9 @@ object WebApp extends App {
 				getFromResource(s"public/$path")
 			}
 
-		encodeResponse { route }
+    stat(statActor) {
+  		encodeResponse { route }
+    }
 	}
 
   def getUser(id: String) = {
