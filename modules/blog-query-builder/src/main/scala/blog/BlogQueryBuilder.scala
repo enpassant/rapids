@@ -21,43 +21,55 @@ object BlogQueryBuilder extends App {
     val mongoClient = MongoClient(MongoClientURI(uri))
     val collection = mongoClient.getDB("blog")("blog")
 
+		val producer = Kafka.createProducer[ProducerData[String]]("localhost:9092")
+    {
+			case ProducerData(topic, id, value) =>
+				new ProducerRecord[Array[Byte], String](
+					topic, id.getBytes(), value)
+		}
+
+    val statActor = system.actorOf(
+      Performance.props("blog-query-builder", producer))
+
 		val consumer = Kafka.createConsumer(
 			"localhost:9092",
 			"blog-query",
 			"blog-event")
 		{ msg =>
-			val consumerRecord = msg.record
-			implicit val timeout = Timeout(1000.milliseconds)
-			val key = new String(consumerRecord.key)
-			val jsonTry = Try(BlogSerializer.fromString(consumerRecord.value))
-			val result = Future { jsonTry match {
-				case Success(json) =>
-          json match {
-            case BlogCreated(id, userId, userName, title, content) =>
-              collection.insert(
-                MongoDBObject(
-                  "_id" -> id,
-                  "userId" -> userId,
-                  "userName" -> userName,
-                  "title" -> title,
-                  "content" -> content,
-                  "discussions" -> Seq()))
-            case DiscussionStarted(id, userId, userName, blogId, title) =>
-              collection.update(
-                MongoDBObject("_id" -> blogId),
-                $push("discussions" ->
+      Performance.statF(statActor) {
+        val consumerRecord = msg.record
+        implicit val timeout = Timeout(1000.milliseconds)
+        val key = new String(consumerRecord.key)
+        val jsonTry = Try(BlogSerializer.fromString(consumerRecord.value))
+        val result = Future { jsonTry match {
+          case Success(json) =>
+            json match {
+              case BlogCreated(id, userId, userName, title, content) =>
+                collection.insert(
                   MongoDBObject(
-                    "id" -> id,
+                    "_id" -> id,
                     "userId" -> userId,
                     "userName" -> userName,
-                    "title" -> title)))
-            case _ => 1
-          }
-				case Failure(e) =>
-          println("Wrong json format: " + e)
-					e
-			} }
-      result map { _ => msg.committableOffset }
+                    "title" -> title,
+                    "content" -> content,
+                    "discussions" -> Seq()))
+              case DiscussionStarted(id, userId, userName, blogId, title) =>
+                collection.update(
+                  MongoDBObject("_id" -> blogId),
+                  $push("discussions" ->
+                    MongoDBObject(
+                      "id" -> id,
+                      "userId" -> userId,
+                      "userName" -> userName,
+                      "title" -> title)))
+              case _ => 1
+            }
+          case Failure(e) =>
+            println("Wrong json format: " + e)
+            e
+        } }
+        result map { _ => msg.committableOffset }
+      }
 		}
     consumer.onComplete {
       case Success(done) =>

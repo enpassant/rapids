@@ -3,7 +3,9 @@ package common
 import akka.actor._
 import akka.stream._
 import akka.stream.scaladsl._
+import scala.concurrent.Future
 import scala.concurrent.duration._
+import scala.util.{Try, Success, Failure}
 
 case class StatData(time: Long)
 case class Stat(reqNum: Long, min: Long, max: Long, avg: Long)
@@ -52,6 +54,8 @@ class StatActor(msId: String, producer: SourceQueue[ProducerData[String]])
 }
 
 object Performance {
+  import scala.concurrent.ExecutionContext.Implicits.global
+
 	def props(msId: String, producer: SourceQueue[ProducerData[String]]) =
     Props(new StatActor(msId, producer))
 
@@ -62,5 +66,15 @@ object Performance {
 
     statActor ! StatData(end - start)
     result
+  }
+
+  def statF[T](statActor: ActorRef)(process: => Future[T]) = {
+    val start = System.nanoTime
+    process map {
+      value =>
+        val end = System.nanoTime
+        statActor ! StatData(end - start)
+        value
+    }
   }
 }
