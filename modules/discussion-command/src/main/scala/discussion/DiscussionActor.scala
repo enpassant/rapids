@@ -96,7 +96,6 @@ class DiscussionActor(val id: String) extends Actor with PersistentActor {
         }
       }
     case msg =>
-      println(msg.toString)
       sender ! WrongMessage(msg.toString)
   }
 }
