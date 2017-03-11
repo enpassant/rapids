@@ -26,7 +26,7 @@ class StatActor(msId: String, producer: SourceQueue[ProducerData[String]])
   import context.dispatcher
 
   val tick =
-    context.system.scheduler.schedule(1000 millis, 1000 millis, self, Tick)
+    context.system.scheduler.schedule(5000 millis, 5000 millis, self, Tick)
 
   override def postStop() = tick.cancel()
 

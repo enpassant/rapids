@@ -12,6 +12,7 @@ import com.github.jknack.handlebars.{ Context, Handlebars, Template }
 import com.mongodb.casbah.Imports._
 import com.typesafe.config.ConfigFactory
 import fixiegrips.{ Json4sHelpers, Json4sResolver }
+import org.apache.kafka.clients.producer.ProducerRecord
 import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
 import org.json4s.mongo.JObjectParser._
@@ -35,6 +36,16 @@ object DiscussionQuery extends App with BaseFormats {
     val commentNew = handlebars.compile("comment-new")
     val commentReply = handlebars.compile("comment-reply")
     val discussion = handlebars.compile("discussion")
+
+		val producer = Kafka.createProducer[ProducerData[String]]("localhost:9092")
+    {
+			case ProducerData(topic, id, value) =>
+				new ProducerRecord[Array[Byte], String](
+					topic, id.getBytes(), value)
+		}
+
+    val statActor = system.actorOf(
+      Performance.props("discussion-query", producer))
 
 		val route =
       pathPrefix("discussion") {
@@ -69,7 +80,7 @@ object DiscussionQuery extends App with BaseFormats {
         }
       }
 
-		route
+    stat(statActor)(route)
 	}
 
 	implicit val system = ActorSystem("DiscussionQuery")
