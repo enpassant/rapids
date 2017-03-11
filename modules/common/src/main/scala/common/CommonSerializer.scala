@@ -21,7 +21,8 @@ object CommonSerializer extends common.JsonSerializer {
 	implicit val formats = new DefaultFormats {
 		override val typeHintFieldName = "_t"
 		override val typeHints = ShortTypeHints(List(
-			classOf[FunctionLink]
+			classOf[FunctionLink],
+			classOf[Stat]
 		))
 	} ++ org.json4s.ext.JodaTimeSerializers.all
 }

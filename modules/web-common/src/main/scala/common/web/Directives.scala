@@ -8,6 +8,7 @@ import akka.http.scaladsl.marshalling.ToResponseMarshallable
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.Accept
 import akka.http.scaladsl.server.directives.Credentials
+import akka.http.scaladsl.server.{RequestContext, Route}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream._
@@ -98,4 +99,7 @@ object Directives extends BaseFormats {
   val authenticates = (getUser: String => User) =>
     authenticateOAuth2("rapids", authenticateJwt(getUser)) |
       authenticateBasic(realm = "rapids", authenticate(getUser))
+
+  def stat(statActor: ActorRef)(route: Route) = (request: RequestContext) =>
+    Performance.stat(statActor)(route(request))
 }

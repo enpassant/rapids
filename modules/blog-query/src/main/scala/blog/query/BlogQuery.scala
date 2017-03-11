@@ -45,6 +45,8 @@ object BlogQuery extends App with BaseFormats {
     val link = CommonSerializer.toString(FunctionLink(0, "/blog", "Blogs"))
     producer.offer(ProducerData("web-app", "blog-query", link))
 
+    val statActor = system.actorOf(Performance.props("blog-query", producer))
+
 		val route =
       pathPrefix("blog") {
         pathEnd {
@@ -70,7 +72,7 @@ object BlogQuery extends App with BaseFormats {
         }
       }
 
-		route
+    stat(statActor)(route)
 	}
 
 	implicit val system = ActorSystem("BlogQuery")
