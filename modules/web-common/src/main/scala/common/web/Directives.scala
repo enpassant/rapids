@@ -101,5 +101,5 @@ object Directives extends BaseFormats {
       authenticateBasic(realm = "rapids", authenticate(getUser))
 
   def stat(statActor: ActorRef)(route: Route) = (request: RequestContext) =>
-    Performance.stat(statActor)(route(request))
+    Performance.statF(statActor)(route(request))
 }
