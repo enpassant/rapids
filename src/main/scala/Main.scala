@@ -13,7 +13,7 @@ object Main extends App {
 	val routeBlogQuery = blog.query.BlogQuery.start
 	val routeDiscussionQuery = discussion.query.DiscussionQuery.start
 	val routeMonitor = monitor.Monitor.start
-	val route = routeWeb ~ routeBlogQuery ~ routeDiscussionQuery ~ routeMonitor
+	val route = routeBlogQuery ~ routeDiscussionQuery ~ routeMonitor ~ routeWeb
 	blog.BlogCommandApp.start(system)
 	discussion.DiscussionCommandApp.start(system)
 	blog.BlogQueryBuilder.start(system)
