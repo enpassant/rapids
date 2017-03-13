@@ -28,13 +28,6 @@ object Monitor extends App with BaseFormats {
 
     val config = ConfigFactory.load
 
-    val handlebars = new Handlebars().registerHelpers(Json4sHelpers)
-    def ctx(obj: Object) =
-      Context.newBuilder(obj).resolver(Json4sResolver).build
-    val render = (template: Template) => (obj: Object) => template(ctx(obj))
-
-    val monitor = handlebars.compile("monitor")
-
     var stats = Map.empty[String, Stat]
     //var stats = List.empty[Stat]
 

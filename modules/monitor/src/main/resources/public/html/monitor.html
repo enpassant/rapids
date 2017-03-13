@@ -1,8 +1,73 @@
-<div>
-    <a href="javascript:WSMonitor()">Run WebSocket</a>
+<div id="monitor">
 </div>
 
 <script type="text/javascript">
+    const { render, Component, createElement } = Inferno;
+
+    const stats = {
+        "web-app": {
+            "reqNum": 10,
+            "failed": 0,
+            "min": 15,
+            "max": 24,
+            "avg": 19
+        },
+        "monitor": {
+            "reqNum": 10,
+            "failed": 0,
+            "min": 15,
+            "max": 24,
+            "avg": 19
+        }
+    };
+
+    function Bar(width, y) {
+        return [
+            createElement('g', { "className": "bar" },
+                createElement(
+                    'rect',
+                    { "width": width, "height": 8, "y": y }),
+                createElement(
+                    'text',
+                    { "x": width + 2, "height": 8, "y": y + 5,
+                        "font-size": 7 },
+                    width))
+        ];
+    }
+
+    function MsStat(props) {
+        const bars = [
+            Bar(props.stat.min, 40),
+            Bar(props.stat.avg, 50),
+            Bar(props.stat.max, 60)
+        ];
+        return createElement('svg',
+            { "className": "stat", "width": 150, "height": 100 },
+            [
+                createElement(
+                    'text',
+                    { "x": props.stat.reqNum + 1, "y": 15 },
+                    props.key),
+                createElement(
+                    'text',
+                    { "x": props.stat.reqNum + 1, "y": 35 },
+                    props.stat.reqNum + "/" + props.stat.failed)
+            ].concat(bars)
+        );
+    }
+
+    function Microservices(props) {
+        const msStats = Object.keys(stats).map(function(objectKey, index) {
+            var value = {
+                "key": objectKey,
+                "stat": stats[objectKey]
+            };
+            console.log(value);
+            return MsStat(value);
+        });
+        return createElement('div', null, msStats);
+    }
+
     (function() {
         function WSMonitor()
         {
@@ -41,5 +106,7 @@
             }
         }
         var webSocket = WSMonitor();
-        })();
+
+        Inferno.render(Microservices(), document.getElementById('monitor'));
+    })();
 </script>
