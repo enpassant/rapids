@@ -146,6 +146,7 @@
                     return new Promise(function(resolve, reject) {
                         let req = new XMLHttpRequest();
                         req.open(method || "GET", url);
+                        req.setRequestHeader('Cache-Control', 'no-cache');
                         req.onload = function() {
                             if (req.status === 200) {
                                 const links = req.getResponseHeader("Link");

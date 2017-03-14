@@ -4,23 +4,6 @@
 <script type="text/javascript">
     const { render, Component, createElement } = Inferno;
 
-    const stats = {
-        "web-app": {
-            "reqNum": 10,
-            "failed": 0,
-            "min": 15,
-            "max": 24,
-            "avg": 19
-        },
-        "monitor": {
-            "reqNum": 10,
-            "failed": 0,
-            "min": 15,
-            "max": 24,
-            "avg": 19
-        }
-    };
-
     function Bar(width, y) {
         return [
             createElement('g', { "className": "bar" },
@@ -56,7 +39,7 @@
         );
     }
 
-    function Microservices(props) {
+    function Microservices(stats) {
         const msStats = Object.keys(stats).map(function(objectKey, index) {
             var value = {
                 "key": objectKey,
@@ -90,7 +73,9 @@
                     self.ws.onmessage = function (evt)
                     {
                         var received_msg = evt.data;
-                        console.log("Message is received:\n" + received_msg);
+                        console.log("1 Message is received:\n" + received_msg);
+                        const stats = JSON.parse(evt.data);
+                        Inferno.render(Microservices(stats), document.getElementById('monitor'));
                     };
 
                     self.ws.onclose = function()
@@ -106,7 +91,5 @@
             }
         }
         var webSocket = WSMonitor();
-
-        Inferno.render(Microservices(), document.getElementById('monitor'));
     })();
 </script>
