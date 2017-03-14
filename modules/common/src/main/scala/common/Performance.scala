@@ -65,7 +65,7 @@ object Performance {
     val result = process
     val end = System.nanoTime
 
-    statActor ! StatData(end - start)
+    statActor ! StatData((end - start) / 1000000)
     result
   }
 
@@ -74,12 +74,12 @@ object Performance {
     val result = process map {
       value =>
         val end = System.nanoTime
-        statActor ! StatData(end - start)
+        statActor ! StatData((end - start) / 1000000)
         value
     }
     result.failed.foreach { e =>
       val end = System.nanoTime
-      statActor ! StatData(end - start, false)
+      statActor ! StatData((end - start) / 1000000, false)
     }
     result
   }

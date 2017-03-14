@@ -45,7 +45,6 @@
                 "key": objectKey,
                 "stat": stats[objectKey]
             };
-            console.log(value);
             return MsStat(value);
         });
         return createElement('div', null, msStats);
@@ -72,10 +71,10 @@
 
                     self.ws.onmessage = function (evt)
                     {
-                        var received_msg = evt.data;
-                        console.log("1 Message is received:\n" + received_msg);
                         const stats = JSON.parse(evt.data);
-                        Inferno.render(Microservices(stats), document.getElementById('monitor'));
+                        Inferno.render(
+                            Microservices(stats),
+                            document.getElementById('monitor'));
                     };
 
                     self.ws.onclose = function()
