@@ -28,8 +28,13 @@ object Monitor extends App with BaseFormats {
 
     val config = ConfigFactory.load
 
-    var stats = Map.empty[String, Stat]
-    //var stats = List.empty[Stat]
+    val (wsSourceQueue, wsSource) =
+      Source.queue[String](100, OverflowStrategy.backpressure)
+      .map(x => TextMessage(x))
+      .toMat(BroadcastHub.sink(bufferSize = 256))(Keep.both)
+      .run()
+
+    val monitorActor = system.actorOf(MonitorActor.props(wsSourceQueue))
 
 		val consumer = Kafka.createConsumer(
 			"localhost:9092",
@@ -41,8 +46,7 @@ object Monitor extends App with BaseFormats {
         case Success(json) =>
           json match {
             case stat: Stat =>
-              stats = stats + (new String(msg.record.key) -> stat)
-              //stats = stats :+ stat
+              monitorActor ! (new String(msg.record.key), stat)
           }
         }
       }
@@ -55,8 +59,6 @@ object Monitor extends App with BaseFormats {
 				new ProducerRecord[Array[Byte], String](
 					topic, id.getBytes(), value)
 		}
-
-    val wsSource = Source.tick(1.seconds, 1.seconds, TextMessage("teszt"))
 
     val link = CommonSerializer.toString(FunctionLink(10, "/monitor", "Monitor"))
     producer.offer(ProducerData("web-app", "monitor", link))
