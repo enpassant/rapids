@@ -1,56 +1,86 @@
 <div id="monitor">
 </div>
 
+<style>
+    svg.stat {
+        margin: 2px;
+    }
+
+    svg.error {
+        border: 2px solid #ff0000;
+    }
+
+    svg.warning {
+        border: 2px solid #0000ff;
+    }
+
+    svg.info {
+        border: 2px solid #ffff00;
+    }
+
+    svg.normal {
+        border: 2px solid #000000;
+    }
+</style>
+
 <script type="text/javascript">
-    const { render, Component, createElement } = Inferno;
-
-    function Bar(width, y) {
-        return [
-            createElement('g', { "className": "bar" },
-                createElement(
-                    'rect',
-                    { "width": width, "height": 8, "y": y }),
-                createElement(
-                    'text',
-                    { "x": width + 2, "height": 8, "y": y + 5,
-                        "font-size": 7 },
-                    width))
-        ];
-    }
-
-    function MsStat(props) {
-        const bars = [
-            Bar(props.stat.min, 40),
-            Bar(props.stat.avg, 50),
-            Bar(props.stat.max, 60)
-        ];
-        return createElement('svg',
-            { "className": "stat", "width": 150, "height": 100 },
-            [
-                createElement(
-                    'text',
-                    { "x": 1, "y": 15 },
-                    props.key),
-                createElement(
-                    'text',
-                    { "x": 1, "y": 35 },
-                    props.stat.reqNum + "/" + props.stat.failed)
-            ].concat(bars)
-        );
-    }
-
-    function Microservices(stats) {
-        const msStats = Object.keys(stats).map(function(objectKey, index) {
-            var value = {
-                "key": objectKey,
-                "stat": stats[objectKey]
-            };
-            return MsStat(value);
-        });
-        return createElement('div', null, msStats);
-    }
-
     (function() {
+        const { render, Component, createElement } = Inferno;
+
+        function Bar(width, y) {
+            return [
+                createElement('g', { "className": "bar" },
+                    createElement(
+                        'rect',
+                        { "width": width, "height": 8, "y": y }),
+                    createElement(
+                        'text',
+                        { "x": width + 2, "height": 8, "y": y + 5,
+                            "font-size": 7 },
+                        width))
+            ];
+        }
+
+        function borderClass(avg) {
+            if (avg > 1000) return "error";
+            else if (avg > 300) return "warning";
+            else if (avg > 100) return "info";
+            return "normal";
+        }
+
+        function MsStat(props) {
+            const bars = [
+                Bar(props.stat.min, 40),
+                Bar(props.stat.avg, 50),
+                Bar(props.stat.max, 60)
+            ];
+            return createElement('svg',
+                { "className": "stat " + borderClass(props.stat.reqNum),
+                    "width": 150, "height": 100 },
+                [
+                    createElement(
+                        'text',
+                        { "x": 1, "y": 15 },
+                        props.key),
+                    createElement(
+                        'text',
+                        { "x": 1, "y": 35 },
+                        props.stat.reqNum + "/" + props.stat.failed)
+                ].concat(bars)
+            );
+        }
+
+        function Microservices(stats) {
+            const msStats = Object.keys(stats).map(function(objectKey, index) {
+                var value = {
+                    "key": objectKey,
+                    "stat": stats[objectKey]
+                };
+                return MsStat(value);
+            });
+            return createElement('div', null, msStats);
+        }
+
         function WSMonitor()
         {
             if ("WebSocket" in window)
