@@ -26,6 +26,17 @@ case class Stat(
       System.nanoTime / 1000000
     )
   }
+
+  def add(stat: Stat) = {
+    Stat(
+      reqNum + stat.reqNum,
+      if (stat.min < min) stat.min else min,
+      if (stat.max > max) stat.max else max,
+      avg + stat.avg,
+      failed + stat.failed,
+      stat.time
+    )
+  }
 }
 
 case object Tick
@@ -36,7 +47,7 @@ class StatActor(msId: String, producer: SourceQueue[ProducerData[String]])
   import context.dispatcher
 
   val tick =
-    context.system.scheduler.schedule(5000 millis, 5000 millis, self, Tick)
+    context.system.scheduler.schedule(1000 millis, 1000 millis, self, Tick)
 
   override def postStop() = tick.cancel()
 

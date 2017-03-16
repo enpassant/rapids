@@ -20,15 +20,19 @@ class MonitorActor(producer: SourceQueue[String]) extends Actor {
 
   var stats = Map.empty[String, Stat]
 
-  val emptyIntervalData = Stat(0, Long.MaxValue, 0, 0, 0, 0)
-
   def receive = collect(Map.empty[String, Stat])
 
   def collect(stats: Map[String, Stat]): Receive = {
     case (key: String, stat: Stat) =>
-      context become collect(stats + (key -> stat))
+      val updatedStat =
+        if (stats contains key) stats(key) add stat
+        else stat
+      context become collect(stats + (key -> updatedStat))
     case Tick =>
       producer offer CommonSerializer.toString(stats)
+      context become collect(stats map {
+        case (k, s) => k -> Stat(0, 0, 0, 0, 0, 0)
+      })
   }
 }
 
