@@ -8,14 +8,22 @@ import scala.concurrent.duration._
 import scala.util.{Try, Success, Failure}
 
 case class StatData(time: Long, success: Boolean = true)
-case class Stat(reqNum: Long, min: Long, max: Long, avg: Long, failed: Long) {
-  def add(time: Long, success: Boolean = true) = {
+case class Stat(
+  reqNum: Long,
+  min: Long,
+  max: Long,
+  avg: Long,
+  failed: Long,
+  time: Long)
+{
+  def add(duration: Long, success: Boolean = true) = {
     Stat(
       if (success) reqNum + 1 else reqNum,
-      if (time < min) time else min,
-      if (time > max) time else max,
-      avg + time,
-      if (success) failed else failed + 1
+      if (duration < min) duration else min,
+      if (duration > max) duration else max,
+      avg + duration,
+      if (success) failed else failed + 1,
+      System.nanoTime / 1000000
     )
   }
 }
@@ -32,7 +40,7 @@ class StatActor(msId: String, producer: SourceQueue[ProducerData[String]])
 
   override def postStop() = tick.cancel()
 
-  val emptyIntervalData = Stat(0, Long.MaxValue, 0, 0, 0)
+  val emptyIntervalData = Stat(0, Long.MaxValue, 0, 0, 0, 0)
 
   def receive = collect(emptyIntervalData)
 
@@ -46,7 +54,8 @@ class StatActor(msId: String, producer: SourceQueue[ProducerData[String]])
         if (reqNum > 0) intervalData.min else 0,
         intervalData.max,
         if (reqNum > 0) intervalData.avg / reqNum else intervalData.avg,
-        intervalData.failed
+        intervalData.failed,
+        System.currentTimeMillis / 1000
       )
       producer offer
         ProducerData("performance", msId, CommonSerializer.toString(stat))

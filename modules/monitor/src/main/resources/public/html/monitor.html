@@ -4,15 +4,19 @@
 <style>
     svg.stat {
         margin: 2px;
+        background: #ffffff;
     }
 
     svg.error {
+        background: #ffafaf;
     }
 
     svg.warning {
+        background: #ffedaf;
     }
 
     svg.info {
+        background: #afceff;
     }
 
     svg.normal {
@@ -57,6 +61,14 @@
             return createElement('g', { "className": "bar" }, children);
         }
 
+        function errorClass(time) {
+            const duration = new Date().getTime() / 1000 - time;
+            if (duration > 30) return "error";
+            else if (duration > 20) return "warning";
+            else if (duration > 10) return "info";
+            return "";
+        }
+
         function borderClass(avg) {
             if (avg > 1000) return "veryslow";
             else if (avg > 300) return "slow";
@@ -72,7 +84,8 @@
                 Bar(props.stat.max, 0, 75)
             ];
             return createElement('svg',
-                { "className": "stat " + borderClass(props.stat.reqNum),
+                { "className": "stat " + borderClass(props.stat.reqNum) +
+                    " " + errorClass(props.stat.time),
                     "width": 150, "height": 100 },
                 [
                     createElement(

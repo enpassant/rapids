@@ -20,7 +20,7 @@ class MonitorActor(producer: SourceQueue[String]) extends Actor {
 
   var stats = Map.empty[String, Stat]
 
-  val emptyIntervalData = Stat(0, Long.MaxValue, 0, 0, 0)
+  val emptyIntervalData = Stat(0, Long.MaxValue, 0, 0, 0, 0)
 
   def receive = collect(Map.empty[String, Stat])
 
