@@ -14,11 +14,9 @@ class MonitorActor(producer: SourceQueue[String]) extends Actor {
   import context.dispatcher
 
   val tick =
-    context.system.scheduler.schedule(5000 millis, 5000 millis, self, Tick)
+    context.system.scheduler.schedule(2000 millis, 2000 millis, self, Tick)
 
   override def postStop() = tick.cancel()
-
-  var stats = Map.empty[String, Stat]
 
   def receive = collect(Map.empty[String, Stat])
 
@@ -30,9 +28,10 @@ class MonitorActor(producer: SourceQueue[String]) extends Actor {
       context become collect(stats + (key -> updatedStat))
     case Tick =>
       producer offer CommonSerializer.toString(stats)
-      context become collect(stats map {
+      val emptyStats = stats map {
         case (k, s) => k -> Stat(0, 0, 0, 0, 0, 0)
-      })
+      }
+      context become collect(emptyStats)
   }
 }
 
