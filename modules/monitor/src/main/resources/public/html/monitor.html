@@ -50,12 +50,13 @@
 
         function Bar(max, width, ext, y, c) {
             const w = norm(width, max);
+            const e = norm(ext, max);
             const rects = [ Rect(w, 0, y) ].concat(
-                (ext > 0) ? [ Rect(ext, w, y, c) ] : []);
+                (ext > 0) ? [ Rect(e, w, y, c) ] : []);
             const children = rects.concat([
                 createElement(
                     'text',
-                    { "x": w + ext + 2, "height": 12, "y": y + 9,
+                    { "x": w + e + 2, "height": 12, "y": y + 9,
                         "font-size": 9 },
                     (ext > 0) ? (width + "/" + ext) : width )
             ]);
@@ -105,7 +106,8 @@
         function Microservices(stats) {
             const [maxNum, maxTime] = Object.keys(stats).reduce((acc, val) => {
                 const stat = stats[val];
-                const maxNum = (stat.reqNum > acc[0]) ? stat.reqNum : acc[0];
+                const num = stat.reqNum + stat.failed;
+                const maxNum = (num > acc[0]) ? num : acc[0];
                 const maxTime = (stat.max > acc[1]) ? stat.max : acc[1];
                 return [maxNum, maxTime];
             }, [100, 100]);
