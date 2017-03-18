@@ -12,6 +12,11 @@ class PerformanceGatling extends Simulation {
   )
 
   val scn = scenario("SimpleGatling")
+    .exec(
+      http("login").post("/login").basicAuth("john", "john")
+      .check(
+        header("X-Token").exists.saveAs("token"))
+    )
     //.feed(feeder)
     .repeat(50, "blogId") {
       exec(Command.createBlog)
@@ -41,17 +46,20 @@ class PerformanceGatling extends Simulation {
   object Command {
     val createBlog = http("CreateBlog")
       .post(s"/commands/blog/$${blogId}")
-      .body(StringBody(s"""{"_t":"CreateBlog", "title": "Blog $${blogId}", "content": "My $${blogId}. blog"}"""))
+      .header("Authorization", s"Bearer $${token}")
+      .body(StringBody(s"""{"_t":"CreateBlog", "title": "Blog $${blogId}", "content": "My $${blogId}. blog", "loggedIn": ""}"""))
       .check(status.is(session => 200))
 
     val addComment = http("AddComment")
       .post(s"/commands/discussion/disc-$${blogId}")
-      .body(StringBody(s"""{"_t":"AddComment", "id": "$${blogId}-$${commentId}", "content": "$${commentId}. megjegyzés"}"""))
+      .header("Authorization", s"Bearer $${token}")
+      .body(StringBody(s"""{"_t":"AddComment", "id": "$${blogId}-$${commentId}", "content": "$${commentId}. megjegyzés", "loggedIn": ""}"""))
       .check(status.is(session => 200))
 
     val replyComment = http("ReplyComment")
       .post(s"/commands/discussion/disc-$${blogId}")
-      .body(StringBody(s"""{"_t":"ReplyComment", "id": "$${blogId}-$${commentId}-$${replyId}", "parentId": "$${blogId}-$${commentId}", "content": "$${replyId}. válasz"}"""))
+      .header("Authorization", s"Bearer $${token}")
+      .body(StringBody(s"""{"_t":"ReplyComment", "id": "$${blogId}-$${commentId}-$${replyId}", "parentId": "$${blogId}-$${commentId}", "content": "$${replyId}. válasz", "loggedIn": ""}"""))
       .check(status.is(session => 200))
   }
 }
