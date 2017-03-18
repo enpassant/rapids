@@ -125,6 +125,15 @@ object WebApp extends App {
 					}
 				}
 			} ~
+			path("login") {
+        post {
+          authenticates(getUser) { loggedIn =>
+            respondWithHeader(RawHeader("X-Token", loggedIn.token)) {
+              complete("Logged in")
+            }
+          }
+        }
+      } ~
 			path("") {
         (get | head) {
           respondWithHeader(getLink()) {

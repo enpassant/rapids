@@ -5,6 +5,11 @@ import scala.util.Random
 
 class SimpleGatling extends Simulation {
   val scn = scenario("SimpleGatling")
+    .exec(
+      http("login").post("/login").basicAuth("john", "john")
+      .check(
+        header("X-Token").exists.saveAs("token"))
+    )
     .repeat(1, "blogId") {
       exec(Command.createBlog("simple"))
     }
@@ -31,18 +36,21 @@ class SimpleGatling extends Simulation {
   object Command {
     def createBlog(blogId: String) = http("CreateBlog")
       .post(s"/commands/blog/${blogId}")
-      .body(StringBody(s"""{"_t":"CreateBlog", "title": "Blog ${blogId}", "content": "My ${blogId}. blog"}"""))
+      .header("Authorization", s"Bearer $${token}")
+      .body(StringBody(s"""{"_t":"CreateBlog", "title": "Blog ${blogId}", "content": "My ${blogId}. blog", "loggedIn": ""}"""))
       .check(status.is(session => 200))
 
     def addComment(blogId: String, commentId: String) = http("AddComment")
       .post(s"/commands/discussion/disc-${blogId}")
-      .body(StringBody(s"""{"_t":"AddComment", "id": "${commentId}", "content": "${commentId}. megjegyzés"}"""))
+      .header("Authorization", s"Bearer $${token}")
+      .body(StringBody(s"""{"_t":"AddComment", "id": "${commentId}", "content": "${commentId}. megjegyzés", "loggedIn": ""}"""))
       .check(status.is(session => 200))
 
     def replyComment(blogId: String, commentId: String, replyId: String) = {
       http("ReplyComment")
       .post(s"/commands/discussion/disc-${blogId}")
-      .body(StringBody(s"""{"_t":"ReplyComment", "id": "${replyId}", "parentId": "${commentId}", "content": "${replyId}. válasz"}"""))
+      .header("Authorization", s"Bearer $${token}")
+      .body(StringBody(s"""{"_t":"ReplyComment", "id": "${replyId}", "parentId": "${commentId}", "content": "${replyId}. válasz", "loggedIn": ""}"""))
       .check(status.is(session => 200))
     }
   }
