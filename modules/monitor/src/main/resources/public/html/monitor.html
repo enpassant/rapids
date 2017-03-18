@@ -48,13 +48,14 @@
                     "stroke-width": 0, "fill": color });
         }
 
-        function Bar(width, ext, y, c) {
-            const rects = [ Rect(width, 0, y) ].concat(
-                (ext > 0) ? [ Rect(ext, width, y, c) ] : []);
+        function Bar(max, width, ext, y, c) {
+            const w = norm(width, max);
+            const rects = [ Rect(w, 0, y) ].concat(
+                (ext > 0) ? [ Rect(ext, w, y, c) ] : []);
             const children = rects.concat([
                 createElement(
                     'text',
-                    { "x": width + ext + 2, "height": 12, "y": y + 9,
+                    { "x": w + ext + 2, "height": 12, "y": y + 9,
                         "font-size": 9 },
                     (ext > 0) ? (width + "/" + ext) : width )
             ]);
@@ -76,15 +77,20 @@
             return "normal";
         }
 
-        function MsStat(props) {
+        function norm(value, max) {
+            if (max === 0) return value;
+            return Math.round(value * 100 / max);
+        }
+
+        function MsStat(props, maxNum, maxTime) {
             const bars = [
-                Bar(props.stat.reqNum, props.stat.failed, 30, "red"),
-                Bar(props.stat.min, 0, 45),
-                Bar(props.stat.avg, 0, 60),
-                Bar(props.stat.max, 0, 75)
+                Bar(maxNum, props.stat.reqNum, props.stat.failed, 30, "red"),
+                Bar(maxTime, props.stat.min, 0, 45),
+                Bar(maxTime, props.stat.avg, 0, 60),
+                Bar(maxTime, props.stat.max, 0, 75)
             ];
             return createElement('svg',
-                { "className": "stat " + borderClass(props.stat.reqNum) +
+                { "className": "stat " + borderClass(props.stat.avg) +
                     " " + errorClass(props.stat.time),
                     "width": 150, "height": 100 },
                 [
@@ -97,12 +103,18 @@
         }
 
         function Microservices(stats) {
+            const [maxNum, maxTime] = Object.keys(stats).reduce((acc, val) => {
+                const stat = stats[val];
+                const maxNum = (stat.reqNum > acc[0]) ? stat.reqNum : acc[0];
+                const maxTime = (stat.max > acc[1]) ? stat.max : acc[1];
+                return [maxNum, maxTime];
+            }, [100, 100]);
             const msStats = Object.keys(stats).map(function(objectKey, index) {
                 var value = {
                     "key": objectKey,
                     "stat": stats[objectKey]
                 };
-                return MsStat(value);
+                return MsStat(value, maxNum, maxTime);
             });
             return createElement('div', null, msStats);
         }
