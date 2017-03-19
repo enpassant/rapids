@@ -7,8 +7,7 @@ class RealGatling extends Simulation {
   val feeder = Iterator.continually(
     Map(
       "userId" -> Random.nextInt(100).toString,
-      "discId" -> Random.nextInt(10).toString,
-      "parentId" -> Random.nextInt(100).toString
+      "uuid" -> common.CommonUtil.uuid
     )
   )
 
@@ -24,12 +23,13 @@ class RealGatling extends Simulation {
     }
     .pause(900 milliseconds)
     .repeat(1, "blogId") {
-      repeat(5, "commentId") {
+      exec(Command.queryBlogs)
+      .repeat(5, "commentId") {
         exec(Command.addComment)
-        .pause(10 milliseconds)
-        .repeat(5, "replyId") {
-          exec(Command.replyComment)
-        }
+        //.pause(10 milliseconds)
+        //.repeat(5, "replyId") {
+          //exec(Command.replyComment)
+        //}
       }
     }
 
@@ -42,18 +42,25 @@ class RealGatling extends Simulation {
     .userAgentHeader("Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0")
 
   setUp(
-    scn.inject(rampUsersPerSec(1) to(100) during(50 seconds) randomized)
+    scn.inject(rampUsersPerSec(1) to(10) during(5 seconds) randomized)
   ).protocols(httpConf)
 
   object Command {
+    val queryBlogs = http("QueryBlogs")
+      .get("/blog")
+      .header("Authorization", s"Bearer $${token}")
+      .header(HttpHeaderNames.Accept, HttpHeaderValues.ApplicationJson)
+      .check(status.is(session => 200))
+      .check(jsonPath("$.blogs[*]._id").findAll.saveAs("blogIds"))
+
     val createBlog = http("CreateBlog")
-      .post(s"/commands/blog/$${userId}$${blogId}")
+      .post(s"/commands/blog/$${uuid}")
       .header("Authorization", s"Bearer $${token}")
       .body(StringBody(s"""{"_t":"CreateBlog", "title": "Blog $${userId} $${blogId}", "content": "My $${userId} $${blogId}. blog", "loggedIn": ""}"""))
       .check(status.is(session => 200))
 
     val addComment = http("AddComment")
-      .post(s"/commands/discussion/disc-$${userId}$${blogId}")
+      .post(s"/commands/discussion/$${blogIds.random()}")
       .header("Authorization", s"Bearer $${token}")
       .body(StringBody(s"""{"_t":"AddComment", "id": "$${userId}$${blogId}-$${commentId}", "content": "$${commentId}. megjegyzés", "loggedIn": ""}"""))
       .check(status.is(session => 200))
