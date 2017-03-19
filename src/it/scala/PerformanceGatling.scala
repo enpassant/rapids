@@ -4,20 +4,12 @@ import scala.concurrent.duration._
 import scala.util.Random
 
 class PerformanceGatling extends Simulation {
-  val feeder = Iterator.continually(
-    Map(
-      "discId" -> Random.nextInt(10).toString,
-      "parentId" -> Random.nextInt(100).toString
-    )
-  )
-
   val scn = scenario("SimpleGatling")
     .exec(
       http("login").post("/login").basicAuth("john", "john")
       .check(
         header("X-Token").exists.saveAs("token"))
     )
-    //.feed(feeder)
     .repeat(50, "blogId") {
       exec(Command.createBlog)
     }
