@@ -105,8 +105,9 @@
 
                         var open = function() {
                             console.log("Connection is opened...");
-                            self.ws = new WebSocket("ws://localhost:8080/updates/"
-                                + clientId);
+                            self.ws = new WebSocket("ws://" + location.hostname
+                                + (location.port ? ':' + location.port : '')
+                                + "/updates/" + clientId);
 
                             /*
                             self.ws.onopen = function()

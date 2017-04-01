@@ -21,12 +21,12 @@ import org.json4s.jackson.JsonMethods._
 import scala.concurrent.Future
 import scala.collection.SortedSet
 
-object WebApp extends App {
+object WebApp extends App with Microservice {
 	def start(implicit system: ActorSystem, materializer: ActorMaterializer) = {
 		implicit val executionContext = system.dispatcher
 
 		val producer = Kafka.createProducer[ProducerData[String]](
-      "localhost:9092")
+      kafkaServer)
     {
 			case ProducerData(topic, id, value) =>
 				new ProducerRecord[Array[Byte], String](
@@ -34,7 +34,7 @@ object WebApp extends App {
 		}
 
 		lazy val consumerSource = Kafka.createConsumerSource(
-			"localhost:9092",
+      kafkaServer,
 			"webapp",
 			"client-commands")
 		{
@@ -50,7 +50,7 @@ object WebApp extends App {
     var links = SortedSet.empty[FunctionLink]
 
 		val webAppConsumer = Kafka.createConsumer(
-			"localhost:9092",
+      kafkaServer,
 			"web-app",
 			"web-app")
 		{ msg =>

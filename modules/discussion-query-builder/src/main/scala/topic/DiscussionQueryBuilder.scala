@@ -13,16 +13,15 @@ import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 import scala.util.{Try, Success, Failure}
 
-object DiscussionQueryBuilder extends App {
+object DiscussionQueryBuilder extends App with Microservice {
 	def start(implicit system: ActorSystem) = {
 		implicit val executionContext = system.dispatcher
 
-    val config = ConfigFactory.load
     val uri = config.getString("discussion.query.builder.mongodb.uri")
     val mongoClient = MongoClient(MongoClientURI(uri))
     val collDiscussion = mongoClient.getDB("blog")("discussion")
 
-		val producer = Kafka.createProducer[ProducerData[String]]("localhost:9092")
+		val producer = Kafka.createProducer[ProducerData[String]](kafkaServer)
     {
 			case ProducerData(topic, id, value) =>
 				new ProducerRecord[Array[Byte], String](
@@ -33,7 +32,7 @@ object DiscussionQueryBuilder extends App {
       Performance.props("disc-query-builder", producer))
 
 		val consumer = Kafka.createConsumer(
-			"localhost:9092",
+      kafkaServer,
 			"discussion-query",
 			"discussion-event")
 		{ msg =>

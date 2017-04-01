@@ -22,7 +22,7 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.{Try, Success, Failure}
 
-object Monitor extends App with BaseFormats {
+object Monitor extends App with BaseFormats with Microservice {
 	def start(implicit system: ActorSystem, materializer: ActorMaterializer) = {
 		implicit val executionContext = system.dispatcher
 
@@ -37,7 +37,7 @@ object Monitor extends App with BaseFormats {
     val monitorActor = system.actorOf(MonitorActor.props(wsSourceQueue))
 
 		val consumer = Kafka.createConsumer(
-			"localhost:9092",
+      kafkaServer,
 			"monitor",
 			"performance")
 		{ msg =>
@@ -53,7 +53,7 @@ object Monitor extends App with BaseFormats {
       result map { _ => msg.committableOffset }
     }
 
-		val producer = Kafka.createProducer[ProducerData[String]]("localhost:9092")
+		val producer = Kafka.createProducer[ProducerData[String]](kafkaServer)
     {
 			case ProducerData(topic, id, value) =>
 				new ProducerRecord[Array[Byte], String](

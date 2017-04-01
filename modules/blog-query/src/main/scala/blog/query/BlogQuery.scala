@@ -17,7 +17,7 @@ import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
 import org.json4s.mongo.JObjectParser._
 
-object BlogQuery extends App with BaseFormats {
+object BlogQuery extends App with BaseFormats with Microservice {
 	def start(implicit system: ActorSystem, materializer: ActorMaterializer) = {
 		implicit val executionContext = system.dispatcher
 
@@ -35,7 +35,7 @@ object BlogQuery extends App with BaseFormats {
     val blog = handlebars.compile("blog")
     val blogNew = handlebars.compile("blog-new")
 
-		val producer = Kafka.createProducer[ProducerData[String]]("localhost:9092")
+		val producer = Kafka.createProducer[ProducerData[String]](kafkaServer)
     {
 			case ProducerData(topic, id, value) =>
 				new ProducerRecord[Array[Byte], String](

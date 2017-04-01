@@ -8,12 +8,12 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
-object BlogCommandApp extends App {
+object BlogCommandApp extends App with Microservice {
 	def start(implicit system: ActorSystem) = {
 		implicit val executionContext = system.dispatcher
 
 		val producer = Kafka.createProducer[ProducerData[BlogMessage]](
-      "localhost:9092")
+      kafkaServer)
     {
 			case ProducerData(topic, id, event) =>
 				val value = BlogSerializer.toString(event)
@@ -22,7 +22,7 @@ object BlogCommandApp extends App {
 		}
 
 		val producerStat = Kafka.createProducer[ProducerData[String]](
-      "localhost:9092")
+      kafkaServer)
     {
 			case ProducerData(topic, id, event) =>
 				new ProducerRecord[Array[Byte], String](
@@ -35,7 +35,7 @@ object BlogCommandApp extends App {
       Performance.props("blog-command", producerStat))
 
 		val consumer = Kafka.createConsumer(
-			"localhost:9092",
+      kafkaServer,
 			"blog-command",
 			"blog-command")
 		{ msg =>
