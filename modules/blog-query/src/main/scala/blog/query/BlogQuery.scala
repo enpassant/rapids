@@ -79,8 +79,5 @@ object BlogQuery extends App with BaseFormats with Microservice {
 	implicit val materializer = ActorMaterializer()
 	val route = start
 	val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8083)
-
-	scala.io.StdIn.readLine()
-	system.terminate
 }
 

@@ -13,11 +13,17 @@ dockerCommands := dockerCommands.value.flatMap{
  case other => List(other)
 }
 
+dockerRepository := Some("enpassant")
+
+dockerExposedPorts := Seq(8080)
+
 ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
 
 libraryDependencies ++= Seq(
-  "com.github.scopt"       %% "scopt"                 % "3.3.0"
+  "com.github.scopt"       %% "scopt"                 % "3.3.0",
+  "org.scala-lang"          % "scala-compiler"        % scalaVersion.value
 )
+
 
 lazy val common = (project in file("modules/common"))
 
