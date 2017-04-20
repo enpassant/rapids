@@ -25,6 +25,7 @@ object BlogQuery extends App with BaseFormats with Microservice {
     val uri = config.getString("blog.query.mongodb.uri")
     val mongoClient = MongoClient(MongoClientURI(uri))
     val collBlog = mongoClient.getDB("blog")("blog")
+    val title = config.getString("blog.query.title")
 
     val handlebars = new Handlebars().registerHelpers(Json4sHelpers)
     def ctx(obj: Object) =
@@ -56,7 +57,7 @@ object BlogQuery extends App with BaseFormats with Microservice {
               MongoDBObject("content" -> 0)
             )
               .map(o => serialize(o)).toList
-            Some(JObject(JField("blogs", blogs)))
+            Some(JObject(JField("blogs", blogs), JField("title", title)))
           }
         } ~
         path("new") {
