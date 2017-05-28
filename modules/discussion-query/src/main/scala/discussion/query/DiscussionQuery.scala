@@ -18,7 +18,11 @@ import org.json4s.JsonDSL._
 import org.json4s.mongo.JObjectParser._
 
 object DiscussionQuery extends App with BaseFormats with Microservice {
-	def start(implicit system: ActorSystem, materializer: ActorMaterializer) = {
+	def start(implicit
+    mq: MQProtocol,
+    system: ActorSystem,
+    materializer: ActorMaterializer) =
+  {
 		implicit val executionContext = system.dispatcher
 
     val config = ConfigFactory.load
@@ -37,7 +41,7 @@ object DiscussionQuery extends App with BaseFormats with Microservice {
     val commentReply = handlebars.compile("comment-reply")
     val discussion = handlebars.compile("discussion")
 
-		val producer = Kafka.createProducer[ProducerData[String]](kafkaServer)
+		val producer = mq.createProducer[ProducerData[String]](kafkaServer)
     {
 			case msg @ ProducerData(topic, id, value) => msg
 		}
@@ -81,6 +85,7 @@ object DiscussionQuery extends App with BaseFormats with Microservice {
     stat(statActor)(route)
 	}
 
+  implicit val mq = Kafka
 	implicit val system = ActorSystem("DiscussionQuery")
 	implicit val materializer = ActorMaterializer()
 	val route = start

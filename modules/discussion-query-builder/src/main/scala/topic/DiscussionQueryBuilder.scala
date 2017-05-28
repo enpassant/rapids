@@ -14,14 +14,14 @@ import scala.util.{Failure, Success}
 import scala.util.{Try, Success, Failure}
 
 object DiscussionQueryBuilder extends App with Microservice {
-	def start(implicit system: ActorSystem) = {
+	def start(implicit mq: MQProtocol, system: ActorSystem) = {
 		implicit val executionContext = system.dispatcher
 
     val uri = config.getString("discussion.query.builder.mongodb.uri")
     val mongoClient = MongoClient(MongoClientURI(uri))
     val collDiscussion = mongoClient.getDB("blog")("discussion")
 
-		val producer = Kafka.createProducer[ProducerData[String]](kafkaServer)
+		val producer = mq.createProducer[ProducerData[String]](kafkaServer)
     {
 			case msg @ ProducerData(topic, id, value) => msg
 		}
@@ -29,7 +29,7 @@ object DiscussionQueryBuilder extends App with Microservice {
     val statActor = system.actorOf(
       Performance.props("disc-query-builder", producer))
 
-		val consumer = Kafka.createConsumer(
+		val consumer = mq.createConsumer(
       kafkaServer,
 			"discussion-query",
 			"discussion-event")
@@ -95,10 +95,11 @@ object DiscussionQueryBuilder extends App with Microservice {
     }
 	}
 
-	val system = ActorSystem("DiscussionQueryBuilder")
+  implicit val mq = Kafka
+	implicit val system = ActorSystem("DiscussionQueryBuilder")
 	import common.TypeHintContext._
 
-	start(system)
+	start
 	scala.io.StdIn.readLine()
 	system.terminate
 }

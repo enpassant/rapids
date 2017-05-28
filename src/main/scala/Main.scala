@@ -10,6 +10,11 @@ object Main extends App {
 	implicit val system = ActorSystem("Main")
 	implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
+  implicit val mq = if (args.length > 0 && args(0) == "-t") {
+    new MQTest(system)
+  } else {
+    Kafka
+  }
 
   println("Program has started")
 
@@ -18,10 +23,10 @@ object Main extends App {
 	val routeDiscussionQuery = discussion.query.DiscussionQuery.start
 	val routeMonitor = monitor.Monitor.start
 	val route = routeBlogQuery ~ routeDiscussionQuery ~ routeMonitor ~ routeWeb
-	blog.BlogCommandApp.start(system)
-	discussion.DiscussionCommandApp.start(system)
-	blog.BlogQueryBuilder.start(system)
-	discussion.DiscussionQueryBuilder.start(system)
+	blog.BlogCommandApp.start
+	discussion.DiscussionCommandApp.start
+	blog.BlogQueryBuilder.start
+	discussion.DiscussionQueryBuilder.start
 
 	val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8080)
 

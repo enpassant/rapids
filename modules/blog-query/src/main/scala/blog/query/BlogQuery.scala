@@ -18,7 +18,11 @@ import org.json4s.JsonDSL._
 import org.json4s.mongo.JObjectParser._
 
 object BlogQuery extends App with BaseFormats with Microservice {
-	def start(implicit system: ActorSystem, materializer: ActorMaterializer) = {
+	def start(implicit
+    mq: MQProtocol,
+    system: ActorSystem,
+    materializer: ActorMaterializer) =
+  {
 		implicit val executionContext = system.dispatcher
 
     val config = ConfigFactory.load
@@ -36,7 +40,7 @@ object BlogQuery extends App with BaseFormats with Microservice {
     val blog = handlebars.compile("blog")
     val blogNew = handlebars.compile("blog-new")
 
-		val producer = Kafka.createProducer[ProducerData[String]](kafkaServer)
+		val producer = mq.createProducer[ProducerData[String]](kafkaServer)
     {
 			case msg @ ProducerData(topic, id, value) => msg
 		}
@@ -74,6 +78,7 @@ object BlogQuery extends App with BaseFormats with Microservice {
     stat(statActor)(route)
 	}
 
+  implicit val mq = Kafka
 	implicit val system = ActorSystem("BlogQuery")
 	implicit val materializer = ActorMaterializer()
 	val route = start

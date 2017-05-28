@@ -22,16 +22,20 @@ import scala.concurrent.Future
 import scala.collection.SortedSet
 
 object WebApp extends App with Microservice {
-	def start(implicit system: ActorSystem, materializer: ActorMaterializer) = {
+	def start(implicit
+    mq: MQProtocol,
+    system: ActorSystem,
+    materializer: ActorMaterializer) =
+  {
 		implicit val executionContext = system.dispatcher
 
-		val producer = Kafka.createProducer[ProducerData[String]](
+		val producer = mq.createProducer[ProducerData[String]](
       kafkaServer)
     {
 			case msg @ ProducerData(topic, id, value) => msg
 		}
 
-		lazy val consumerSource = Kafka.createConsumerSource(
+		lazy val consumerSource = mq.createConsumerSource(
       kafkaServer,
 			"webapp",
 			"client-commands")
@@ -45,7 +49,7 @@ object WebApp extends App with Microservice {
 
     var links = SortedSet.empty[FunctionLink]
 
-		val webAppConsumer = Kafka.createConsumer(
+		val webAppConsumer = mq.createConsumer(
       kafkaServer,
 			"web-app",
 			"web-app")
@@ -154,6 +158,7 @@ object WebApp extends App with Microservice {
       if (scala.util.Random.nextBoolean) "admin" else "user", "checker")
   }
 
+	implicit val mq = Kafka
 	implicit val system = ActorSystem("WebApp")
 	implicit val materializer = ActorMaterializer()
 	val route = start

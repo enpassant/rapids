@@ -10,10 +10,10 @@ import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
 object DiscussionCommandApp extends App with Microservice {
-	def start(implicit system: ActorSystem) = {
+	def start(implicit mq: MQProtocol, system: ActorSystem) = {
 		implicit val executionContext = system.dispatcher
 
-		val producer = Kafka.createProducer[ProducerData[BlogMessage]](
+		val producer = mq.createProducer[ProducerData[BlogMessage]](
       kafkaServer)
     {
 			case ProducerData(topic, id, event) =>
@@ -21,7 +21,7 @@ object DiscussionCommandApp extends App with Microservice {
 				ProducerData(topic, id, value)
 		}
 
-		val producerStat = Kafka.createProducer[ProducerData[String]](
+		val producerStat = mq.createProducer[ProducerData[String]](
       kafkaServer)
     {
 			case msg @ ProducerData(topic, id, value) => msg
@@ -32,7 +32,7 @@ object DiscussionCommandApp extends App with Microservice {
     val statActor = system.actorOf(
       Performance.props("disc-command", producerStat))
 
-		val consumer = Kafka.createConsumer(
+		val consumer = mq.createConsumer(
       kafkaServer,
 			"discussion-command",
 			"discussion-command")
@@ -62,10 +62,11 @@ object DiscussionCommandApp extends App with Microservice {
     }
 	}
 
-	val system = ActorSystem("DiscussionCommandApp")
+  implicit val mq = Kafka
+	implicit val system = ActorSystem("DiscussionCommandApp")
 	import common.TypeHintContext._
 
-	start(system)
+	start
 	scala.io.StdIn.readLine()
 	system.terminate
 }
