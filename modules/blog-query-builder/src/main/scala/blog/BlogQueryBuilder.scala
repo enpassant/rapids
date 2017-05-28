@@ -23,9 +23,7 @@ object BlogQueryBuilder extends App with Microservice {
 
 		val producer = Kafka.createProducer[ProducerData[String]](kafkaServer)
     {
-			case ProducerData(topic, id, value) =>
-				new ProducerRecord[Array[Byte], String](
-					topic, id.getBytes(), value)
+			case msg @ ProducerData(topic, id, value) => msg
 		}
 
     val statActor = system.actorOf(
@@ -37,10 +35,8 @@ object BlogQueryBuilder extends App with Microservice {
 			"blog-event")
 		{ msg =>
       Performance.statF(statActor) {
-        val consumerRecord = msg.record
         implicit val timeout = Timeout(1000.milliseconds)
-        val key = new String(consumerRecord.key)
-        val jsonTry = Try(BlogSerializer.fromString(consumerRecord.value))
+        val jsonTry = Try(BlogSerializer.fromString(msg.value))
         val result = Future { jsonTry match {
           case Success(json) =>
             json match {
@@ -68,10 +64,10 @@ object BlogQueryBuilder extends App with Microservice {
             println("Wrong json format: " + e)
             e
         } }
-        result map { _ => msg.committableOffset }
+        result
       }
 		}
-    consumer.onComplete {
+    consumer._2.onComplete {
       case Success(done) =>
       case Failure(throwable) => println(throwable)
     }

@@ -28,9 +28,7 @@ object WebApp extends App with Microservice {
 		val producer = Kafka.createProducer[ProducerData[String]](
       kafkaServer)
     {
-			case ProducerData(topic, id, value) =>
-				new ProducerRecord[Array[Byte], String](
-					topic, id.getBytes(), value)
+			case msg @ ProducerData(topic, id, value) => msg
 		}
 
 		lazy val consumerSource = Kafka.createConsumerSource(
@@ -38,9 +36,7 @@ object WebApp extends App with Microservice {
 			"webapp",
 			"client-commands")
 		{
-      msg => Future {
-        (TextMessage(msg.record.value), msg)
-      }
+      msg => Future(TextMessage(msg.value))
     }.toMat(BroadcastHub.sink(bufferSize = 256))(Keep.right).run()
 
 		def consumer(clientId: String) = consumerSource.filter {
@@ -54,13 +50,13 @@ object WebApp extends App with Microservice {
 			"web-app",
 			"web-app")
 		{ msg =>
-			val json = CommonSerializer.fromString(msg.record.value)
+			val json = CommonSerializer.fromString(msg.value)
       json match {
         case link: FunctionLink =>
           links = links + link
         case _ =>
       }
-      Future { msg.committableOffset }
+      Future { true }
     }
 
     val statActor = system.actorOf(Performance.props("web-app", producer))

@@ -38,9 +38,7 @@ object BlogQuery extends App with BaseFormats with Microservice {
 
 		val producer = Kafka.createProducer[ProducerData[String]](kafkaServer)
     {
-			case ProducerData(topic, id, value) =>
-				new ProducerRecord[Array[Byte], String](
-					topic, id.getBytes(), value)
+			case msg @ ProducerData(topic, id, value) => msg
 		}
 
     val link = CommonSerializer.toString(FunctionLink(0, "/blog", "Blogs"))

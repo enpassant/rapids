@@ -41,23 +41,21 @@ object Monitor extends App with BaseFormats with Microservice {
 			"monitor",
 			"performance")
 		{ msg =>
-      val jsonTry = Try(CommonSerializer.fromString(msg.record.value))
+      val jsonTry = Try(CommonSerializer.fromString(msg.value))
       val result = Future { jsonTry match {
         case Success(json) =>
           json match {
             case stat: Stat =>
-              monitorActor ! (new String(msg.record.key), stat)
+              monitorActor ! (new String(msg.key), stat)
           }
         }
       }
-      result map { _ => msg.committableOffset }
+      result
     }
 
 		val producer = Kafka.createProducer[ProducerData[String]](kafkaServer)
     {
-			case ProducerData(topic, id, value) =>
-				new ProducerRecord[Array[Byte], String](
-					topic, id.getBytes(), value)
+			case msg @ ProducerData(topic, id, value) => msg
 		}
 
     val link = CommonSerializer.toString(FunctionLink(10, "/monitor", "Monitor"))
