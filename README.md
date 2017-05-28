@@ -32,11 +32,10 @@ docker service create --name appBlogQuery -e VIRTUAL_HOST_WEIGHT=10 -e SERVICE_P
 ## Use docker for development
 
 ```bash
-docker swarm init
-
-docker service create --name portainer -p 9090:9000 --constraint 'node.role == manager' --mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock portainer/portainer -H unix:///var/run/docker.sock
-
 docker run --name mongodb -p 27017:27017 mongo:latest
+```
 
-run Main -t
+In sbt console:
+```bash
+~runMain Main -t
 ```
