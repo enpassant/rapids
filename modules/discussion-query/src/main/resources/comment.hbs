@@ -1,9 +1,10 @@
 {{#each comments}}
 <div class="comment" id="{{this.commentId}}">
     <div>
-        <p>{{userName}}</p>
-        <div>
-            {{content}}
+        <div class="comment-header">
+            <div>
+                <span class="name">{{userName}}</span>
+            </div>
             <div>
                 <a href="/discussion/{{_id}}#{{this.commentId}}" class="button">permalink</a>
                 {{#if ../commentId}}
@@ -12,10 +13,12 @@
                 <a href="/discussion/{{_id}}/comment/{{this.commentId}}/new" class="button">Válasz</a>
             </div>
         </div>
+        <div>
+            {{content}}
+        </div>
     </div>
     {{#if comments}}
         {{> comment}}
     {{/if}}
 </div>
 {{/each}}
-

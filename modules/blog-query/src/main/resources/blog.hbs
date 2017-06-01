@@ -3,12 +3,14 @@
         <a href="/blog/{{_id}}">{{title}}</a>
     </h2>
     <p>{{userName}}</p>
+</div>
+<div>
+    {{content}}
+</div>
+<div>
     {{#each discussions}}
     <span class="discussion">
         <a href="/discussion/{{id}}">{{title}}</a>
     </span>
     {{/each}}
-</div>
-<div>
-    {{content}}
 </div>
