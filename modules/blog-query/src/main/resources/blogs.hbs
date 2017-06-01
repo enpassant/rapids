@@ -1,12 +1,12 @@
 <h1>{{title}}</h1>
 <div>
-    <a href="/blog/new">Új blog</a>
+    <a href="/blog/new" class="button">Új blog</a>
 </div>
 {{#each blogs}}
 <div class="blog">
-    <h1>
+    <h2>
         <a href="/blog/{{_id}}">{{title}}</a>
-    </h1>
+    </h2>
     <p>{{userName}}</p>
     {{#each discussions}}
     <span class="discussion">

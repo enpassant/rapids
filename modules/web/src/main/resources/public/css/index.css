@@ -10,28 +10,64 @@ textarea {
   height: 250px;
 }
 
-.logo, .login, #messages, #view {
+h2 {
+    font-family: "Whitney Cond A", "Whitney Cond B","Lato", "Lucida Grande", "Lucida Sans Unicode", Tahoma, Sans-Serif;
+    font-size: 1.45rem;
+    font-weight: 700;
+    line-height: 1.05;
+}
+.header, .login, #messages, #view {
     flex: 1 100%;
 }
 
 @media all and (min-width: 600px) {
-  .logo { flex: 1 80%; }
-  .login { flex: 1 20%; }
-}
-
-@media all and (min-width: 900px) {
-  .logo { flex: 1 70%; order: 1; }
-  .login { flex: 1 30%; order: 2; }
-  #view { flex: 2 70%; order: 3; }
+  .header { flex: 1 100%; }
+  #view { flex: 2 70%; order: 2; }
   #messages { flex: 1 30%; order: 4; }
 }
 
+@media all and (min-width: 900px) {
+  /*.logo { flex: 1 70%; order: 1; }*/
+  .login { flex: 1 20%; order: 2; }
+  #view { flex: 2 55%; order: 3; }
+  #messages { flex: 2 20%; order: 4; }
+}
+
+.header {
+    display: flex;
+    background: #d8d8d8;
+    height: 15mm;
+    align-items: center;
+    justify-content: center;
+    margin: 0px;
+    padding: 0px;
+}
+
 .logo {
-    background: #d8d8ff;
+    width: 70%;
+    background: #d8d8d8;
+}
+
+div {
+    background: #fafafa;
+    /*border: 1px solid #808080;*/
+    margin: 4px;
+    padding: 4px;
+}
+
+.button, [type=button] {
+    padding: .1em .6em .1em .6em;
+    line-height: inherit;
+    font-size: .9375em;
+    font-weight: normal;
+    text-decoration: none;
+    color: #778187;
+    background: #f2f2f3;
+    box-sizing: content-box;
+    box-shadow: 4px 4px 2px #a0a0a0;
 }
 
 .login {
-    background: #6060ff;
 }
 
 #login-data {
@@ -46,7 +82,6 @@ textarea {
 }
 
 .login > * {
-    text-align: center;
     width: 100%;
 }
 
@@ -56,4 +91,24 @@ textarea {
     text-align: center;
     font-weight: 700;
     font-size: 12px;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:link {
+    color: #3f3f3f;
+}
+
+a:visited {
+    color: #3f3f3f;
+}
+
+a:hover {
+    color: #6f6f6f;
+}
+
+a:active {
+    color: #6f6f6f;
 }

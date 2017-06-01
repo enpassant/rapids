@@ -5,11 +5,11 @@
         <div>
             {{content}}
             <div>
-                <a href="/discussion/{{_id}}#{{this.commentId}}">permalink</a>
+                <a href="/discussion/{{_id}}#{{this.commentId}}" class="button">permalink</a>
                 {{#if ../commentId}}
-                <a href="/discussion/{{_id}}#{{../commentId}}">szülő</a>
+                <a href="/discussion/{{_id}}#{{../commentId}}" class="button">szülő</a>
                 {{/if}}
-                <a href="/discussion/{{_id}}/comment/{{this.commentId}}/new">Válasz</a>
+                <a href="/discussion/{{_id}}/comment/{{this.commentId}}/new" class="button">Válasz</a>
             </div>
         </div>
     </div>

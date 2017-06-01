@@ -1,28 +1,25 @@
 <style>
-.comment {
-    margin-left: 16px;
-    border-left: solid #f5f5f5;
-}
-.comment > div:first-child {
-    margin-top: 8px;
-    border: thin solid #808080;
-    background-color: #f0f0f0;
-}
-h2 {
-    /*background-color: #f0f0f0;*/
-}
+    .comment {
+        margin-left: 16px;
+        border-left: solid #f5f5f5;
+    }
+    .comment > div:first-child {
+        margin-top: 8px;
+        border: thin solid #808080;
+        background-color: #f0f0f0;
+    }
+    h2 {
+        /*background-color: #f0f0f0;*/
+    }
 </style>
 
 <div class="discussion">
-    <h1>
-        <a href="/blog/{{_id}}">{{title}}</a>
-    </h1>
+    <h2>
+        <a href="/blog/{{blogId}}">{{title}}</a>
+    </h2>
     <p>{{userName}}</p>
-    <span class="to-blog">
-        <a href="/blog/{{blogId}}">Vissza a blogra</a>
-    </span>
     <div>
-        <a href="/discussion/{{_id}}/new">Új hozzászólás</a>
+        <a href="/discussion/{{_id}}/new" class="button">Új hozzászólás</a>
     </div>
     {{> comment}}
 </div>
