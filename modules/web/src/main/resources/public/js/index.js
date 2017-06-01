@@ -85,7 +85,7 @@
     window.ajaxPost = function(url, data) {
         return new Promise(function(resolve, reject) {
             let req = new XMLHttpRequest();
-            req.open("POST", url);
+            req.open("POST", fullUrl(url));
             req.setRequestHeader("Content-type", "application/json");
             const payload = extractPayload(token);
             if (typeof payload !== "undefined") {
@@ -141,7 +141,7 @@
     var el = null;
     function router () {
         el = el || byId('view');
-        var url = location.hash.slice(1) || baseUrl;
+        var url = fullUrl(location.hash.slice(2)) || baseUrl;
         if (!url && !linkObjs) {
             ajaxGet(window.location.href, "HEAD").then(
                 function(data) {
@@ -169,6 +169,10 @@
                 });
         }
     }
+
+    const fullUrl = function(url) {
+        return location.origin + location.pathname + url;
+    };
 
     const dequote = function(str) {
         return str.replace(/"/g, '');

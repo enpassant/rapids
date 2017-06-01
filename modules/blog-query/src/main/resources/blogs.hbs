@@ -1,17 +1,35 @@
-<h1>{{title}}</h1>
-<div>
-    <a href="/blog/new" class="button">Új blog</a>
-</div>
-{{#each blogs}}
-<div class="blog">
-    <h2>
-        <a href="/blog/{{_id}}">{{title}}</a>
-    </h2>
-    <p>{{userName}}</p>
-    {{#each discussions}}
-    <span class="discussion">
-        <a href="/discussion/{{id}}">{{title}}</a>
-    </span>
+<div class="wrapped-container">
+    <div class="head">
+        <h1>{{title}}</h1>
+        <div>
+            <a href="/blog/new" class="button">Új blog</a>
+        </div>
+    </div>
+    {{#each blogs}}
+    <div class="blog">
+        <h2>
+            <a href="/blog/{{_id}}">{{title}}</a>
+        </h2>
+        <span class="name">{{userName}}</span>
+        {{#each discussions}}
+        <span class="discussion">
+            <a href="/discussion/{{id}}">{{title}}</a>
+        </span>
+        {{/each}}
+    </div>
     {{/each}}
 </div>
-{{/each}}
+
+<style>
+    .blog {
+        background: #ffffff;
+        flex: 0 1 100%;
+    }
+
+    @media all and (min-width: 1280px) {
+        .blog {
+            background: #ffffff;
+            flex: 0 1 45%;
+        }
+    }
+</style>

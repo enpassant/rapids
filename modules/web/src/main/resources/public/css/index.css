@@ -28,9 +28,23 @@ h2 {
 
 @media all and (min-width: 900px) {
   /*.logo { flex: 1 70%; order: 1; }*/
-  .login { flex: 1 20%; order: 2; }
-  #view { flex: 2 55%; order: 3; }
-  #messages { flex: 2 20%; order: 4; }
+  .login { flex: 1 15%; order: 2; }
+  #view { flex: 2 65%; order: 3; }
+  #messages { flex: 2 15%; order: 4; }
+}
+
+.wrapped-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.head {
+    display: flex;
+    height: 15mm;
+    flex: 1 100%;
+    align-items: center;
+    justify-content: center;
 }
 
 .header {
@@ -53,6 +67,16 @@ div {
     /*border: 1px solid #808080;*/
     margin: 4px;
     padding: 4px;
+}
+
+.name {
+    padding: .1em .6em .1em .6em;
+    line-height: inherit;
+    font-size: .9375em;
+    font-weight: normal;
+    color: #3f3f3f;
+    background: #e2e2e2;
+    box-sizing: content-box;
 }
 
 .button, [type=button] {
