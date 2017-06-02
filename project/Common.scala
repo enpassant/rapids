@@ -52,6 +52,7 @@ object Common {
 		"org.json4s"             %% "json4s-mongo"          % "3.2.10",
 		"com.github.salat"       %% "salat"                 % "1.10.0",
 		"org.mongodb"            %% "casbah"                % "3.1.1",
+    "com.vladsch.flexmark"    % "flexmark-all"          % "0.19.3",
     "com.github.ironfish"    %% "akka-persistence-mongo" % "1.0.0-SNAPSHOT" % "compile"
 	)
 }

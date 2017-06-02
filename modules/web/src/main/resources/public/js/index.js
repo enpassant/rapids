@@ -171,7 +171,8 @@
     }
 
     const fullUrl = function(url) {
-        return location.origin + location.pathname + url;
+        const path = url[0] === '/' ? url.slice(1) : url;
+        return location.origin + location.pathname + path;
     };
 
     const dequote = function(str) {

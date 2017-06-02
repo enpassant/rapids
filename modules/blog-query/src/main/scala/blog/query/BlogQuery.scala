@@ -11,6 +11,9 @@ import akka.stream._
 import com.github.jknack.handlebars.{ Context, Handlebars, Template }
 import com.mongodb.casbah.Imports._
 import com.typesafe.config.ConfigFactory
+import com.vladsch.flexmark.html.HtmlRenderer;
+import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.util.options.MutableDataSet;
 import fixiegrips.{ Json4sHelpers, Json4sResolver }
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.json4s.JsonAST._
@@ -50,6 +53,10 @@ object BlogQuery extends App with BaseFormats with Microservice {
 
     val statActor = system.actorOf(Performance.props("blog-query", producer))
 
+    val options = new MutableDataSet()
+    val parser = Parser.builder(options).build()
+    val renderer = HtmlRenderer.builder(options).build()
+
 		val route =
       pathPrefix("blog") {
         pathEnd {
@@ -70,6 +77,14 @@ object BlogQuery extends App with BaseFormats with Microservice {
         path(Segment) { id =>
           completePage(render(blog), "blog") {
             collBlog.findOne(MongoDBObject("_id" -> id))
+              .map(o =>
+                if (o contains "content") {
+                  val document = parser.parse(o("content").toString)
+                  o("content") = renderer.render(document)
+                  o
+                } else {
+                  o
+                })
               .map(o => serialize(o))
           }
         }

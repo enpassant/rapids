@@ -5,7 +5,7 @@
     <p>{{userName}}</p>
 </div>
 <div>
-    {{content}}
+    {{{content}}}
 </div>
 <div>
     {{#each discussions}}
@@ -14,3 +14,10 @@
     </span>
     {{/each}}
 </div>
+<script>
+    var codes = document.querySelectorAll('pre code');
+    for (i = 0; i < codes.length; i++) {
+        hljs.highlightBlock(codes[i]);
+    }
+
+</script>
