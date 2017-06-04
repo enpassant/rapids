@@ -5,7 +5,11 @@
     <p>{{userName}}</p>
 </div>
 <div>
-    {{{content}}}
+    {{#if htmlContent}}
+        {{{htmlContent}}}
+    {{else}}
+        {{{content}}}
+    {{/if}}
 </div>
 <div>
     {{#each discussions}}

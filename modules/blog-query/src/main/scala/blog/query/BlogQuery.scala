@@ -11,9 +11,6 @@ import akka.stream._
 import com.github.jknack.handlebars.{ Context, Handlebars, Template }
 import com.mongodb.casbah.Imports._
 import com.typesafe.config.ConfigFactory
-import com.vladsch.flexmark.html.HtmlRenderer;
-import com.vladsch.flexmark.parser.Parser;
-import com.vladsch.flexmark.util.options.MutableDataSet;
 import fixiegrips.{ Json4sHelpers, Json4sResolver }
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.json4s.JsonAST._
@@ -21,12 +18,12 @@ import org.json4s.JsonDSL._
 import org.json4s.mongo.JObjectParser._
 
 object BlogQuery extends App with BaseFormats with Microservice {
-	def start(implicit
+  def start(implicit
     mq: MQProtocol,
     system: ActorSystem,
     materializer: ActorMaterializer) =
   {
-		implicit val executionContext = system.dispatcher
+    implicit val executionContext = system.dispatcher
 
     val config = ConfigFactory.load
     val uri = config.getString("blog.query.mongodb.uri")
@@ -43,21 +40,17 @@ object BlogQuery extends App with BaseFormats with Microservice {
     val blog = handlebars.compile("blog")
     val blogNew = handlebars.compile("blog-new")
 
-		val producer = mq.createProducer[ProducerData[String]](kafkaServer)
+    val producer = mq.createProducer[ProducerData[String]](kafkaServer)
     {
-			case msg @ ProducerData(topic, id, value) => msg
-		}
+      case msg @ ProducerData(topic, id, value) => msg
+    }
 
     val link = CommonSerializer.toString(FunctionLink(0, "/blog", "Blogs"))
     producer.offer(ProducerData("web-app", "blog-query", link))
 
     val statActor = system.actorOf(Performance.props("blog-query", producer))
 
-    val options = new MutableDataSet()
-    val parser = Parser.builder(options).build()
-    val renderer = HtmlRenderer.builder(options).build()
-
-		val route =
+    val route =
       pathPrefix("blog") {
         pathEnd {
           completePage(render(blogs), "blogs") {
@@ -77,26 +70,18 @@ object BlogQuery extends App with BaseFormats with Microservice {
         path(Segment) { id =>
           completePage(render(blog), "blog") {
             collBlog.findOne(MongoDBObject("_id" -> id))
-              .map(o =>
-                if (o contains "content") {
-                  val document = parser.parse(o("content").toString)
-                  o("content") = renderer.render(document)
-                  o
-                } else {
-                  o
-                })
               .map(o => serialize(o))
           }
         }
       }
 
     stat(statActor)(route)
-	}
+  }
 
   implicit val mq = Kafka
-	implicit val system = ActorSystem("BlogQuery")
-	implicit val materializer = ActorMaterializer()
-	val route = start
-	val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8083)
+  implicit val system = ActorSystem("BlogQuery")
+  implicit val materializer = ActorMaterializer()
+  val route = start
+  val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8083)
 }
 

@@ -1,11 +1,14 @@
 package blog
 
 import common._
-import com.mongodb.casbah.Imports._
-import com.typesafe.config.ConfigFactory
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
+import com.mongodb.casbah.Imports._
+import com.typesafe.config.ConfigFactory
+import com.vladsch.flexmark.html.HtmlRenderer;
+import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.util.options.MutableDataSet;
 import org.apache.kafka.clients.producer.ProducerRecord
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -20,6 +23,10 @@ object BlogQueryBuilder extends App with Microservice {
     val uri = config.getString("blog.query.builder.mongodb.uri")
     val mongoClient = MongoClient(MongoClientURI(uri))
     val collection = mongoClient.getDB("blog")("blog")
+
+    val options = new MutableDataSet()
+    val parser = Parser.builder(options).build()
+    val renderer = HtmlRenderer.builder(options).build()
 
 		val producer = mq.createProducer[ProducerData[String]](kafkaServer)
     {
@@ -41,6 +48,8 @@ object BlogQueryBuilder extends App with Microservice {
           case Success(json) =>
             json match {
               case BlogCreated(id, userId, userName, title, content) =>
+                val document = parser.parse(content)
+                val htmlContent = renderer.render(document)
                 collection.insert(
                   MongoDBObject(
                     "_id" -> id,
@@ -48,6 +57,7 @@ object BlogQueryBuilder extends App with Microservice {
                     "userName" -> userName,
                     "title" -> title,
                     "content" -> content,
+                    "htmlContent" -> htmlContent,
                     "discussions" -> Seq()))
               case DiscussionStarted(id, userId, userName, blogId, title) =>
                 collection.update(
