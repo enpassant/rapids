@@ -17,9 +17,18 @@ case class WrongMessage(message: String) extends BlogMessage
 sealed trait BlogCommand extends BlogMessage
 case class CreateBlog(title: String, content: String, loggedIn: LoggedIn)
   extends BlogCommand with UserCommand
+case class ModifyBlog(title: String, content: String, loggedIn: LoggedIn)
+  extends BlogCommand with UserCommand
 
 sealed trait BlogEvent extends BlogMessage
 case class BlogCreated(
+  id: String,
+  userId: String,
+  userName: String,
+  title: String,
+  content: String
+)	extends BlogEvent
+case class BlogModified(
   id: String,
   userId: String,
   userName: String,
@@ -115,6 +124,8 @@ class BlogSerializer extends common.JsonSerializer {
 			classOf[Blog],
 			classOf[CreateBlog],
 			classOf[BlogCreated],
+			classOf[ModifyBlog],
+			classOf[BlogModified],
 			classOf[StartDiscussion],
 			classOf[AddComment],
 			classOf[ReplyComment],

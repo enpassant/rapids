@@ -67,14 +67,10 @@ object BlogQueryBuilder extends App with Microservice {
                   val htmlContent = renderer.render(document)
                   collection.update(
                     MongoDBObject("_id" -> id),
-                    MongoDBObject(
-                      "_id" -> id,
-                      "userId" -> userId,
-                      "userName" -> userName,
+                    MongoDBObject("$set" -> MongoDBObject(
                       "title" -> title,
                       "content" -> content,
-                      "htmlContent" -> htmlContent,
-                      "discussions" -> blog("discussions")))
+                      "htmlContent" -> htmlContent)))
                 }
               case DiscussionStarted(id, userId, userName, blogId, title) =>
                 collection.update(
