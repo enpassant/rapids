@@ -37,6 +37,7 @@ object Main extends App {
   }
 
   if (isTest) {
+    testError.TestError.start
     println("Press ENTER to exit!")
     scala.io.StdIn.readLine()
     system.terminate()

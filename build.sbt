@@ -61,6 +61,9 @@ lazy val monitor = (project in file("modules/monitor"))
   .aggregate(webCommon)
   .dependsOn(webCommon)
 
+lazy val testError = (project in file("modules/test-error"))
+  .dependsOn(common)
+
 lazy val root = (project in file("."))
   .enablePlugins(GatlingPlugin)
   .settings(libraryDependencies ++= Seq(
@@ -77,7 +80,8 @@ lazy val root = (project in file("."))
     discussionQueryBuilder,
     blogQuery,
     discussionQuery,
-    monitor
+    monitor,
+    testError
   )
   .dependsOn(
     common,
@@ -89,7 +93,8 @@ lazy val root = (project in file("."))
     discussionQueryBuilder,
     blogQuery,
     discussionQuery,
-    monitor
+    monitor,
+    testError
   )
 
 

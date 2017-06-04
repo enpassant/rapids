@@ -146,7 +146,7 @@ object WebApp extends App with Microservice {
 			} ~
 			path(Remaining) { path =>
 				getFromResource(s"public/$path")
-			}
+      }
 
     stat(statActor) {
   		encodeResponse { route }
