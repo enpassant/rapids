@@ -39,6 +39,7 @@ object BlogQuery extends App with BaseFormats with Microservice {
     val blogs = handlebars.compile("blogs")
     val blog = handlebars.compile("blog")
     val blogNew = handlebars.compile("blog-new")
+    val blogEdit = handlebars.compile("blog-edit")
 
     val producer = mq.createProducer[ProducerData[String]](kafkaServer)
     {
@@ -67,10 +68,18 @@ object BlogQuery extends App with BaseFormats with Microservice {
             Some(JObject(JField("uuid", CommonUtil.uuid)))
           }
         } ~
-        path(Segment) { id =>
-          completePage(render(blog), "blog") {
-            collBlog.findOne(MongoDBObject("_id" -> id))
-              .map(o => serialize(o))
+        pathPrefix(Segment) { id =>
+          pathEnd {
+            completePage(render(blog), "blog") {
+              collBlog.findOne(MongoDBObject("_id" -> id))
+                .map(o => serialize(o))
+            }
+          } ~
+          path("edit") {
+            completePage(render(blogEdit), "blog-edit") {
+              collBlog.findOne(MongoDBObject("_id" -> id))
+                .map(o => serialize(o))
+            }
           }
         }
       }

@@ -50,6 +50,9 @@ object BlogCommandApp extends App with Microservice {
                 "discussion-command",
                 id,
                 StartDiscussion(id, blogId, title, userId, userName)))
+          case event @ BlogModified(blogId, userId, userName, title, content) =>
+            producer.offer(
+              ProducerData("blog-event", blogId, event))
           case event @ DiscussionStarted(id, userId, userName, blogId, title) =>
             producer.offer(
               ProducerData("blog-event", blogId, event))

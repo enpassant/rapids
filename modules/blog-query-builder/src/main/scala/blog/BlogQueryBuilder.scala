@@ -59,6 +59,23 @@ object BlogQueryBuilder extends App with Microservice {
                     "content" -> content,
                     "htmlContent" -> htmlContent,
                     "discussions" -> Seq()))
+              case BlogModified(id, userId, userName, title, content) =>
+                val blogOpt = collection.findOne(
+                  MongoDBObject("_id" -> id))
+                blogOpt foreach { blog =>
+                  val document = parser.parse(content)
+                  val htmlContent = renderer.render(document)
+                  collection.update(
+                    MongoDBObject("_id" -> id),
+                    MongoDBObject(
+                      "_id" -> id,
+                      "userId" -> userId,
+                      "userName" -> userName,
+                      "title" -> title,
+                      "content" -> content,
+                      "htmlContent" -> htmlContent,
+                      "discussions" -> blog("discussions")))
+                }
               case DiscussionStarted(id, userId, userName, blogId, title) =>
                 collection.update(
                   MongoDBObject("_id" -> blogId),

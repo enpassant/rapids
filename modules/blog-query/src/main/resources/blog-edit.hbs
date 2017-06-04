@@ -1,28 +1,28 @@
-<form id="createBlog">
+<form id="modifyBlog">
     <div>
         <h1 class="blog">
-            <input id="title"/>
+            <input id="title" value="{{title}}"/>
         </h1>
     </div>
     <div>
-        <textarea id="content"></textarea>
+        <textarea id="content">{{{content}}}</textarea>
     </div>
     <div>
-        <input type="button" value="Create"
-            onClick="byId('createBlog').createBlog();"/>
+        <input type="button" value="Modify"
+            onClick="byId('modifyBlog').modifyBlog();"/>
     </div>
 </form>
 
 <script type="text/javascript">
-    this.createBlog = function() {
+    this.modifyBlog = function() {
         var title = byId("title").value;
         var content = byId("content").value;
         var data = {
-            "_t": "CreateBlog",
+            "_t": "ModifyBlog",
             "title": title,
             "content": content,
             "loggedIn": ""
         };
-        ajaxPost("/commands/blog/{{uuid}}", data);
+        ajaxPost("/commands/blog/{{_id}}", data);
     };
 </script>
