@@ -15,7 +15,6 @@ import akka.stream._
 import java.util.Base64
 import com.github.jknack.handlebars.{ Context, Handlebars }
 import com.mongodb.casbah.Imports._
-import com.typesafe.config.ConfigFactory
 import org.json4s._
 import org.json4s.jackson.JsonMethods.{parse => jparse}
 import org.json4s.JsonAST._
