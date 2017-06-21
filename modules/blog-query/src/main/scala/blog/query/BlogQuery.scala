@@ -10,7 +10,6 @@ import akka.http.scaladsl.server.Directives._
 import akka.stream._
 import com.github.jknack.handlebars.{ Context, Handlebars, Template }
 import com.mongodb.casbah.Imports._
-import com.typesafe.config.ConfigFactory
 import fixiegrips.{ Json4sHelpers, Json4sResolver }
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.json4s.JsonAST._
@@ -25,7 +24,6 @@ object BlogQuery extends App with BaseFormats with Microservice {
   {
     implicit val executionContext = system.dispatcher
 
-    val config = ConfigFactory.load
     val uri = config.getString("blog.query.mongodb.uri")
     val mongoClient = MongoClient(MongoClientURI(uri))
     val collBlog = mongoClient.getDB("blog")("blog")

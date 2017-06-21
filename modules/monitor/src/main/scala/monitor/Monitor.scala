@@ -13,7 +13,6 @@ import akka.stream._
 import akka.stream.scaladsl._
 import com.github.jknack.handlebars.{ Context, Handlebars, Template }
 import com.mongodb.casbah.Imports._
-import com.typesafe.config.ConfigFactory
 import fixiegrips.{ Json4sHelpers, Json4sResolver }
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.json4s._
@@ -29,8 +28,6 @@ object Monitor extends App with BaseFormats with Microservice {
     materializer: ActorMaterializer) =
   {
 		implicit val executionContext = system.dispatcher
-
-    val config = ConfigFactory.load
 
     val (wsSourceQueue, wsSource) =
       Source.queue[String](100, OverflowStrategy.backpressure)

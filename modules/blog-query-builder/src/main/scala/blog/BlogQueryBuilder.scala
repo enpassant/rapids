@@ -5,7 +5,6 @@ import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
 import com.mongodb.casbah.Imports._
-import com.typesafe.config.ConfigFactory
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.options.MutableDataSet;
@@ -19,7 +18,6 @@ object BlogQueryBuilder extends App with Microservice {
 	def start(implicit mq: MQProtocol, system: ActorSystem) = {
 		implicit val executionContext = system.dispatcher
 
-    val config = ConfigFactory.load
     val uri = config.getString("blog.query.builder.mongodb.uri")
     val mongoClient = MongoClient(MongoClientURI(uri))
     val collection = mongoClient.getDB("blog")("blog")
