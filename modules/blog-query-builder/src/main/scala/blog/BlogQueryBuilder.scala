@@ -1,6 +1,8 @@
 package blog
 
 import common._
+import config.ProductionKafkaConfig
+
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
@@ -26,7 +28,7 @@ object BlogQueryBuilder extends App with Microservice {
     val parser = Parser.builder(options).build()
     val renderer = HtmlRenderer.builder(options).build()
 
-		val producer = mq.createProducer[ProducerData[String]](kafkaServer)
+		val producer = mq.createProducer[ProducerData[String]]()
     {
 			case msg @ ProducerData(topic, id, value) => msg
 		}
@@ -35,7 +37,6 @@ object BlogQueryBuilder extends App with Microservice {
       Performance.props("blog-query-builder", producer))
 
 		val consumer = mq.createConsumer(
-      kafkaServer,
 			"blog-query",
 			"blog-event")
 		{ msg =>
@@ -94,7 +95,7 @@ object BlogQueryBuilder extends App with Microservice {
     }
 	}
 
-  implicit val mq = Kafka
+	implicit val mq = new Kafka(ProductionKafkaConfig)
 	implicit val system = ActorSystem("DiscussionQueryBuilder")
 	import common.TypeHintContext._
 

@@ -2,6 +2,8 @@ package discussion
 
 import common._
 import blog._
+import config.ProductionKafkaConfig
+
 import com.mongodb.casbah.Imports._
 import akka.actor._
 import akka.pattern.ask
@@ -20,7 +22,7 @@ object DiscussionQueryBuilder extends App with Microservice {
     val mongoClient = MongoClient(MongoClientURI(uri))
     val collDiscussion = mongoClient.getDB("blog")("discussion")
 
-		val producer = mq.createProducer[ProducerData[String]](kafkaServer)
+		val producer = mq.createProducer[ProducerData[String]]()
     {
 			case msg @ ProducerData(topic, id, value) => msg
 		}
@@ -29,7 +31,6 @@ object DiscussionQueryBuilder extends App with Microservice {
       Performance.props("disc-query-builder", producer))
 
 		val consumer = mq.createConsumer(
-      kafkaServer,
 			"discussion-query",
 			"discussion-event")
 		{ msg =>
@@ -94,7 +95,7 @@ object DiscussionQueryBuilder extends App with Microservice {
     }
 	}
 
-  implicit val mq = Kafka
+	implicit val mq = new Kafka(ProductionKafkaConfig)
 	implicit val system = ActorSystem("DiscussionQueryBuilder")
 	import common.TypeHintContext._
 

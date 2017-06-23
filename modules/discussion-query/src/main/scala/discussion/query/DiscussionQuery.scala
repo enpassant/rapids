@@ -2,6 +2,7 @@ package discussion.query
 
 import common._
 import common.web.Directives._
+import config.ProductionKafkaConfig
 
 import akka.actor._
 import akka.http.scaladsl.Http
@@ -39,7 +40,7 @@ object DiscussionQuery extends App with BaseFormats with Microservice {
     val commentReply = handlebars.compile("comment-reply")
     val discussion = handlebars.compile("discussion")
 
-		val producer = mq.createProducer[ProducerData[String]](kafkaServer)
+		val producer = mq.createProducer[ProducerData[String]]()
     {
 			case msg @ ProducerData(topic, id, value) => msg
 		}
@@ -83,7 +84,7 @@ object DiscussionQuery extends App with BaseFormats with Microservice {
     stat(statActor)(route)
 	}
 
-  implicit val mq = Kafka
+	implicit val mq = new Kafka(ProductionKafkaConfig)
 	implicit val system = ActorSystem("DiscussionQuery")
 	implicit val materializer = ActorMaterializer()
 	val route = start

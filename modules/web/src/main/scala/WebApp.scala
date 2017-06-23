@@ -1,6 +1,7 @@
 import common._
 import blog.BlogSerializer
 import common.web.Directives._
+import config.ProductionKafkaConfig
 
 import akka.actor._
 import akka.kafka._
@@ -29,14 +30,12 @@ object WebApp extends App with Microservice {
   {
 		implicit val executionContext = system.dispatcher
 
-		val producer = mq.createProducer[ProducerData[String]](
-      kafkaServer)
+		val producer = mq.createProducer[ProducerData[String]]()
     {
 			case msg @ ProducerData(topic, id, value) => msg
 		}
 
 		lazy val consumerSource = mq.createConsumerSource(
-      kafkaServer,
 			"webapp",
 			"client-commands")
 		{
@@ -50,7 +49,6 @@ object WebApp extends App with Microservice {
     var links = SortedSet.empty[FunctionLink]
 
 		val webAppConsumer = mq.createConsumer(
-      kafkaServer,
 			"web-app",
 			"web-app")
 		{ msg =>
@@ -158,7 +156,7 @@ object WebApp extends App with Microservice {
       if (scala.util.Random.nextBoolean) "admin" else "user", "checker")
   }
 
-	implicit val mq = Kafka
+	implicit val mq = new Kafka(ProductionKafkaConfig)
 	implicit val system = ActorSystem("WebApp")
 	implicit val materializer = ActorMaterializer()
 	val route = start

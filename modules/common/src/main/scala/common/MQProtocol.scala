@@ -7,15 +7,15 @@ import akka.stream.scaladsl._
 import scala.concurrent.Future
 
 trait MQProtocol {
-	def createProducer[A](server: String)
+	def createProducer[A]()
 		(mapper: A => ProducerData[String])
 		(implicit system: ActorSystem): SourceQueueWithComplete[A];
 
-	def createConsumerSource[T](server: String, groupId: String, topic: String*)
+	def createConsumerSource[T](groupId: String, topic: String*)
     (mapper: ConsumerData => Future[T])
 		(implicit system: ActorSystem): Source[(String, T), KillSwitch];
 
-	def createConsumer[T](server: String, groupId: String, topic: String*)
+	def createConsumer[T](groupId: String, topic: String*)
     (mapper: ConsumerData => Future[T])
 		(implicit system: ActorSystem): (KillSwitch, Future[Done]);
 }

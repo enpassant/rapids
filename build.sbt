@@ -25,7 +25,11 @@ libraryDependencies ++= Seq(
 )
 
 
+lazy val config = (project in file("modules/config"))
+
 lazy val common = (project in file("modules/common"))
+  .aggregate(config)
+  .dependsOn(config)
 
 lazy val webCommon = (project in file("modules/web-common"))
   .settings(libraryDependencies ++= Common.webDependencies)

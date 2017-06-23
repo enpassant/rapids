@@ -10,8 +10,8 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization._
 import scala.concurrent.Future
 
-object Kafka extends MQProtocol {
-	def createProducer[A](server: String)
+class Kafka(kafkaConfig: config.KafkaConfig) extends MQProtocol {
+	def createProducer[A]()
 		(mapper: A => ProducerData[String])
 		(implicit system: ActorSystem) =
 	{
@@ -22,7 +22,7 @@ object Kafka extends MQProtocol {
 			system,
 			new ByteArraySerializer,
 			new StringSerializer)
-			.withBootstrapServers(server)
+			.withBootstrapServers(kafkaConfig.server)
 
 		Source.queue[A](256, OverflowStrategy.backpressure)
 			.map { input =>
@@ -35,7 +35,6 @@ object Kafka extends MQProtocol {
 	}
 
 	private def createBaseConsumerSource(
-    server: String,
     groupId: String,
     topic: String*)
 		(implicit system: ActorSystem) =
@@ -45,7 +44,7 @@ object Kafka extends MQProtocol {
 			new ByteArrayDeserializer,
 			new StringDeserializer
 		)
-			.withBootstrapServers(server)
+			.withBootstrapServers(kafkaConfig.server)
 			.withGroupId(groupId)
 
 		Consumer.committableSource(
@@ -54,13 +53,13 @@ object Kafka extends MQProtocol {
 		)
 	}
 
-	def createConsumerSource[T](server: String, groupId: String, topic: String*)
+	def createConsumerSource[T](groupId: String, topic: String*)
     (mapper: ConsumerData => Future[T])
 		(implicit system: ActorSystem) =
 	{
 		implicit val executionContext = system.dispatcher
 
-    createBaseConsumerSource(server, groupId, topic :_*)
+    createBaseConsumerSource(groupId, topic :_*)
 			.mapAsync(1) { msg =>
         mapper(ConsumerData(new String(msg.record.key), msg.record.value))
           .map((_, msg))
@@ -73,14 +72,14 @@ object Kafka extends MQProtocol {
       .viaMat(KillSwitches.single)(Keep.right)
   }
 
-	def createConsumer[T](server: String, groupId: String, topic: String*)
+	def createConsumer[T](groupId: String, topic: String*)
     (mapper: ConsumerData => Future[T])
 		(implicit system: ActorSystem) =
 	{
 		implicit val materializer = ActorMaterializer()
 		implicit val executionContext = system.dispatcher
 
-    createBaseConsumerSource(server, groupId, topic :_*)
+    createBaseConsumerSource(groupId, topic :_*)
       .mapAsync(1) { msg =>
         mapper(ConsumerData(new String(msg.record.key), msg.record.value))
           .map(m => msg.committableOffset)

@@ -1,6 +1,7 @@
 package testError
 
 import common._
+import config.ProductionKafkaConfig
 
 import akka.actor._
 import akka.stream._
@@ -23,7 +24,6 @@ object TestError extends App with BaseFormats with Microservice {
     val config = ConfigFactory.load
 
 		val consumer = mq.createConsumer(
-      kafkaServer,
 			"testError",
 			"error")
     {
@@ -36,7 +36,7 @@ object TestError extends App with BaseFormats with Microservice {
     }
 	}
 
-  implicit val mq = Kafka
+	implicit val mq = new Kafka(ProductionKafkaConfig)
 	implicit val system = ActorSystem("Monitor")
 	implicit val materializer = ActorMaterializer()
 	start

@@ -1,6 +1,8 @@
 package blog
 
 import common._
+import config.ProductionKafkaConfig
+
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
@@ -12,16 +14,14 @@ object BlogCommandApp extends App with Microservice {
 	def start(implicit mq: MQProtocol, system: ActorSystem) = {
 		implicit val executionContext = system.dispatcher
 
-		val producer = mq.createProducer[ProducerData[BlogMessage]](
-      kafkaServer)
+		val producer = mq.createProducer[ProducerData[BlogMessage]]()
     {
 			case ProducerData(topic, id, event) =>
 				val value = BlogSerializer.toString(event)
 				ProducerData(topic, id, value)
 		}
 
-		val producerStat = mq.createProducer[ProducerData[String]](
-      kafkaServer)
+		val producerStat = mq.createProducer[ProducerData[String]]()
     {
 			case msg @ ProducerData(topic, id, value) => msg
 		}
@@ -32,7 +32,6 @@ object BlogCommandApp extends App with Microservice {
       Performance.props("blog-command", producerStat))
 
 		val consumer = mq.createConsumer(
-      kafkaServer,
 			"blog-command",
 			"blog-command")
 		{ msg =>
@@ -72,7 +71,7 @@ object BlogCommandApp extends App with Microservice {
     }
 	}
 
-  implicit val mq = Kafka
+	implicit val mq = new Kafka(ProductionKafkaConfig)
 	implicit val system = ActorSystem("BlogCommandApp")
 	import common.TypeHintContext._
 

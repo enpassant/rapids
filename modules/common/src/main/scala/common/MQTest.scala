@@ -12,7 +12,7 @@ class MQTest(val system: ActorSystem) extends MQProtocol
 {
   val mqTestActor = system.actorOf(MQTestActor.props(), "MQTestActor")
 
-	def createProducer[A](server: String)
+	def createProducer[A]()
 		(mapper: A => ProducerData[String])
 		(implicit system: ActorSystem) =
 	{
@@ -27,13 +27,13 @@ class MQTest(val system: ActorSystem) extends MQProtocol
 			.run()
 	}
 
-	def createConsumerSource[T](server: String, groupId: String, topic: String*)
+	def createConsumerSource[T](groupId: String, topic: String*)
     (mapper: ConsumerData => Future[T])
 		(implicit system: ActorSystem) =
 	{
 		implicit val executionContext = system.dispatcher
 
-    createBaseConsumerSource(server, groupId, topic :_*)
+    createBaseConsumerSource(groupId, topic :_*)
 			.mapAsync(1) { msg =>
         mapper(msg)
           .map((msg.key, _))
@@ -41,22 +41,21 @@ class MQTest(val system: ActorSystem) extends MQProtocol
       .viaMat(KillSwitches.single)(Keep.right)
   }
 
-	def createConsumer[T](server: String, groupId: String, topic: String*)
+	def createConsumer[T](groupId: String, topic: String*)
     (mapper: ConsumerData => Future[T])
 		(implicit system: ActorSystem) =
 	{
 		implicit val materializer = ActorMaterializer()
 		implicit val executionContext = system.dispatcher
 
-    createBaseConsumerSource(server, groupId, topic :_*)
+    createBaseConsumerSource(groupId, topic :_*)
       .mapAsync(1)(mapper)
       .viaMat(KillSwitches.single)(Keep.right)
       .toMat(Sink.ignore)(Keep.both)
       .run()
 	}
 
-	private def createBaseConsumerSource(
-    server: String, groupId: String, topic: String*)
+	private def createBaseConsumerSource(groupId: String, topic: String*)
 		(implicit system: ActorSystem)
     : Source[ConsumerData, SourceQueueWithComplete[ConsumerData]] =
 	{

@@ -1,5 +1,7 @@
 import common._
 
+import config.ProductionKafkaConfig
+
 import akka.actor._
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
@@ -11,7 +13,8 @@ object Main extends App {
 	implicit val system = ActorSystem("Main")
 	implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
-  implicit val mq = if (isTest) new MQTest(system) else Kafka
+  implicit val mq =
+    if (isTest) new MQTest(system) else new Kafka(ProductionKafkaConfig)
 
   println("Program has started")
 
