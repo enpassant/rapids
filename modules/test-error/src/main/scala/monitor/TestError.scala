@@ -6,12 +6,7 @@ import config.ProductionKafkaConfig
 import akka.actor._
 import akka.stream._
 import akka.stream.scaladsl._
-import com.typesafe.config.ConfigFactory
-import org.json4s._
-import org.json4s.mongo.JObjectParser._
 import scala.concurrent.Future
-import scala.concurrent.duration._
-import scala.util.{Try, Success, Failure}
 
 object TestError extends App with BaseFormats with Microservice {
 	def start(implicit
@@ -20,8 +15,6 @@ object TestError extends App with BaseFormats with Microservice {
     materializer: ActorMaterializer) =
   {
 		implicit val executionContext = system.dispatcher
-
-    val config = ConfigFactory.load
 
 		val consumer = mq.createConsumer(
 			"testError",
