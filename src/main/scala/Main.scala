@@ -1,6 +1,6 @@
 import common._
 
-import config.ProductionKafkaConfig
+import config._
 
 import akka.actor._
 import akka.http.scaladsl.Http
@@ -19,14 +19,17 @@ object Main extends App {
   println("Program has started")
 
 	val routeWeb = WebApp.start
-	val routeBlogQuery = blog.query.BlogQuery.start
-	val routeDiscussionQuery = discussion.query.DiscussionQuery.start
+	val routeBlogQuery =
+    new blog.query.BlogQuery(ProductionBlogQueryConfig).start
+	val routeDiscussionQuery =
+    new discussion.query.DiscussionQuery(ProductionDiscussionQueryConfig).start
 	val routeMonitor = monitor.Monitor.start
 	val route = routeBlogQuery ~ routeDiscussionQuery ~ routeMonitor ~ routeWeb
 	blog.BlogCommandApp.start
 	discussion.DiscussionCommandApp.start
-	blog.BlogQueryBuilder.start
-	discussion.DiscussionQueryBuilder.start
+	new blog.BlogQueryBuilder(ProductionBlogQueryBuilderConfig).start
+	new discussion.DiscussionQueryBuilder(ProductionDiscussionQueryBuilderConfig)
+    .start
 
 	val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8080)
 

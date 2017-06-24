@@ -2,7 +2,7 @@ package discussion.query
 
 import common._
 import common.web.Directives._
-import config.ProductionKafkaConfig
+import config._
 
 import akka.actor._
 import akka.http.scaladsl.Http
@@ -17,7 +17,9 @@ import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
 import org.json4s.mongo.JObjectParser._
 
-object DiscussionQuery extends App with BaseFormats with Microservice {
+class DiscussionQuery(config: DiscussionQueryConfig)
+  extends App with BaseFormats with Microservice
+{
 	def start(implicit
     mq: MQProtocol,
     system: ActorSystem,
@@ -25,9 +27,7 @@ object DiscussionQuery extends App with BaseFormats with Microservice {
   {
 		implicit val executionContext = system.dispatcher
 
-    val uri = config.getString("discussion.query.mongodb.uri")
-    val mongoClient = MongoClient(MongoClientURI(uri))
-    val collDiscussion = mongoClient.getDB("blog")("discussion")
+    val collDiscussion = config.mongoClient.getDB("blog")("discussion")
 
     val handlebars = new Handlebars().registerHelpers(Json4sHelpers)
     handlebars.setInfiniteLoops(true)

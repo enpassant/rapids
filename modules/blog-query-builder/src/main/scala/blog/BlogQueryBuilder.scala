@@ -1,7 +1,7 @@
 package blog
 
 import common._
-import config.ProductionKafkaConfig
+import config._
 
 import akka.actor._
 import akka.pattern.ask
@@ -16,13 +16,13 @@ import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 import scala.util.{Try, Success, Failure}
 
-object BlogQueryBuilder extends App with Microservice {
+class BlogQueryBuilder(config: BlogQueryBuilderConfig)
+  extends App with Microservice
+{
 	def start(implicit mq: MQProtocol, system: ActorSystem) = {
 		implicit val executionContext = system.dispatcher
 
-    val uri = config.getString("blog.query.builder.mongodb.uri")
-    val mongoClient = MongoClient(MongoClientURI(uri))
-    val collection = mongoClient.getDB("blog")("blog")
+    val collection = config.mongoClient.getDB("blog")("blog")
 
     val options = new MutableDataSet()
     val parser = Parser.builder(options).build()

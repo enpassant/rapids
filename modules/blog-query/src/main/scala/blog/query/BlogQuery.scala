@@ -2,7 +2,7 @@ package blog.query
 
 import common._
 import common.web.Directives._
-import config.ProductionKafkaConfig
+import config._
 
 import akka.actor._
 import akka.http.scaladsl.Http
@@ -17,7 +17,9 @@ import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
 import org.json4s.mongo.JObjectParser._
 
-object BlogQuery extends App with BaseFormats with Microservice {
+class BlogQuery(config: BlogQueryConfig)
+  extends App with BaseFormats with Microservice
+{
   def start(implicit
     mq: MQProtocol,
     system: ActorSystem,
@@ -25,10 +27,8 @@ object BlogQuery extends App with BaseFormats with Microservice {
   {
     implicit val executionContext = system.dispatcher
 
-    val uri = config.getString("blog.query.mongodb.uri")
-    val mongoClient = MongoClient(MongoClientURI(uri))
-    val collBlog = mongoClient.getDB("blog")("blog")
-    val title = config.getString("blog.query.title")
+    val collBlog = config.mongoClient.getDB("blog")("blog")
+    val title = config.title
 
     val handlebars = new Handlebars().registerHelpers(Json4sHelpers)
     def ctx(obj: Object) =

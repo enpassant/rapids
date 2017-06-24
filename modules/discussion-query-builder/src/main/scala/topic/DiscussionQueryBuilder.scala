@@ -2,7 +2,7 @@ package discussion
 
 import common._
 import blog._
-import config.ProductionKafkaConfig
+import config._
 
 import com.mongodb.casbah.Imports._
 import akka.actor._
@@ -14,13 +14,13 @@ import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 import scala.util.{Try, Success, Failure}
 
-object DiscussionQueryBuilder extends App with Microservice {
+class DiscussionQueryBuilder(config: DiscussionQueryBuilderConfig)
+  extends App with Microservice
+{
 	def start(implicit mq: MQProtocol, system: ActorSystem) = {
 		implicit val executionContext = system.dispatcher
 
-    val uri = config.getString("discussion.query.builder.mongodb.uri")
-    val mongoClient = MongoClient(MongoClientURI(uri))
-    val collDiscussion = mongoClient.getDB("blog")("discussion")
+    val collDiscussion = config.mongoClient.getDB("blog")("discussion")
 
 		val producer = mq.createProducer[ProducerData[String]]()
     {
