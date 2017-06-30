@@ -2,7 +2,7 @@
     var clientId = Math.floor(Math.random() * (10 - 1) + 1)
     console.log("WebSocket clientId: " + clientId);
 
-    var token = undefined;
+    var token = getCookie("X-Token");
     var baseUrl = undefined;
     var linkObjs = undefined;
 
@@ -89,13 +89,7 @@
             req.setRequestHeader("Content-type", "application/json");
             const payload = extractPayload(token);
             if (typeof payload !== "undefined") {
-                const now = new Date().getTime() / 1000;
-                if (now <= payload.exp) {
-                    req.setRequestHeader("Authorization",
-                        "Bearer " + token);
-                } else {
-                    token = undefined;
-                }
+                req.setRequestHeader("Authorization", "Bearer " + token);
             }
             req.onload = function() {
                 if (req.status === 200) {
@@ -121,7 +115,17 @@
         if (typeof token !== "undefined") {
             const parts = token.split('.');
             if (parts.length === 3) {
-                return JSON.parse(atob(parts[1]));
+                const payload = JSON.parse(
+                    decodeURIComponent(escape(atob(parts[1]))));
+                if (typeof payload !== "undefined") {
+                    const now = new Date().getTime() / 1000;
+                    if (now <= payload.exp) {
+                        byId("login-user").innerHTML = payload.name;
+                        return payload;
+                    } else {
+                        token = undefined;
+                    }
+                }
             }
         }
         return undefined;
@@ -206,7 +210,30 @@
         return (style.display === 'none')
     }
 
+    function getCookie(cname) {
+        var name = cname + "=";
+        var decodedCookie = decodeURIComponent(document.cookie);
+        var ca = decodedCookie.split(';');
+        for(var i = 0; i <ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+
+    const login = function() {
+        window.location.assign("https://accounts.google.com/o/oauth2/v2/auth?client_id=33475451407-kv7l7blhf3jiha12c95doqvunb0uajop.apps.googleusercontent.com&redirect_uri=https://feca.mooo.com/app/auth/callback&response_type=code&access_type=online&scope=email openid profile&nonce=feca&state=feca|" + encodeURIComponent(window.location.href));
+    };
+
+    if (token) extractPayload();
+
     window.addEventListener('hashchange', router);
     window.addEventListener('load', router);
+    byId('btnLogin').addEventListener('click', login);
     <!--var webSocket = WebSocketTest();-->
 })();

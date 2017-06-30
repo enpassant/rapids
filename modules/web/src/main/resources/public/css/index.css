@@ -21,16 +21,17 @@ h2 {
 }
 
 @media all and (min-width: 600px) {
-  .header { flex: 1 100%; }
+  .header { flex: 1 60%; }
+  .login { flex: 0 1 40%; order: 2; }
   #view { flex: 2 70%; order: 2; }
   #messages { flex: 1 30%; order: 4; }
 }
 
 @media all and (min-width: 900px) {
-  /*.logo { flex: 1 70%; order: 1; }*/
-  .login { flex: 1 15%; order: 2; }
-  #view { flex: 2 65%; order: 3; }
-  #messages { flex: 2 15%; order: 4; }
+  .logo { flex: 0 1 60%; order: 1; }
+  .login { flex: 0 1 20%; order: 2; }
+  #view { flex: 0 2 65%; order: 3; }
+  #messages { flex: 0 2 15%; order: 4; }
 }
 
 .wrapped-container {
@@ -52,13 +53,13 @@ h2 {
     background: #d8d8d8;
     height: 15mm;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     margin: 0px;
     padding: 0px;
 }
 
 .logo {
-    width: 70%;
+    width: 60%;
     background: #d8d8d8;
 }
 
@@ -90,6 +91,8 @@ div {
 }
 
 .login {
+    display: flex;
+    justify-content: flex-end;
 }
 
 #login-data {
@@ -99,12 +102,13 @@ div {
 }
 
 .login > a {
-    width: 100%;
+    width: 20%;
     cursor: pointer;
 }
 
 .login > * {
-    width: 100%;
+    flex: 0 0 auto;
+    margin: 0px 4px;
 }
 
 #login-data > div > label {

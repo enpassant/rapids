@@ -6,11 +6,12 @@ import akka.actor._
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshalling.ToResponseMarshallable
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.Accept
+import akka.http.scaladsl.model.headers.{Accept, HttpCookiePair}
 import akka.http.scaladsl.server.directives.Credentials
 import akka.http.scaladsl.server.{RequestContext, Route}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.Directive1
 import akka.stream._
 import java.util.Base64
 import com.github.jknack.handlebars.{ Context, Handlebars }
@@ -59,28 +60,34 @@ object Directives extends BaseFormats {
   {
     credentials match {
       case Credentials.Provided(id) =>
-        val parts = id.split('.')
-        if (parts.length == 3) {
-          val header = parts(0)
-          CommonUtil.encodeOpt("secret", s"$header.${parts(1)}") { t =>
-            if (encoder.encodeToString(t) == parts(2)) {
-              implicit val formats = DefaultFormats
-              val payload = jparse(new String(decoder.decode(parts(1))))
-                .extract[Payload]
-              if (System.currentTimeMillis / 1000 <= payload.exp) {
-                val user = User(payload.sub, payload.name, payload.roles:_*)
-                CommonUtil.createJwt(user, 5 * 60, 0)
-              } else {
-                None
-              }
-            } else {
-              None
-            }
+        extractJwt(getUser)(id)
+      case _ => None
+    }
+  }
+
+  def extractJwt(getUser: String => User)
+    (token: String): Option[LoggedIn] =
+  {
+    val parts = token.split('.')
+    if (parts.length == 3) {
+      val header = parts(0)
+      CommonUtil.encodeOpt("secret", s"$header.${parts(1)}") { t =>
+        if (encoder.encodeToString(t) == parts(2)) {
+          implicit val formats = DefaultFormats
+          val payload = jparse(new String(decoder.decode(parts(1))))
+            .extract[Payload]
+          if (System.currentTimeMillis / 1000 <= payload.exp) {
+            val user = User(payload.sub, payload.name, payload.roles:_*)
+            CommonUtil.createJwt(user, 5 * 60, 0)
+          } else {
+            None
           }
         } else {
           None
         }
-      case _ => None
+      }
+    } else {
+      None
     }
   }
 
@@ -95,9 +102,26 @@ object Directives extends BaseFormats {
     }
   }
 
-  val authenticates = (getUser: String => User) =>
-    authenticateOAuth2("rapids", authenticateJwt(getUser)) |
-      authenticateBasic(realm = "rapids", authenticate(getUser))
+  def authenticates(getUser: String => User): Directive1[LoggedIn] = {
+    val cookieDirective:Directive1[LoggedIn] = optionalCookie("X-Token").flatMap {
+      case Some(cookie) => {
+        println(cookie)
+        extractJwt(getUser)(cookie.value) match {
+          case Some(loggedIn) =>
+            println(loggedIn)
+            provide(loggedIn)
+          case _ => reject
+        }
+      }
+      case _ =>
+        println("Missing X-Token cookie!")
+        reject
+    }
+
+    cookieDirective |
+      authenticateOAuth2("rapids", authenticateJwt(getUser)) |
+        authenticateBasic(realm = "rapids", authenticate(getUser))
+  }
 
   def stat(statActor: ActorRef)(route: Route) = (request: RequestContext) =>
     Performance.statF(statActor)(route(request))

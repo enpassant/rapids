@@ -1,7 +1,7 @@
 import common._
 import blog.BlogSerializer
 import common.web.Directives._
-import config.ProductionKafkaConfig
+import config.{OauthConfig, ProductionKafkaConfig}
 
 import akka.actor._
 import akka.kafka._
@@ -22,7 +22,7 @@ import org.json4s.jackson.JsonMethods._
 import scala.concurrent.Future
 import scala.collection.SortedSet
 
-object WebApp extends App with Microservice {
+class WebApp(oauthConfig: OauthConfig) extends App with Microservice {
 	def start(implicit
     mq: MQProtocol,
     system: ActorSystem,
@@ -123,6 +123,9 @@ object WebApp extends App with Microservice {
 					}
 				}
 			} ~
+			path("auth" / "callback") {
+        auth.GoogleOauth.route(oauthConfig)
+      } ~
 			path("login") {
         post {
           authenticates(getUser) { loggedIn =>

@@ -1,6 +1,22 @@
 package config
 
 import com.mongodb.casbah.Imports._
+import com.typesafe.config.ConfigFactory
+
+object OauthConfig {
+  def get = {
+    val config = ConfigFactory.load("oauth")
+    OauthConfig(
+      config.getString("clientId"),
+      config.getString("clientSecret"),
+      config.getString("redirectUri"))
+  }
+}
+
+case class OauthConfig(
+  clientId: String,
+  clientSecret: String,
+  redirectUri: String)
 
 trait MongoClientConfig {
   def mongoDbUri: String

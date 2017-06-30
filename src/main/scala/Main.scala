@@ -18,7 +18,7 @@ object Main extends App {
 
   println("Program has started")
 
-	val routeWeb = WebApp.start
+	val routeWeb = new WebApp(OauthConfig.get).start
 	val routeBlogQuery =
     new blog.query.BlogQuery(ProductionBlogQueryConfig).start
 	val routeDiscussionQuery =
