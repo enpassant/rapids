@@ -31,13 +31,13 @@
 
                 self.ws.onmessage = function (evt)
                 {
-                    console.log(evt);
-
                     var msg = JSON.parse(evt.data).value;
                     var br = document.createElement("br");
                     byId("messages").appendChild(br);
                     var textnode = document.createTextNode(msg);
                     byId("messages").appendChild(textnode);
+                    window.history.back();
+                    console.log(window.history);
                 };
 
                 self.ws.onclose = function()
