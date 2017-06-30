@@ -73,7 +73,6 @@ object GoogleOauth {
       val header = parts(0)
       val headerJwt =
         jparse(new String(decoder.decode(parts(0)))).extract[Header]
-      //println(headerJwt)
       val hash = s"$header.${parts(1)}".getBytes
       encrypt(
         googleN(headerJwt.kid),
@@ -83,7 +82,6 @@ object GoogleOauth {
       ) flatMap { t =>
         if (t) {
           val idToken = new String(decoder.decode(parts(1)))
-          println(idToken)
           Option(jparse(idToken).extract[IdToken]) flatMap { idTokenPayload =>
             val user = User(idTokenPayload.sub, idTokenPayload.name, "user")
             CommonUtil.createJwt(user, 5 * 60, 0)
