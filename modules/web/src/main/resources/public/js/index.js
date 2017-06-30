@@ -6,6 +6,7 @@
     var baseUrl = undefined;
     var linkObjs = undefined;
     var websocket = undefined;
+    var timeoutFn = undefined;
 
     function WebSocketTest()
     {
@@ -123,7 +124,13 @@
                 if (typeof payload !== "undefined") {
                     const now = new Date().getTime() / 1000;
                     if (now <= payload.exp) {
-                        byId("login-user").innerHTML = payload.name;
+                        const timeout = Math.ceil(payload.exp - now);
+                        if (timeoutFn) clearTimeout(timeoutFn);
+                        timeoutFn = setTimeout(
+                            function() { extractPayload(); },
+                            Math.min(timeout * 1000, 10000));
+                        byId("login-user").innerHTML =
+                            payload.name + " (" + timeout + "s)";
                         clientId = payload.sub;
                         if (!websocket) websocket = WebSocketTest();
                         return payload;
@@ -132,6 +139,7 @@
             }
             token = undefined;
             if (websocket) {
+                byId("login-user").innerHTML = "";
                 websocket.ws.close();
                 websocket = undefined;
             }
