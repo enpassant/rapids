@@ -58,6 +58,8 @@ class BlogQueryBuilder(config: BlogQueryBuilderConfig)
                     "content" -> content,
                     "htmlContent" -> htmlContent,
                     "discussions" -> Seq()))
+                producer.offer(ProducerData(
+                  "client-commands", userId, """{"value":"BlogCreated"}"""))
               case BlogModified(id, userId, userName, title, content) =>
                 val blogOpt = collection.findOne(
                   MongoDBObject("_id" -> id))
@@ -71,6 +73,8 @@ class BlogQueryBuilder(config: BlogQueryBuilderConfig)
                       "content" -> content,
                       "htmlContent" -> htmlContent)))
                 }
+                producer.offer(ProducerData(
+                  "client-commands", userId, """{"value":"BlogModified"}"""))
               case DiscussionStarted(id, userId, userName, blogId, title) =>
                 collection.update(
                   MongoDBObject("_id" -> blogId),
@@ -80,6 +84,8 @@ class BlogQueryBuilder(config: BlogQueryBuilderConfig)
                       "userId" -> userId,
                       "userName" -> userName,
                       "title" -> title)))
+                producer.offer(ProducerData(
+                  "client-commands", userId, """{"value":"DiscussionStarted"}"""))
               case _ => 1
             }
           case Failure(e) =>

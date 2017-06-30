@@ -64,8 +64,11 @@ class DiscussionQueryBuilder(config: DiscussionQueryBuilderConfig)
                       "content" -> content,
                       "comments" -> List()
                   )))
+                  producer.offer(ProducerData(
+                    "client-commands", userId, """{"value":"CommentAdded"}"""))
                 }
-              case CommentReplied(id, userId, userName, parentId, content, path) =>
+              case msg @
+                CommentReplied(id, userId, userName, parentId, content, path) =>
                 Try {
                   val pos = path.tail.foldLeft("comments") {
                     (p, i) => s"comments.$i.$p"
@@ -79,6 +82,8 @@ class DiscussionQueryBuilder(config: DiscussionQueryBuilderConfig)
                       "content" -> content,
                       "comments" -> List()
                   )))
+                  producer.offer(ProducerData(
+                    "client-commands", userId, """{"value":"CommentReplied"}"""))
                 }
               case _ => 1
             }

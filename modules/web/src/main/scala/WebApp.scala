@@ -49,7 +49,7 @@ class WebApp(oauthConfig: OauthConfig) extends App with Microservice {
     var links = SortedSet.empty[FunctionLink]
 
 		val webAppConsumer = mq.createConsumer(
-			"web-app",
+			"webapp",
 			"web-app")
 		{ msg =>
 			val json = CommonSerializer.fromString(msg.value)

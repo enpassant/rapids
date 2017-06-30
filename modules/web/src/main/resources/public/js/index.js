@@ -1,10 +1,11 @@
 (function() {
-    var clientId = Math.floor(Math.random() * (10 - 1) + 1)
+    var clientId = "clientId-" + Math.floor(Math.random() * (10 - 1) + 1)
     console.log("WebSocket clientId: " + clientId);
 
     var token = getCookie("X-Token");
     var baseUrl = undefined;
     var linkObjs = undefined;
+    var websocket = undefined;
 
     function WebSocketTest()
     {
@@ -16,9 +17,9 @@
 
             var open = function() {
                 console.log("Connection is opened...");
-                self.ws = new WebSocket("ws://" + location.hostname
+                self.ws = new WebSocket("wss://" + location.hostname
                     + (location.port ? ':' + location.port : '')
-                    + "/updates/" + clientId);
+                    + location.pathname + "updates/" + clientId);
 
                 /*
                 self.ws.onopen = function()
@@ -30,6 +31,8 @@
 
                 self.ws.onmessage = function (evt)
                 {
+                    console.log(evt);
+
                     var msg = JSON.parse(evt.data).value;
                     var br = document.createElement("br");
                     byId("messages").appendChild(br);
@@ -40,10 +43,9 @@
                 self.ws.onclose = function()
                 {
                     console.log("Connection is closed...");
-                    open();
+                    if (token) open();
                 };
             }
-
             open();
         }
 
@@ -52,6 +54,7 @@
             // The browser doesn't support WebSocket
             console.log("WebSocket NOT supported by your Browser!");
         }
+        return self.ws;
     }
 
     window.ajaxGet = function(url, method) {
@@ -121,11 +124,16 @@
                     const now = new Date().getTime() / 1000;
                     if (now <= payload.exp) {
                         byId("login-user").innerHTML = payload.name;
+                        clientId = payload.sub;
+                        if (!websocket) websocket = WebSocketTest();
                         return payload;
-                    } else {
-                        token = undefined;
                     }
                 }
+            }
+            token = undefined;
+            if (websocket) {
+                websocket.ws.close();
+                websocket = undefined;
             }
         }
         return undefined;
