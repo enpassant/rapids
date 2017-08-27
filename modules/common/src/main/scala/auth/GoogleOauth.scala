@@ -17,9 +17,11 @@ import akka.http.scaladsl.model.headers.LinkParams._
 import akka.http.scaladsl.model.ws.{UpgradeToWebSocket, TextMessage}
 import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream._
 import org.json4s._
 import org.json4s.jackson.JsonMethods.{parse => jparse}
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Try, Success, Failure}
 import akka.util.ByteString
@@ -54,19 +56,23 @@ case class IdToken(
   locale: String
 )
 
+case class GoogleKeys(keys: List[GoogleKey])
+case class GoogleKey(
+  kty: String,
+  alg: String,
+  use: String,
+  kid: String,
+  n: String,
+  e: String
+)
+
 object GoogleOauth {
   val encoder = Base64.getUrlEncoder()
   val decoder = Base64.getUrlDecoder()
 
-  val googleN = Map(
-    "a0eb736e47190f38e9251187676403e09aa8f9f0" -> "iz7sYHwIcY9XIvDJ_s7ujJnL-OPrSApxyR9cUmhB_YazFhFQOEBHviib46CwY-RLfTfsL6tBwZsI10RtgwVUGjZZ41G6gaZwzGtrrwRvx22_X1GROb1UO5wu0GVJKSD_9Hf7-SnzwkzJ73OiQAFkegiKqghDCRKRxlKQzRFIpdgXuSfdDxy7MPhhKC3YGfKj2S4jaNzNxFJm-8dY-oa2-7f2qQvgXvVnEnFG72FbJChy_Ol7cXkpXf03v6gRMOm8dQIrWh3VhRSm5HJNoOZb2X8Ubc6o-6CDN7OJFZMKlgNuLKT3s3xpY5j7qbvhMANOhAgPpYlDJTR9FHFFFRPFew==",
-    "9fd71f6734984febfdbac1ce6d74235abbdc1aa9" -> "v9ugWig2bv7i2CH8EAujRQlLT4Yuju3nd5vi0vjR6Q28HkM9iusvIlSLWKW7PS2mEK1H2mw7U4o7OClB6LlSFKRGymHLQ7_D1OlbnFHYqFlVhFUcG8kILk6o7b1jdRE2sUNgsArgHaWRPu4qKY6LP26ePOzbcIQ5JswgWGUx0ok7LX5z61HRaMVNcH1JWbJXFlOkZ_LooF_TZ3HElwwmhDBwBGzVJgz1glpY31dj2Zc6ms2Ddl2Be5eyay9dj8aESM-NePmgUa_qXcjjRwQlhPaLoopGB1xQuLh-Gj_bYBGnivQMRwFb44NHUlJujEPzpBe7SjC4a1jbOqoXCWGJVQ",
-    "9b8abc75385c47955744b39d571e5deb1e188d0b" -> "0gyg_L-Mvf6gsRZWjbsO-x8VKnSNIE74A8ekqLI_7kQddPRKSGLdz-KATVqjrIOs6K97aaAOqqfAcYLcIDN-zfdXqG2jHpbtKKPPULUltfRxQfHT7XH8N8PErTt0ePXXujWEpY2Fto7hr9_gA6BcXwgzhQ9z0x23FcATZGYvIXA3IT1xy0xqWBYfD6lQ5K74ZQ8q0MaMK5AqpgWSmW6TLMfvTuDkX91O0ewfHQEsO5Q_s6JWxDAyDo_3ls0kUoQ61uAt5CPoUs8kcvZLu-Hbv6zPXUOrg1p6GW8Q-yKgBQ9OF1FkHjYVF0VBByDJHB-mroh8PY6ER3lINQB9PRAp2w==",
-    "009350c0d3dbc378ee1daf37ddf7f7dbd728a222" -> "vofY0J7vNqKJOEmP3T66cocJ7Z-vNa39_UyvrRkdBDptzop7p8g9JvP25zB1g6LeBSCK6yQzJhhocqqWvaUROpfDl_ChFQGYLs3E4KWgKNPhOBfD6b2hNmGqSMFCxaMnUnT3A0l0YAnYrUDWCfWtMh4KGETNWcKK4SshLznnC5uI0B-Y1M9IlgzC9fXGGTmwEmlH2cURNaqQN0JcGH6SfdQplgEHv_eNlBW4ZLIali225SdD2mQIP_WIkHUahsxbawyRz9BfJ1A_puBYQVb0dwiGCpTq5pFlsoBjoxBF_Om4eNYMhei-207wEJdQruGDqIX5L8ws1rsgMmBgugiGkQ==")
-
   val googleE = "AQAB"
 
-  def extractIdToken(token: String): Option[LoggedIn] = {
+  def extractIdToken(token: String, keys: GoogleKeys): Option[LoggedIn] = {
     val parts = token.split('.')
     if (parts.length == 3) {
       implicit val formats = DefaultFormats
@@ -74,22 +80,49 @@ object GoogleOauth {
       val headerJwt =
         jparse(new String(decoder.decode(parts(0)))).extract[Header]
       val hash = s"$header.${parts(1)}".getBytes
-      encrypt(
-        googleN(headerJwt.kid),
-        googleE,
-        hash,
-        decoder.decode(parts(2))
-      ) flatMap { t =>
-        if (t) {
-          val idToken = new String(decoder.decode(parts(1)))
-          Option(jparse(idToken).extract[IdToken]) flatMap { idTokenPayload =>
-            val user = User(idTokenPayload.sub, idTokenPayload.name, "user")
-            CommonUtil.createJwt(user, 5 * 60, 0)
-          }
-        } else None
+      val keyOpt = keys.keys.find { key => key.kid == headerJwt.kid }
+      keyOpt flatMap { key =>
+        encrypt(
+          key.n,
+          key.e,
+          hash,
+          decoder.decode(parts(2))
+        ) flatMap { t =>
+          if (t) {
+            val idToken = new String(decoder.decode(parts(1)))
+            Option(jparse(idToken).extract[IdToken]) flatMap { idTokenPayload =>
+              val user = User(idTokenPayload.sub, idTokenPayload.name, "user")
+              CommonUtil.createJwt(user, 5 * 60, 0)
+            }
+          } else None
+        }
       }
     } else {
       None
+    }
+  }
+
+  def getGoogleKeys(
+    implicit system: ActorSystem,
+    materializer: ActorMaterializer): Future[GoogleKeys] =
+  {
+    val responseFuture: Future[HttpResponse] =
+      Http().singleRequest(
+        HttpRequest(
+          method = HttpMethods.GET,
+          uri = "https://www.googleapis.com/oauth2/v3/certs"
+        ))
+    responseFuture flatMap { response =>
+      if (response.status.isSuccess) {
+        val bodyF = response.entity.dataBytes.runFold(ByteString(""))(_ ++ _)
+        bodyF map { body =>
+          implicit val formats = DefaultFormats
+          val json = parse(body.utf8String)
+          json.extract[GoogleKeys]
+        }
+      } else {
+        Future.failed(new RuntimeException("failed"))
+      }
     }
   }
 
@@ -99,6 +132,7 @@ object GoogleOauth {
   ): Route = get {
     implicit val formats = DefaultFormats
     parameters('code, 'state) { (code, state) =>
+      val keys = getGoogleKeys
       val responseFuture: Future[HttpResponse] =
         Http().singleRequest(
           HttpRequest(
@@ -115,15 +149,19 @@ object GoogleOauth {
             )
           )
       )
-      onComplete(responseFuture) {
-        case Success(httpResponse) =>
+      val responses = for {
+        response <- responseFuture
+        keys <- getGoogleKeys
+      } yield (response, keys)
+      onComplete(responses) {
+        case Success((httpResponse, keys)) =>
           if (httpResponse.status.isSuccess) {
             onSuccess(
               httpResponse.entity.dataBytes.runFold(ByteString(""))(_ ++ _)) {
               body =>
                 val json = parse(body.utf8String)
                 val googleResponse = json.extract[GoogleResponse]
-                GoogleOauth.extractIdToken(googleResponse.id_token) match {
+                GoogleOauth.extractIdToken(googleResponse.id_token, keys) match {
                   case Some(loggedIn) =>
                     setCookie(HttpCookie(
                       "X-Token",
