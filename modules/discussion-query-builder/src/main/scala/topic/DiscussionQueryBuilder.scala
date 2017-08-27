@@ -102,7 +102,6 @@ class DiscussionQueryBuilder(config: DiscussionQueryBuilderConfig)
 
 	implicit val mq = new Kafka(ProductionKafkaConfig)
 	implicit val system = ActorSystem("DiscussionQueryBuilder")
-	import common.TypeHintContext._
 
 	start
 	scala.io.StdIn.readLine()

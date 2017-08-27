@@ -12,7 +12,6 @@ object BlogActor {
 
 class BlogActor(val id: String) extends Actor with PersistentActor {
 	import BlogActor._
-	import common.TypeHintContext._
 
   override def persistenceId = s"blog-$id"
 

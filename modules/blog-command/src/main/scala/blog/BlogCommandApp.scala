@@ -73,7 +73,6 @@ object BlogCommandApp extends App with Microservice {
 
 	implicit val mq = new Kafka(ProductionKafkaConfig)
 	implicit val system = ActorSystem("BlogCommandApp")
-	import common.TypeHintContext._
 
 	start
 	scala.io.StdIn.readLine()

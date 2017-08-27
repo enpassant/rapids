@@ -63,7 +63,6 @@ object DiscussionCommandApp extends App with Microservice {
 
 	implicit val mq = new Kafka(ProductionKafkaConfig)
 	implicit val system = ActorSystem("DiscussionCommandApp")
-	import common.TypeHintContext._
 
 	start
 	scala.io.StdIn.readLine()

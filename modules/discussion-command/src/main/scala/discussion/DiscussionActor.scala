@@ -27,7 +27,6 @@ object DiscussionActor {
 
 class DiscussionActor(val id: String) extends Actor with PersistentActor {
 	import DiscussionActor._
-	import common.TypeHintContext._
 
   override def persistenceId = s"discussion-$id"
 

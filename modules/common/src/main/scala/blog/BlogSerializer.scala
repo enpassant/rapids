@@ -116,24 +116,21 @@ case class Discussion(
 class BlogSerializer extends common.JsonSerializer {
 	def identifier = 0xfecb
 
-	implicit val formats = new DefaultFormats {
-		override val typeHintFieldName = "_t"
-		override val typeHints = ShortTypeHints(List(
-			classOf[LoggedIn],
-			classOf[Blog],
-			classOf[CreateBlog],
-			classOf[BlogCreated],
-			classOf[ModifyBlog],
-			classOf[BlogModified],
-			classOf[StartDiscussion],
-			classOf[AddComment],
-			classOf[ReplyComment],
-			classOf[DiscussionStarted],
-			classOf[CommentAdded],
-			classOf[CommentReplied],
-			classOf[StartDiscussion]
-		))
-	} ++ org.json4s.ext.JodaTimeSerializers.all
+	implicit val formats = CommonSerializer.getFormats(List(
+    classOf[LoggedIn],
+    classOf[Blog],
+    classOf[CreateBlog],
+    classOf[BlogCreated],
+    classOf[ModifyBlog],
+    classOf[BlogModified],
+    classOf[StartDiscussion],
+    classOf[AddComment],
+    classOf[ReplyComment],
+    classOf[DiscussionStarted],
+    classOf[CommentAdded],
+    classOf[CommentReplied],
+    classOf[StartDiscussion]
+	))
 }
 
 object BlogSerializer extends BlogSerializer {
