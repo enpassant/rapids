@@ -4,6 +4,7 @@ import common._
 
 import akka.actor.{ ActorRef, ActorSystem }
 import akka.serialization._
+import com.typesafe.config.ConfigFactory
 import org.json4s.jackson.Serialization.{ read, writePretty }
 import org.json4s.{ DefaultFormats, Formats, jackson, Serialization }
 import org.json4s._
@@ -131,6 +132,15 @@ class BlogSerializer extends common.JsonSerializer {
     classOf[CommentReplied],
     classOf[StartDiscussion]
 	))
+
+  val config = ConfigFactory.load()
+
+  val zippedSecureTrans = CommonSerializer.pipeTransformations(
+    CommonSerializer.ZipCompressor,
+    new CommonSerializer.Cryptographer(
+      config.getString("serializer.key"),
+      "AES/CBC/PKCS5Padding")
+  )
 }
 
 object BlogSerializer extends BlogSerializer {

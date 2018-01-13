@@ -105,10 +105,8 @@ object Directives extends BaseFormats {
   def authenticates(getUser: String => User): Directive1[LoggedIn] = {
     val cookieDirective:Directive1[LoggedIn] = optionalCookie("X-Token").flatMap {
       case Some(cookie) => {
-        println(cookie)
         extractJwt(getUser)(cookie.value) match {
           case Some(loggedIn) =>
-            println(loggedIn)
             provide(loggedIn)
           case _ => reject
         }

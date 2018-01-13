@@ -42,6 +42,11 @@ object Main extends App {
       println(s"Successed to bind to $t")
   }
 
+  sys.ShutdownHookThread {
+    println("Exiting")
+    system.terminate()
+  }
+
   if (isTest) {
     testError.TestError.start
     println("Press ENTER to exit!")

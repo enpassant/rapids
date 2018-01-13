@@ -19,7 +19,7 @@ case class FunctionLink(order: Int, url: String, title: String)
   def compare(that: FunctionLink) = order.compare(that.order)
 }
 
-object CommonSerializer extends common.JsonSerializer {
+object CommonSerializer extends JsonSerializer {
 	def identifier = 0xfeca
 
 	implicit val formats = getFormats()
