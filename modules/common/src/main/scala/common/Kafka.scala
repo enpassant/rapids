@@ -6,6 +6,9 @@ import akka.kafka.ConsumerMessage._
 import akka.kafka.scaladsl._
 import akka.stream._
 import akka.stream.scaladsl._
+import monix.execution.Scheduler
+import monix.kafka.KafkaProducerConfig
+import monix.kafka.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization._
 import scala.concurrent.Future
@@ -18,20 +21,19 @@ class Kafka(kafkaConfig: config.KafkaConfig) extends MQProtocol {
 		implicit val materializer = ActorMaterializer()
 		implicit val executionContext = system.dispatcher
 
-		val producerSettings = ProducerSettings(
-			system,
-			new ByteArraySerializer,
-			new StringSerializer)
-			.withBootstrapServers(kafkaConfig.server)
+    val producerCfg = KafkaProducerConfig.default.copy(
+      bootstrapServers = List(kafkaConfig.server)
+    )
+
+    val io = Scheduler.io(name="engine-io")
+    val producer = KafkaProducer[String,String](producerCfg, io)
 
 		Source.queue[A](256, OverflowStrategy.backpressure)
-			.map { input =>
+			.to(Sink.foreach { input =>
         val msg = mapper(input)
-				new ProducerRecord[Array[Byte], String](
-					msg.topic, msg.key.getBytes(), msg.value)
-      }
-			.to(Producer.plainSink(producerSettings))
-			.run()
+        producer.send(msg.topic, msg.key, msg.value).runAsync(io)
+      })
+      .run()
 	}
 
 	private def createBaseConsumerSource(

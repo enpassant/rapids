@@ -47,6 +47,8 @@ object Common {
 		"com.typesafe.akka"      %% "akka-testkit"          % akkaVersion   % "test",
 		"com.typesafe.akka"      %% "akka-slf4j"            % akkaVersion,
 		"com.typesafe.akka"      %% "akka-http"             % "10.0.6",
+    "io.monix"               %% "monix"                 % "2.3.0",
+    "io.monix"               %% "monix-kafka-10"        % "0.14",
 		"org.json4s"             %% "json4s-jackson"        % "3.2.10",
 		"org.json4s"             %% "json4s-ext"            % "3.2.10",
 		"org.json4s"             %% "json4s-mongo"          % "3.2.10",
