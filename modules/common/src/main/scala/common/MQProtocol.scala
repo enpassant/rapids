@@ -11,9 +11,13 @@ trait MQProtocol {
 		(mapper: A => ProducerData[String])
 		(implicit system: ActorSystem): SourceQueueWithComplete[A];
 
-	def createConsumerSource[T](groupId: String, topic: String*)
+  def createConsumerSource[T](groupId: String, topic: String*)
     (mapper: ConsumerData => Future[T])
-		(implicit system: ActorSystem): Source[(String, T), KillSwitch];
+    (implicit system: ActorSystem): Source[(String, T), KillSwitch];
+
+	//def createConsumer[T](groupId: String, topic: String*)
+    //(mapper: ConsumerData => Future[T])
+		//(implicit system: ActorSystem): (KillSwitch, Future[Done]);
 
 	def createConsumer[T](groupId: String, topic: String*)
     (mapper: ConsumerData => Future[T])

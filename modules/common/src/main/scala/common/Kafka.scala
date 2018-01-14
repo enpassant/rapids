@@ -7,8 +7,11 @@ import akka.kafka.scaladsl._
 import akka.stream._
 import akka.stream.scaladsl._
 import monix.execution.Scheduler
+import monix.kafka.KafkaConsumerConfig
+import monix.kafka.KafkaConsumerObservable
 import monix.kafka.KafkaProducerConfig
 import monix.kafka.KafkaProducer
+import monix.kafka.config.ObservableCommitType
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization._
 import scala.concurrent.Future
@@ -81,18 +84,26 @@ class Kafka(kafkaConfig: config.KafkaConfig) extends MQProtocol {
 		implicit val materializer = ActorMaterializer()
 		implicit val executionContext = system.dispatcher
 
-    createBaseConsumerSource(groupId, topic :_*)
-      .mapAsync(1) { msg =>
-        mapper(ConsumerData(new String(msg.record.key), msg.record.value))
-          .map(m => msg.committableOffset)
-      }
-			.batch(
-				max = 20,
-				first => CommittableOffsetBatch.empty.updated(first)
-			)((batch, elem) => batch.updated(elem))
-			.mapAsync(3)(_.commitScaladsl())
-      .viaMat(KillSwitches.single)(Keep.right)
-      .toMat(Sink.ignore)(Keep.both)
-      .run()
-	}
+    val consumerCfg = KafkaConsumerConfig.default.copy(
+      bootstrapServers = List(kafkaConfig.server),
+      groupId = groupId
+    )
+
+    import monix.execution.Scheduler
+    implicit val io = Scheduler.io()
+
+    val observable =
+      KafkaConsumerObservable[String,String](consumerCfg, topic.toList)
+
+    val cancelableFuture = observable.foreach { msg =>
+      mapper(ConsumerData(new String(msg.key), msg.value))
+    }
+
+    val killSwitch = new KillSwitch {
+      def abort(ex: Throwable) = cancelableFuture.cancel
+      def shutdown = cancelableFuture.cancel
+    }
+
+    (killSwitch, cancelableFuture.map(result => akka.Done)(io))
+  }
 }
