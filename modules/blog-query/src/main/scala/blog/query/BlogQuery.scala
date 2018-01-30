@@ -11,6 +11,13 @@ import akka.http.scaladsl.server.Directives._
 import akka.stream._
 import com.github.jknack.handlebars.{ Context, Handlebars, Template }
 import com.mongodb.casbah.Imports._
+//import colossus.core.{IOSystem, InitContext, ServerContext}
+//import colossus.protocols.http.Http
+//import colossus.protocols.http.HttpMethod._
+//import colossus.protocols.http.UrlParsing._
+//import colossus.protocols.http.{HttpServer, Initializer, RequestHandler}
+//import colossus.service.Callback
+//import colossus.service.GenRequestHandler.PartialHandler
 import fixiegrips.{ Json4sHelpers, Json4sResolver }
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.json4s.JsonAST._
@@ -88,6 +95,7 @@ class BlogQuery(config: BlogQueryConfig)
 
 	implicit val mq = new Kafka(ProductionKafkaConfig)
   implicit val system = ActorSystem("BlogQuery")
+  //implicit val ioSystem = IOSystem()
   implicit val materializer = ActorMaterializer()
   val route = start
   val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8083)

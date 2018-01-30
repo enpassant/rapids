@@ -6,12 +6,20 @@ import akka.actor._
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
 import akka.stream._
+//import colossus.core.{IOSystem, InitContext, ServerContext}
+//import colossus.protocols.http.Http
+//import colossus.protocols.http.HttpMethod._
+//import colossus.protocols.http.UrlParsing._
+//import colossus.protocols.http.{HttpServer, Initializer, RequestHandler}
+//import colossus.service.Callback
+//import colossus.service.GenRequestHandler.PartialHandler
 import scala.util.{Failure, Success}
 
 object Main extends App {
   val isTest = args.length > 0 && args(0) == "-t"
 	implicit val system = ActorSystem("Main")
 	implicit val materializer = ActorMaterializer()
+  //implicit val ioSystem = IOSystem()
   implicit val executionContext = system.dispatcher
   implicit val mq =
     if (isTest) new MQTest(system) else new Kafka(ProductionKafkaConfig)

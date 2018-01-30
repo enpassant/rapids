@@ -36,6 +36,7 @@ object Common {
 
   val webDependencies = Seq(
     "com.github.spullara.mustache.java" % "compiler" % "0.9.4",
+    "com.tumblr" %% "colossus" % "0.11.0",
     "me.lessis" %% "fixie-grips-json4s" % "0.1.0"
   )
 
