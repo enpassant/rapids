@@ -21,6 +21,10 @@ class DiscussionService() extends Actor {
   val receive: Receive = process(Map.empty[String, ActorRef])
 
   def process(actors: Map[String, ActorRef]): Receive = {
+    case Terminated(actor) =>
+      context become process(
+        actors.filter { case (key, actorRef) => actorRef != actor }
+      )
     case message @ ConsumerData(key, value) =>
 			val jsonTry = Try(BlogSerializer.fromString(value))
 			jsonTry match {

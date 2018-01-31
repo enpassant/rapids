@@ -5,6 +5,7 @@ import common._
 import akka.actor._
 import akka.persistence._
 import com.mongodb.casbah.commons.Imports._
+import scala.concurrent.duration._
 
 object BlogActor {
 	def props(id: String) = Props(new BlogActor(id))
@@ -12,6 +13,8 @@ object BlogActor {
 
 class BlogActor(val id: String) extends Actor with PersistentActor {
 	import BlogActor._
+
+  context.setReceiveTimeout(10.minutes)
 
   override def persistenceId = s"blog-$id"
 
@@ -35,6 +38,8 @@ class BlogActor(val id: String) extends Actor with PersistentActor {
   }
 
   val receiveCommand: Receive = {
+    case ReceiveTimeout =>
+      self ! PoisonPill
     case "snap"  => saveSnapshot(state)
     case CreateBlog(title, content, loggedIn) if !state.isDefined =>
       val payload = CommonUtil.extractPayload(loggedIn.token)

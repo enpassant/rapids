@@ -6,6 +6,7 @@ import blog._
 import akka.actor._
 import akka.persistence._
 import com.mongodb.casbah.commons.Imports._
+import scala.concurrent.duration._
 
 object DiscussionActor {
 	def props(id: String) = Props(new DiscussionActor(id))
@@ -27,6 +28,8 @@ object DiscussionActor {
 
 class DiscussionActor(val id: String) extends Actor with PersistentActor {
 	import DiscussionActor._
+
+  context.setReceiveTimeout(10.minutes)
 
   override def persistenceId = s"discussion-$id"
 
@@ -59,6 +62,8 @@ class DiscussionActor(val id: String) extends Actor with PersistentActor {
   }
 
   val receiveCommand: Receive = {
+    case ReceiveTimeout =>
+      self ! PoisonPill
     case "snap" if state.isDefined => saveSnapshot(state.get)
     case StartDiscussion(id, blogId, title, userId, userName)
         if !state.isDefined =>

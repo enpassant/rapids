@@ -19,17 +19,22 @@ class BlogService() extends Actor {
 
   val receive: Receive = process(Map.empty[String, ActorRef])
 
-  def process(blogs: Map[String, ActorRef]): Receive = {
+  def process(actors: Map[String, ActorRef]): Receive = {
+    case Terminated(actor) =>
+      context become process(
+        actors.filter { case (key, actorRef) => actorRef != actor }
+      )
     case message @ ConsumerData(key, value) =>
 			val jsonTry = Try(BlogSerializer.fromString(value))
 			jsonTry match {
 				case Success(json) =>
-					val blog = blogs get key getOrElse {
+					val actor = actors get key getOrElse {
 						val actorRef = context.actorOf(BlogActor.props(key), s"blog-$key")
-						context become process(blogs + (key -> actorRef))
+            context.watch(actorRef)
+						context become process(actors + (key -> actorRef))
 						actorRef
 					}
-					blog.tell(json, sender)
+					actor.tell(json, sender)
 				case Failure(e) =>
 					sender ! WrongMessage(e + ": " + message.toString)
 			}
