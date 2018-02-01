@@ -26,10 +26,8 @@ object DiscussionActor {
   }
 }
 
-class DiscussionActor(val id: String) extends Actor with PersistentActor {
+class DiscussionActor(val id: String) extends CommandActor {
 	import DiscussionActor._
-
-  context.setReceiveTimeout(10.minutes)
 
   override def persistenceId = s"discussion-$id"
 
@@ -61,9 +59,7 @@ class DiscussionActor(val id: String) extends Actor with PersistentActor {
     case SnapshotOffer(_, snapshot: Discussion) => state = Some(snapshot)
   }
 
-  val receiveCommand: Receive = {
-    case ReceiveTimeout =>
-      self ! PoisonPill
+  val processCommand: Receive = {
     case "snap" if state.isDefined => saveSnapshot(state.get)
     case StartDiscussion(id, blogId, title, userId, userName)
         if !state.isDefined =>

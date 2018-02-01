@@ -14,13 +14,14 @@ object BlogService {
 	def props() = Props(new BlogService())
 }
 
-class BlogService() extends Actor {
+class BlogService() extends Actor with ActorLogging {
 	import BlogService._
 
   val receive: Receive = process(Map.empty[String, ActorRef])
 
   def process(actors: Map[String, ActorRef]): Receive = {
     case Terminated(actor) =>
+      log.info(s"Terminated: $actor")
       context become process(
         actors.filter { case (key, actorRef) => actorRef != actor }
       )

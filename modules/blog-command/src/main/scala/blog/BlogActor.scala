@@ -11,10 +11,8 @@ object BlogActor {
 	def props(id: String) = Props(new BlogActor(id))
 }
 
-class BlogActor(val id: String) extends Actor with PersistentActor {
+class BlogActor(val id: String) extends CommandActor {
 	import BlogActor._
-
-  context.setReceiveTimeout(10.minutes)
 
   override def persistenceId = s"blog-$id"
 
@@ -37,9 +35,7 @@ class BlogActor(val id: String) extends Actor with PersistentActor {
     case SnapshotOffer(_, snapshot: Blog) => state = Some(snapshot)
   }
 
-  val receiveCommand: Receive = {
-    case ReceiveTimeout =>
-      self ! PoisonPill
+  val processCommand: Receive = {
     case "snap"  => saveSnapshot(state)
     case CreateBlog(title, content, loggedIn) if !state.isDefined =>
       val payload = CommonUtil.extractPayload(loggedIn.token)

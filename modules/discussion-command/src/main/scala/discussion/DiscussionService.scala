@@ -22,6 +22,7 @@ class DiscussionService() extends Actor {
 
   def process(actors: Map[String, ActorRef]): Receive = {
     case Terminated(actor) =>
+      log.info(s"Terminated: $actor")
       context become process(
         actors.filter { case (key, actorRef) => actorRef != actor }
       )
