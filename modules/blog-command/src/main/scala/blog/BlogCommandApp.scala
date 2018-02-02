@@ -26,7 +26,9 @@ object BlogCommandApp extends App with Microservice {
 			case msg @ ProducerData(topic, id, value) => msg
 		}
 
-		val service = system.actorOf(BlogService.props, s"blog-service")
+		val service = system.actorOf(
+      CommandService.props(BlogSerializer.fromString, "blog", BlogActor.props),
+      "blog-service")
 
     val statActor = system.actorOf(
       Performance.props("blog-command", producerStat))

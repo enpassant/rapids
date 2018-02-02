@@ -27,7 +27,12 @@ object DiscussionCommandApp extends App with Microservice {
 			case msg @ ProducerData(topic, id, value) => msg
 		}
 
-		val service = system.actorOf(DiscussionService.props, s"discussion-service")
+		val service = system.actorOf(
+      CommandService.props(
+        BlogSerializer.fromString,
+        "blog",
+        DiscussionActor.props),
+      "discussion-service")
 
     val statActor = system.actorOf(
       Performance.props("disc-command", producerStat))
