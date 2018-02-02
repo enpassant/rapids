@@ -15,7 +15,7 @@ object DiscussionService {
 	def props() = Props(new DiscussionService())
 }
 
-class DiscussionService() extends Actor {
+class DiscussionService() extends Actor with ActorLogging {
 	import DiscussionService._
 
   val receive: Receive = process(Map.empty[String, ActorRef])
