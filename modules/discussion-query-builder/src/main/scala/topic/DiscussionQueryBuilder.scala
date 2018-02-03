@@ -22,13 +22,7 @@ class DiscussionQueryBuilder(config: DiscussionQueryBuilderConfig)
 
     val collDiscussion = config.mongoClient.getDB("blog")("discussion")
 
-		val producer = mq.createProducer[ProducerData[String]]()
-    {
-			case msg @ ProducerData(topic, id, value) => msg
-		}
-
-    val statActor = system.actorOf(
-      Performance.props("disc-query-builder", producer))
+    val (statActor, producer) = statActorAndProducer(mq, "disc-query-builder")
 
 		val consumer = mq.createConsumer(
 			"discussion-query",

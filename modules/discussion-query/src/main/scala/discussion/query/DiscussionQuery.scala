@@ -40,14 +40,6 @@ class DiscussionQuery(config: DiscussionQueryConfig)
     val commentReply = handlebars.compile("comment-reply")
     val discussion = handlebars.compile("discussion")
 
-		val producer = mq.createProducer[ProducerData[String]]()
-    {
-			case msg @ ProducerData(topic, id, value) => msg
-		}
-
-    val statActor = system.actorOf(
-      Performance.props("discussion-query", producer))
-
 		val route =
       pathPrefix("discussion") {
         pathPrefix(Segment) { id =>
@@ -81,14 +73,13 @@ class DiscussionQuery(config: DiscussionQueryConfig)
         }
       }
 
-    stat(statActor)(route)
+    stat(statActorAndProducer(mq, "discussion-query")._1)(route)
 	}
 
 	implicit val mq = new Kafka(ProductionKafkaConfig)
 	implicit val system = ActorSystem("DiscussionQuery")
 	implicit val materializer = ActorMaterializer()
-	val route = start
-	val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8083)
+	val bindingFuture = Http().bindAndHandle(start, "0.0.0.0", 8083)
 
 	scala.io.StdIn.readLine()
 	system.terminate

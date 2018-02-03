@@ -28,13 +28,7 @@ class BlogQueryBuilder(config: BlogQueryBuilderConfig)
     val parser = Parser.builder(options).build()
     val renderer = HtmlRenderer.builder(options).build()
 
-		val producer = mq.createProducer[ProducerData[String]]()
-    {
-			case msg @ ProducerData(topic, id, value) => msg
-		}
-
-    val statActor = system.actorOf(
-      Performance.props("blog-query-builder", producer))
+    val (statActor, producer) = statActorAndProducer(mq, "blog-query-builder")
 
 		val consumer = mq.createConsumer(
 			"blog-query",

@@ -54,15 +54,10 @@ object Monitor extends App with BaseFormats with Microservice {
       result
     }
 
-		val producer = mq.createProducer[ProducerData[String]]()
-    {
-			case msg @ ProducerData(topic, id, value) => msg
-		}
+    val (statActor, producer) = statActorAndProducer(mq, "monitor")
 
     val link = CommonSerializer.toString(FunctionLink(10, "/monitor", "Monitor"))
     producer.offer(ProducerData("web-app", "monitor", link))
-
-    val statActor = system.actorOf(Performance.props("monitor", producer))
 
 		val route =
       pathPrefix("wsmonitor") {
@@ -86,8 +81,7 @@ object Monitor extends App with BaseFormats with Microservice {
 	implicit val mq = new Kafka(ProductionKafkaConfig)
 	implicit val system = ActorSystem("Monitor")
 	implicit val materializer = ActorMaterializer()
-	val route = start
-	val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8084)
+	val bindingFuture = Http().bindAndHandle(start, "0.0.0.0", 8084)
 
 	scala.io.StdIn.readLine()
 	system.terminate

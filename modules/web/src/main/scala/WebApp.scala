@@ -30,10 +30,7 @@ class WebApp(oauthConfig: OauthConfig) extends App with Microservice {
   {
 		implicit val executionContext = system.dispatcher
 
-		val producer = mq.createProducer[ProducerData[String]]()
-    {
-			case msg @ ProducerData(topic, id, value) => msg
-		}
+    val (statActor, producer) = statActorAndProducer(mq, "web-app")
 
 		lazy val consumerSource = mq.createConsumerSource(
 			"webapp",
@@ -60,8 +57,6 @@ class WebApp(oauthConfig: OauthConfig) extends App with Microservice {
       }
       Future { true }
     }
-
-    val statActor = system.actorOf(Performance.props("web-app", producer))
 
     def getLink() = {
       Link(
@@ -162,8 +157,7 @@ class WebApp(oauthConfig: OauthConfig) extends App with Microservice {
 	implicit val mq = new Kafka(ProductionKafkaConfig)
 	implicit val system = ActorSystem("WebApp")
 	implicit val materializer = ActorMaterializer()
-	val route = start
-	val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8081)
+	val bindingFuture = Http().bindAndHandle(start, "0.0.0.0", 8081)
 
 	scala.io.StdIn.readLine()
 	system.terminate

@@ -22,10 +22,7 @@ object DiscussionCommandApp extends App with Microservice {
 				ProducerData(topic, id, value)
 		}
 
-		val producerStat = mq.createProducer[ProducerData[String]]()
-    {
-			case msg @ ProducerData(topic, id, value) => msg
-		}
+    val (statActor, producerStat) = statActorAndProducer(mq, "disc-command")
 
 		val service = system.actorOf(
       CommandService.props(
@@ -33,9 +30,6 @@ object DiscussionCommandApp extends App with Microservice {
         "blog",
         DiscussionActor.props),
       "discussion-service")
-
-    val statActor = system.actorOf(
-      Performance.props("disc-command", producerStat))
 
 		val consumer = mq.createConsumer(
 			"discussion-command",

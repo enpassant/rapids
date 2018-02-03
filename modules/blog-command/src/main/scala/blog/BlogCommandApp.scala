@@ -21,17 +21,11 @@ object BlogCommandApp extends App with Microservice {
 				ProducerData(topic, id, value)
 		}
 
-		val producerStat = mq.createProducer[ProducerData[String]]()
-    {
-			case msg @ ProducerData(topic, id, value) => msg
-		}
+    val (statActor, producerStat) = statActorAndProducer(mq, "blog-command")
 
 		val service = system.actorOf(
       CommandService.props(BlogSerializer.fromString, "blog", BlogActor.props),
       "blog-service")
-
-    val statActor = system.actorOf(
-      Performance.props("blog-command", producerStat))
 
 		val consumer = mq.createConsumer(
 			"blog-command",

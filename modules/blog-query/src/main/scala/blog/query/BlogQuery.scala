@@ -40,15 +40,10 @@ class BlogQuery(config: BlogQueryConfig)
     val blogNew = handlebars.compile("blog-new")
     val blogEdit = handlebars.compile("blog-edit")
 
-    val producer = mq.createProducer[ProducerData[String]]()
-    {
-      case msg @ ProducerData(topic, id, value) => msg
-    }
+    val (statActor, producer) = statActorAndProducer(mq, "blog-query")
 
     val link = CommonSerializer.toString(FunctionLink(0, "/blog", "Blogs"))
     producer.offer(ProducerData("web-app", "blog-query", link))
-
-    val statActor = system.actorOf(Performance.props("blog-query", producer))
 
     val route =
       pathPrefix("blog") {
@@ -89,7 +84,6 @@ class BlogQuery(config: BlogQueryConfig)
 	implicit val mq = new Kafka(ProductionKafkaConfig)
   implicit val system = ActorSystem("BlogQuery")
   implicit val materializer = ActorMaterializer()
-  val route = start
-  val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8083)
+  val bindingFuture = Http().bindAndHandle(start, "0.0.0.0", 8083)
 }
 
