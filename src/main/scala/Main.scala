@@ -1,5 +1,6 @@
 import common._
 
+import blog._
 import config._
 
 import akka.actor._
@@ -18,6 +19,8 @@ object Main extends App {
 
   println("Program has started")
 
+  val blogStore = new BlogStoreDB(ProductionBlogQueryBuilderConfig)
+
 	val routeWeb = new WebApp(OauthConfig.get).start
 	val routeBlogQuery =
     new blog.query.BlogQuery(ProductionBlogQueryConfig).start
@@ -27,7 +30,7 @@ object Main extends App {
 	val route = routeBlogQuery ~ routeDiscussionQuery ~ routeMonitor ~ routeWeb
 	blog.BlogCommandApp.start
 	discussion.DiscussionCommandApp.start
-	new blog.BlogQueryBuilder(ProductionBlogQueryBuilderConfig).start
+	blog.BlogQueryBuilder.start(blogStore)
 	new discussion.DiscussionQueryBuilder(ProductionDiscussionQueryBuilderConfig)
     .start
 

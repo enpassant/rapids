@@ -16,13 +16,11 @@ import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 import scala.util.{Try, Success, Failure}
 
-class BlogQueryBuilder(config: BlogQueryBuilderConfig)
-  extends App with Microservice
-{
-	def start(implicit mq: MQProtocol, system: ActorSystem) = {
+object BlogQueryBuilder extends App with Microservice {
+	def start(blogStore: BlogStore)
+    (implicit mq: MQProtocol, system: ActorSystem) =
+  {
 		implicit val executionContext = system.dispatcher
-
-    val collection = config.mongoClient.getDB("blog")("blog")
 
     val options = new MutableDataSet()
     val parser = Parser.builder(options).build()
@@ -43,41 +41,25 @@ class BlogQueryBuilder(config: BlogQueryBuilderConfig)
               case BlogCreated(id, userId, userName, title, content) =>
                 val document = parser.parse(content)
                 val htmlContent = renderer.render(document)
-                collection.insert(
-                  MongoDBObject(
-                    "_id" -> id,
-                    "userId" -> userId,
-                    "userName" -> userName,
-                    "title" -> title,
-                    "content" -> content,
-                    "htmlContent" -> htmlContent,
-                    "discussions" -> Seq()))
+                blogStore.insert(
+                  id,
+                  userId,
+                  userName,
+                  title,
+                  content,
+                  htmlContent)
                 producer.offer(ProducerData(
                   "client-commands", userId, """{"value":"BlogCreated"}"""))
               case BlogModified(id, userId, userName, title, content) =>
-                val blogOpt = collection.findOne(
-                  MongoDBObject("_id" -> id))
-                blogOpt foreach { blog =>
+                if (blogStore.existsBlog(id)) {
                   val document = parser.parse(content)
                   val htmlContent = renderer.render(document)
-                  collection.update(
-                    MongoDBObject("_id" -> id),
-                    MongoDBObject("$set" -> MongoDBObject(
-                      "title" -> title,
-                      "content" -> content,
-                      "htmlContent" -> htmlContent)))
+                  blogStore.update(id, title, content, htmlContent)
                 }
                 producer.offer(ProducerData(
                   "client-commands", userId, """{"value":"BlogModified"}"""))
               case DiscussionStarted(id, userId, userName, blogId, title) =>
-                collection.update(
-                  MongoDBObject("_id" -> blogId),
-                  $push("discussions" ->
-                    MongoDBObject(
-                      "id" -> id,
-                      "userId" -> userId,
-                      "userName" -> userName,
-                      "title" -> title)))
+                blogStore.addDiscussion(blogId, id, userId, userName, title)
                 producer.offer(ProducerData(
                   "client-commands", userId, """{"value":"DiscussionStarted"}"""))
               case _ => 1
@@ -95,10 +77,12 @@ class BlogQueryBuilder(config: BlogQueryBuilderConfig)
     }
 	}
 
+  val blogStore = new BlogStoreDB(ProductionBlogQueryBuilderConfig)
+
 	implicit val mq = new Kafka(ProductionKafkaConfig)
 	implicit val system = ActorSystem("DiscussionQueryBuilder")
 
-	start
+	start(blogStore)
 	scala.io.StdIn.readLine()
 	system.terminate
 }
