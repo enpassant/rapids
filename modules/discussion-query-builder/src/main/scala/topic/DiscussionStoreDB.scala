@@ -1,5 +1,6 @@
 package discussion
 
+import blog._
 import config._
 
 import com.mongodb.casbah.Imports._
@@ -9,57 +10,41 @@ class DiscussionStoreDB(config: DiscussionQueryBuilderConfig)
 {
   val collDiscussion = config.mongoClient.getDB("blog")("discussion")
 
-  def insert(
-    id: String,
-    userId: String,
-    userName: String,
-    blogId: String,
-    title: String) =
-  {
+  def insert(discussionStarted: DiscussionStarted) = {
     collDiscussion.insert(
       MongoDBObject(
-        "_id" -> id,
-        "userId" -> userId,
-        "userName" -> userName,
-        "blogId" -> blogId,
-        "title" -> title,
+        "_id" -> discussionStarted.id,
+        "userId" -> discussionStarted.userId,
+        "userName" -> discussionStarted.userName,
+        "blogId" -> discussionStarted.blogId,
+        "title" -> discussionStarted.title,
         "comments" -> List()
     ))
   }
 
-  def addComment(
-    key: String,
-    id: String,
-    userId: String,
-    userName: String,
-    content: String) =
-  {
+  def addComment(commentAdded: CommentAdded) = {
     collDiscussion.update(
-      MongoDBObject("_id" -> key),
+      MongoDBObject("_id" -> commentAdded.id),
       $push("comments" -> MongoDBObject(
-        "commentId" -> id,
-        "userId" -> userId,
-        "userName" -> userName,
-        "content" -> content,
+        "commentId" -> commentAdded.commentId,
+        "userId" -> commentAdded.userId,
+        "userName" -> commentAdded.userName,
+        "content" -> commentAdded.content,
         "comments" -> List()
     )))
   }
 
-  def replayComment(
-    key: String,
-    pos: String,
-    id: String,
-    userId: String,
-    userName: String,
-    content: String) =
-  {
+  def replayComment(commentReplied: CommentReplied) = {
+    val pos = commentReplied.path.tail.foldLeft("comments") {
+      (p, i) => s"comments.$i.$p"
+    }
     collDiscussion.update(
-      MongoDBObject("_id" -> key),
+      MongoDBObject("_id" -> commentReplied.id),
       $push(pos -> MongoDBObject(
-        "commentId" -> id,
-        "userId" -> userId,
-        "userName" -> userName,
-        "content" -> content,
+        "commentId" -> commentReplied.commentId,
+        "userId" -> commentReplied.userId,
+        "userName" -> commentReplied.userName,
+        "content" -> commentReplied.content,
         "comments" -> List()
     )))
   }

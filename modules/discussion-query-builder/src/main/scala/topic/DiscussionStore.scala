@@ -1,26 +1,12 @@
 package discussion
 
+import blog._
+
 trait DiscussionStore {
-  def insert(
-    id: String,
-    userId: String,
-    userName: String,
-    blogId: String,
-    title: String)
+  def insert(discussionStarted: DiscussionStarted)
 
-  def addComment(
-    key: String,
-    id: String,
-    userId: String,
-    userName: String,
-    content: String)
+  def addComment(commentAdded: CommentAdded)
 
-  def replayComment(
-    key: String,
-    pos: String,
-    id: String,
-    userId: String,
-    userName: String,
-    content: String)
+  def replayComment(commentReplied: CommentReplied)
 }
 

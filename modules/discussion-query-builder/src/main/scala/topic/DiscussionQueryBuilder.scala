@@ -33,29 +33,17 @@ object DiscussionQueryBuilder extends App with Microservice {
         val result = Future { jsonTry match {
           case Success(json) =>
             json match {
-              case DiscussionStarted(id, userId, userName, blogId, title) =>
+              case discussionStarted: DiscussionStarted =>
+                Try { discussionStore.insert(discussionStarted) }
+              case commentAdded @ CommentAdded(_, _, userId, _, _, _) =>
                 Try {
-                  discussionStore.insert(id, userId, userName, blogId, title)
-                }
-              case CommentAdded(id, userId, userName, content, index) =>
-                Try {
-                  discussionStore.addComment(key, id, userId, userName, content)
+                  discussionStore.addComment(commentAdded)
                   producer.offer(ProducerData(
                     "client-commands", userId, """{"value":"CommentAdded"}"""))
                 }
-              case msg @
-                CommentReplied(id, userId, userName, parentId, content, path) =>
+              case commentReplied @ CommentReplied(_, _, userId, _, _, _, _) =>
                 Try {
-                  val pos = path.tail.foldLeft("comments") {
-                    (p, i) => s"comments.$i.$p"
-                  }
-                  discussionStore.replayComment(
-                    key,
-                    pos,
-                    id,
-                    userId,
-                    userName,
-                    content)
+                  discussionStore.replayComment(commentReplied)
                   producer.offer(ProducerData(
                     "client-commands", userId, """{"value":"CommentReplied"}"""))
                 }

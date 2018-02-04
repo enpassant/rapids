@@ -80,7 +80,8 @@ case class DiscussionStarted(
 )	extends DiscussionEvent
 
 case class CommentAdded(
-	id: String,
+  id: String,
+	commentId: String,
   userId: String,
   userName: String,
   content: String,
@@ -88,7 +89,8 @@ case class CommentAdded(
 )	extends DiscussionEvent
 
 case class CommentReplied(
-	id: String,
+  id: String,
+	commentId: String,
   userId: String,
   userName: String,
 	parentId: String,
