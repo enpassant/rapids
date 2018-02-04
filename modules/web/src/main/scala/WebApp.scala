@@ -32,10 +32,9 @@ class WebApp(oauthConfig: OauthConfig) extends App with Microservice {
 
     val (statActor, producer) = statActorAndProducer(mq, "web-app")
 
-		lazy val consumerSource = mq.createConsumerSource(
-			"webapp",
-			"client-commands")
-		{
+		lazy val consumerSource =
+      mq.createConsumerSource("webapp", "client-commands")
+    {
       msg => Future(TextMessage(msg.value))
     }.toMat(BroadcastHub.sink(bufferSize = 256))(Keep.right).run()
 
@@ -45,10 +44,7 @@ class WebApp(oauthConfig: OauthConfig) extends App with Microservice {
 
     var links = SortedSet.empty[FunctionLink]
 
-		val webAppConsumer = mq.createConsumer(
-			"webapp",
-			"web-app")
-		{ msg =>
+		val webAppConsumer = mq.createConsumer("webapp", "web-app") { msg =>
 			val json = CommonSerializer.fromString(msg.value)
       json match {
         case link: FunctionLink =>

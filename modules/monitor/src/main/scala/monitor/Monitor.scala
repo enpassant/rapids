@@ -38,10 +38,7 @@ object Monitor extends App with BaseFormats with Microservice {
 
     val monitorActor = system.actorOf(MonitorActor.props(wsSourceQueue))
 
-		val consumer = mq.createConsumer(
-			"monitor",
-			"performance")
-		{ msg =>
+		val consumer = mq.createConsumer("monitor", "performance") { msg =>
       val jsonTry = Try(CommonSerializer.fromString(msg.value))
       val result = Future { jsonTry match {
         case Success(json) =>

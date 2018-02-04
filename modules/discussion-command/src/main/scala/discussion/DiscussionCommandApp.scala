@@ -31,9 +31,7 @@ object DiscussionCommandApp extends App with Microservice {
         DiscussionActor.props),
       "discussion-service")
 
-		val consumer = mq.createConsumer(
-			"discussion-command",
-			"discussion-command")
+		val consumer = mq.createConsumer("discussion-command", "discussion-command")
 		{ msg =>
       Performance.statF(statActor) {
         implicit val timeout = Timeout(3000.milliseconds)

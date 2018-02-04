@@ -28,10 +28,7 @@ object BlogQueryBuilder extends App with Microservice {
 
     val (statActor, producer) = statActorAndProducer(mq, "blog-query-builder")
 
-		val consumer = mq.createConsumer(
-			"blog-query",
-			"blog-event")
-		{ msg =>
+		val consumer = mq.createConsumer("blog-query", "blog-event") { msg =>
       Performance.statF(statActor) {
         implicit val timeout = Timeout(1000.milliseconds)
         val jsonTry = Try(BlogSerializer.fromString(msg.value))

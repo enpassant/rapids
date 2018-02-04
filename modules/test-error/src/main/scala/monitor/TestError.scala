@@ -16,10 +16,7 @@ object TestError extends App with BaseFormats with Microservice {
   {
 		implicit val executionContext = system.dispatcher
 
-		val consumer = mq.createConsumer(
-			"testError",
-			"error")
-    {
+		val consumer = mq.createConsumer("testError", "error") {
       case ConsumerData(key, value) =>
         println(s"$key error message: $value")
         Future { ConsumerData(key, value) }

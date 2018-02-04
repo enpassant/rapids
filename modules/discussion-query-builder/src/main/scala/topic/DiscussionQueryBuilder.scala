@@ -22,9 +22,7 @@ object DiscussionQueryBuilder extends App with Microservice {
 
     val (statActor, producer) = statActorAndProducer(mq, "disc-query-builder")
 
-		val consumer = mq.createConsumer(
-			"discussion-query",
-			"discussion-event")
+		val consumer = mq.createConsumer("discussion-query", "discussion-event")
 		{ msg =>
       Performance.statF(statActor) {
         implicit val timeout = Timeout(1000.milliseconds)

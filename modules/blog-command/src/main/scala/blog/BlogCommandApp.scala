@@ -27,10 +27,7 @@ object BlogCommandApp extends App with Microservice {
       CommandService.props(BlogSerializer.fromString, "blog", BlogActor.props),
       "blog-service")
 
-		val consumer = mq.createConsumer(
-			"blog-command",
-			"blog-command")
-		{ msg =>
+		val consumer = mq.createConsumer("blog-command", "blog-command") { msg =>
       Performance.statF(statActor) {
         implicit val timeout = Timeout(3000.milliseconds)
         val result = service ? common.ConsumerData(msg.key, msg.value)
