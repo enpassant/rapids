@@ -14,13 +14,11 @@ import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 import scala.util.{Try, Success, Failure}
 
-class DiscussionQueryBuilder(config: DiscussionQueryBuilderConfig)
-  extends App with Microservice
-{
-	def start(implicit mq: MQProtocol, system: ActorSystem) = {
+object DiscussionQueryBuilder extends App with Microservice {
+	def start(discussionStore: DiscussionStore)
+    (implicit mq: MQProtocol, system: ActorSystem) =
+  {
 		implicit val executionContext = system.dispatcher
-
-    val collDiscussion = config.mongoClient.getDB("blog")("discussion")
 
     val (statActor, producer) = statActorAndProducer(mq, "disc-query-builder")
 
@@ -37,27 +35,11 @@ class DiscussionQueryBuilder(config: DiscussionQueryBuilderConfig)
             json match {
               case DiscussionStarted(id, userId, userName, blogId, title) =>
                 Try {
-                  collDiscussion.insert(
-                    MongoDBObject(
-                      "_id" -> id,
-                      "userId" -> userId,
-                      "userName" -> userName,
-                      "blogId" -> blogId,
-                      "title" -> title,
-                      "comments" -> List()
-                  ))
+                  discussionStore.insert(id, userId, userName, blogId, title)
                 }
               case CommentAdded(id, userId, userName, content, index) =>
                 Try {
-                  collDiscussion.update(
-                    MongoDBObject("_id" -> key),
-                    $push("comments" -> MongoDBObject(
-                      "commentId" -> id,
-                      "userId" -> userId,
-                      "userName" -> userName,
-                      "content" -> content,
-                      "comments" -> List()
-                  )))
+                  discussionStore.addComment(key, id, userId, userName, content)
                   producer.offer(ProducerData(
                     "client-commands", userId, """{"value":"CommentAdded"}"""))
                 }
@@ -67,15 +49,13 @@ class DiscussionQueryBuilder(config: DiscussionQueryBuilderConfig)
                   val pos = path.tail.foldLeft("comments") {
                     (p, i) => s"comments.$i.$p"
                   }
-                  collDiscussion.update(
-                    MongoDBObject("_id" -> key),
-                    $push(pos -> MongoDBObject(
-                      "commentId" -> id,
-                      "userId" -> userId,
-                      "userName" -> userName,
-                      "content" -> content,
-                      "comments" -> List()
-                  )))
+                  discussionStore.replayComment(
+                    key,
+                    pos,
+                    id,
+                    userId,
+                    userName,
+                    content)
                   producer.offer(ProducerData(
                     "client-commands", userId, """{"value":"CommentReplied"}"""))
                 }
@@ -94,10 +74,13 @@ class DiscussionQueryBuilder(config: DiscussionQueryBuilderConfig)
     }
 	}
 
+  val discussionStore = new DiscussionStoreDB(
+    ProductionDiscussionQueryBuilderConfig)
+
 	implicit val mq = new Kafka(ProductionKafkaConfig)
 	implicit val system = ActorSystem("DiscussionQueryBuilder")
 
-	start
+	start(discussionStore)
 	scala.io.StdIn.readLine()
 	system.terminate
 }

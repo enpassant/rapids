@@ -99,4 +99,3 @@ class DiscussionActor(val id: String) extends CommandActor {
       sender ! WrongMessage(msg.toString)
   }
 }
-

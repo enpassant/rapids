@@ -2,6 +2,7 @@ import common._
 
 import blog._
 import config._
+import discussion._
 
 import akka.actor._
 import akka.http.scaladsl.Http
@@ -20,6 +21,8 @@ object Main extends App {
   println("Program has started")
 
   val blogStore = new BlogStoreDB(ProductionBlogQueryBuilderConfig)
+  val discussionStore = new DiscussionStoreDB(
+    ProductionDiscussionQueryBuilderConfig)
 
 	val routeWeb = new WebApp(OauthConfig.get).start
 	val routeBlogQuery =
@@ -28,11 +31,10 @@ object Main extends App {
     new discussion.query.DiscussionQuery(ProductionDiscussionQueryConfig).start
 	val routeMonitor = monitor.Monitor.start
 	val route = routeBlogQuery ~ routeDiscussionQuery ~ routeMonitor ~ routeWeb
-	blog.BlogCommandApp.start
-	discussion.DiscussionCommandApp.start
-	blog.BlogQueryBuilder.start(blogStore)
-	new discussion.DiscussionQueryBuilder(ProductionDiscussionQueryBuilderConfig)
-    .start
+	BlogCommandApp.start
+	DiscussionCommandApp.start
+	BlogQueryBuilder.start(blogStore)
+	DiscussionQueryBuilder.start(discussionStore)
 
 	val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8080)
 
