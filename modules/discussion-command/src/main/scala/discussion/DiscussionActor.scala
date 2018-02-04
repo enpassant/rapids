@@ -5,8 +5,6 @@ import blog._
 
 import akka.actor._
 import akka.persistence._
-import com.mongodb.casbah.commons.Imports._
-import scala.concurrent.duration._
 
 object DiscussionActor {
 	def props(id: String) = Props(new DiscussionActor(id))
@@ -51,7 +49,6 @@ class DiscussionActor(val id: String) extends CommandActor {
             + (id -> CommentIndex(path, 0))
             + (parentId -> parentComment.copy(childCount = childCount + 1)))
       }
-    case _ =>
   }
 
   val receiveRecover: Receive = {
