@@ -1,24 +1,11 @@
 package blog
 
 trait BlogStore {
-  def insert(
-    id: String,
-    userId: String,
-    userName: String,
-    title: String,
-    content: String,
-    htmlContent: String)
+  def insert(blogCreated: BlogCreated, htmlContent: String)
 
   def existsBlog(id: String): Boolean
 
-  def update(
-    id: String,
-    title: String,
-    content: String,
-    htmlContent: String)
+  def update(blogModified: BlogModified, htmlContent: String)
 
-  def addDiscussion(
-    blogId: String,
-    id: String,
-    userId: String, userName: String, title: String)
+  def addDiscussion(discussionStarted: DiscussionStarted)
 }

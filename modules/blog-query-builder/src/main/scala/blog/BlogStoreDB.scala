@@ -7,20 +7,13 @@ import com.mongodb.casbah.Imports._
 class BlogStoreDB(config: BlogQueryBuilderConfig) extends BlogStore {
   val collection = config.mongoClient.getDB("blog")("blog")
 
-  def insert(
-    id: String,
-    userId: String,
-    userName: String,
-    title: String,
-    content: String,
-    htmlContent: String) =
-  {
+  def insert(blogCreated: BlogCreated, htmlContent: String) {
     collection.insert(MongoDBObject(
-      "_id" -> id,
-      "userId" -> userId,
-      "userName" -> userName,
-      "title" -> title,
-      "content" -> content,
+      "_id" -> blogCreated.id,
+      "userId" -> blogCreated.userId,
+      "userName" -> blogCreated.userName,
+      "title" -> blogCreated.title,
+      "content" -> blogCreated.content,
       "htmlContent" -> htmlContent,
       "discussions" -> Seq()))
   }
@@ -29,32 +22,23 @@ class BlogStoreDB(config: BlogQueryBuilderConfig) extends BlogStore {
     collection.findOne(MongoDBObject("_id" -> id)).isDefined
   }
 
-  def update(
-    id: String,
-    title: String,
-    content: String,
-    htmlContent: String) =
-  {
+  def update(blogModified: BlogModified, htmlContent: String) {
     collection.update(
-      MongoDBObject("_id" -> id),
+      MongoDBObject("_id" -> blogModified.id),
       MongoDBObject("$set" -> MongoDBObject(
-        "title" -> title,
-        "content" -> content,
+        "title" -> blogModified.title,
+        "content" -> blogModified.content,
         "htmlContent" -> htmlContent)))
   }
 
-  def addDiscussion(
-    blogId: String,
-    id: String,
-    userId: String, userName: String, title: String) =
-  {
+  def addDiscussion(discussionStarted: DiscussionStarted) {
     collection.update(
-      MongoDBObject("_id" -> blogId),
+      MongoDBObject("_id" -> discussionStarted.blogId),
       $push("discussions" ->
         MongoDBObject(
-          "id" -> id,
-          "userId" -> userId,
-          "userName" -> userName,
-          "title" -> title)))
+          "id" -> discussionStarted.id,
+          "userId" -> discussionStarted.userId,
+          "userName" -> discussionStarted.userName,
+          "title" -> discussionStarted.title)))
   }
 }

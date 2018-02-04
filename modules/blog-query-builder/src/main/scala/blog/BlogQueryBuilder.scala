@@ -38,28 +38,22 @@ object BlogQueryBuilder extends App with Microservice {
         val result = Future { jsonTry match {
           case Success(json) =>
             json match {
-              case BlogCreated(id, userId, userName, title, content) =>
+              case blogCreated @ BlogCreated(_, userId, _, _, content) =>
                 val document = parser.parse(content)
                 val htmlContent = renderer.render(document)
-                blogStore.insert(
-                  id,
-                  userId,
-                  userName,
-                  title,
-                  content,
-                  htmlContent)
+                blogStore.insert(blogCreated, htmlContent)
                 producer.offer(ProducerData(
                   "client-commands", userId, """{"value":"BlogCreated"}"""))
-              case BlogModified(id, userId, userName, title, content) =>
+              case blogModified @ BlogModified(id, userId, _, _, content) =>
                 if (blogStore.existsBlog(id)) {
                   val document = parser.parse(content)
                   val htmlContent = renderer.render(document)
-                  blogStore.update(id, title, content, htmlContent)
+                  blogStore.update(blogModified, htmlContent)
                 }
                 producer.offer(ProducerData(
                   "client-commands", userId, """{"value":"BlogModified"}"""))
-              case DiscussionStarted(id, userId, userName, blogId, title) =>
-                blogStore.addDiscussion(blogId, id, userId, userName, title)
+              case discussionStarted @ DiscussionStarted(_, userId, _, _, _) =>
+                blogStore.addDiscussion(discussionStarted)
                 producer.offer(ProducerData(
                   "client-commands", userId, """{"value":"DiscussionStarted"}"""))
               case _ => 1
