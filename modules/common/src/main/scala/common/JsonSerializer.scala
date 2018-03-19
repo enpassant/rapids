@@ -15,7 +15,7 @@ abstract class JsonSerializer extends Serializer {
 	}
 
 	def fromString(json: String): AnyRef = {
-		serialization.read(json)
+		serialization.read[AnyRef](json)
 	}
 
 	def toBinary(obj: AnyRef): Array[Byte] = {
