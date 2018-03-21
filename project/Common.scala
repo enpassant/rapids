@@ -35,8 +35,8 @@ object Common {
 	// Settings for every service, i.e. for admin and web subprojects
 
   val webDependencies = Seq(
-    "com.github.spullara.mustache.java" % "compiler" % "0.9.4",
-    "me.lessis" %% "fixie-grips-json4s" % "0.1.0"
+    "com.github.enpassant" %% "ickenham" % "1.0",
+    "com.github.enpassant" %% "ickenham-json4s" % "1.0"
   )
 
 	val commonDependencies = Seq(
@@ -47,9 +47,9 @@ object Common {
 		"com.typesafe.akka"      %% "akka-testkit"          % akkaVersion   % "test",
 		"com.typesafe.akka"      %% "akka-slf4j"            % akkaVersion,
 		"com.typesafe.akka"      %% "akka-http"             % "10.0.6",
-		"org.json4s"             %% "json4s-jackson"        % "3.2.10",
-		"org.json4s"             %% "json4s-ext"            % "3.2.10",
-		"org.json4s"             %% "json4s-mongo"          % "3.2.10",
+		"org.json4s"             %% "json4s-jackson"        % "3.5.3",
+		"org.json4s"             %% "json4s-ext"            % "3.5.3",
+		"org.json4s"             %% "json4s-mongo"          % "3.5.3",
 		"org.mongodb"            %% "casbah"                % "3.1.1",
     "com.vladsch.flexmark"    % "flexmark-all"          % "0.19.3",
     "com.github.ironfish"    %% "akka-persistence-mongo" % "1.0.0-SNAPSHOT" % "compile"

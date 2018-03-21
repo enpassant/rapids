@@ -9,9 +9,9 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.stream._
-import com.github.jknack.handlebars.{ Context, Handlebars, Template }
+import com.github.enpassant.ickenham._
+import com.github.enpassant.ickenham.adapter.Json4sAdapter
 import com.mongodb.casbah.Imports._
-import fixiegrips.{ Json4sHelpers, Json4sResolver }
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
@@ -29,22 +29,26 @@ class DiscussionQuery(config: DiscussionQueryConfig)
 
     val collDiscussion = config.mongoClient.getDB("blog")("discussion")
 
-    val handlebars = new Handlebars().registerHelpers(Json4sHelpers)
-    handlebars.setInfiniteLoops(true)
-    def ctx(obj: Object) =
-      Context.newBuilder(obj).resolver(Json4sResolver).build
-    val render = (template: Template) => (obj: Object) => template(ctx(obj))
+    val ickenham = new Ickenham(new Json4sAdapter)
+    val assemble = (template: String, templates: Map[String, Vector[Tag]]) =>
+      ickenham.assemble(template, templates)
 
-    val comment = handlebars.compile("comment")
-    val commentNew = handlebars.compile("comment-new")
-    val commentReply = handlebars.compile("comment-reply")
-    val discussion = handlebars.compile("discussion")
+    val templates = ickenham.compiles(
+      "comment",
+      "comment-new",
+      "comment-reply",
+      "discussion")
+
+    val comment = assemble("comment", templates)
+    val commentNew = assemble("comment-new", templates)
+    val commentReply = assemble("comment-reply", templates)
+    val discussion = assemble("discussion", templates)
 
 		val route =
       pathPrefix("discussion") {
         pathPrefix(Segment) { id =>
           path("new") {
-            completePage(render(commentNew), "comment-new") {
+            completePage(commentNew, "comment-new") {
               Some(JObject(
                 JField("_id", id),
                 JField("uuid", CommonUtil.uuid)
@@ -54,7 +58,7 @@ class DiscussionQuery(config: DiscussionQueryConfig)
           pathPrefix("comment") {
             pathPrefix(Segment) { commentId =>
               path("new") {
-                completePage(render(commentReply), "comment-reply") {
+                completePage(commentReply, "comment-reply") {
                   Some(JObject(
                     JField("_id", id),
                     JField("commentId", commentId),
@@ -65,7 +69,7 @@ class DiscussionQuery(config: DiscussionQueryConfig)
             }
           } ~
           pathEnd {
-            completePage(render(discussion), "discussion") {
+            completePage(discussion, "discussion") {
               collDiscussion.findOne(MongoDBObject("_id" -> id))
                 .map(o => serialize(o))
             }

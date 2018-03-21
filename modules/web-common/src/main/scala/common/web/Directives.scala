@@ -14,7 +14,6 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directive1
 import akka.stream._
 import java.util.Base64
-import com.github.jknack.handlebars.{ Context, Handlebars }
 import com.mongodb.casbah.Imports._
 import org.json4s._
 import org.json4s.jackson.JsonMethods.{parse => jparse}
@@ -23,7 +22,7 @@ import org.json4s.JsonDSL._
 import org.json4s.mongo.JObjectParser._
 
 object Directives extends BaseFormats {
-  def completePage(render: Object => String, template: String)
+  def completePage(render: JValue => String, template: String)
     (makeObject: => Option[JValue]): Route =
   {
     get {

@@ -9,9 +9,9 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.stream._
-import com.github.jknack.handlebars.{ Context, Handlebars, Template }
+import com.github.enpassant.ickenham._
+import com.github.enpassant.ickenham.adapter.Json4sAdapter
 import com.mongodb.casbah.Imports._
-import fixiegrips.{ Json4sHelpers, Json4sResolver }
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
@@ -30,15 +30,16 @@ class BlogQuery(config: BlogQueryConfig)
     val collBlog = config.mongoClient.getDB("blog")("blog")
     val title = config.title
 
-    val handlebars = new Handlebars().registerHelpers(Json4sHelpers)
-    def ctx(obj: Object) =
-      Context.newBuilder(obj).resolver(Json4sResolver).build
-    val render = (template: Template) => (obj: Object) => template(ctx(obj))
+    val ickenham = new Ickenham(new Json4sAdapter)
+    val assemble = (template: String, templates: Map[String, Vector[Tag]]) =>
+      ickenham.assemble(template, templates)
 
-    val blogs = handlebars.compile("blogs")
-    val blog = handlebars.compile("blog")
-    val blogNew = handlebars.compile("blog-new")
-    val blogEdit = handlebars.compile("blog-edit")
+    val templates = ickenham.compiles("blog", "blogs", "blog-new", "blog-edit")
+
+    val blogs = assemble("blogs", templates)
+    val blog = assemble("blog", templates)
+    val blogNew = assemble("blog-new", templates)
+    val blogEdit = assemble("blog-edit", templates)
 
     val (statActor, producer) = statActorAndProducer(mq, "blog-query")
 
@@ -48,7 +49,7 @@ class BlogQuery(config: BlogQueryConfig)
     val route =
       pathPrefix("blog") {
         pathEnd {
-          completePage(render(blogs), "blogs") {
+          completePage(blogs, "blogs") {
             val blogs = collBlog.find(
               MongoDBObject(),
               MongoDBObject("content" -> 0)
@@ -58,19 +59,19 @@ class BlogQuery(config: BlogQueryConfig)
           }
         } ~
         path("new") {
-          completePage(render(blogNew), "blog-new") {
+          completePage(blogNew, "blog-new") {
             Some(JObject(JField("uuid", CommonUtil.uuid)))
           }
         } ~
         pathPrefix(Segment) { id =>
           pathEnd {
-            completePage(render(blog), "blog") {
+            completePage(blog, "blog") {
               collBlog.findOne(MongoDBObject("_id" -> id))
                 .map(o => serialize(o))
             }
           } ~
           path("edit") {
-            completePage(render(blogEdit), "blog-edit") {
+            completePage(blogEdit, "blog-edit") {
               collBlog.findOne(MongoDBObject("_id" -> id))
                 .map(o => serialize(o))
             }
