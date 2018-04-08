@@ -1,5 +1,5 @@
 (function() {
-    var clientId = "clientId-" + Math.floor(Math.random() * (10 - 1) + 1)
+    var clientId = "clientId-" + Math.floor(Math.random() * (1000000 - 1) + 1)
     console.log("WebSocket clientId: " + clientId);
 
     var token = getCookie("X-Token");
@@ -18,7 +18,9 @@
 
             var open = function() {
                 console.log("Connection is opened...");
-                self.ws = new WebSocket("wss://" + location.hostname
+                var wsScheme =
+                     window.location.href.startsWith("https") ? "wss" : "ws";
+                self.ws = new WebSocket(wsScheme + "://" + location.hostname
                     + (location.port ? ':' + location.port : '')
                     + location.pathname + "updates/" + clientId);
 
