@@ -30,19 +30,11 @@ class DiscussionQuery(config: DiscussionQueryConfig)
     val collDiscussion = config.mongoClient.getDB("blog")("discussion")
 
     val ickenham = new Ickenham(new Json4sAdapter)
-    val assemble = (template: String, templates: Map[String, Vector[Tag]]) =>
-      ickenham.assemble(template, templates)
 
-    val templates = ickenham.compiles(
-      "comment",
-      "comment-new",
-      "comment-reply",
-      "discussion")
-
-    val comment = assemble("comment", templates)
-    val commentNew = assemble("comment-new", templates)
-    val commentReply = assemble("comment-reply", templates)
-    val discussion = assemble("discussion", templates)
+    val comment = ickenham.compile("comment")
+    val commentNew = ickenham.compile("comment-new")
+    val commentReply = ickenham.compile("comment-reply")
+    val discussion = ickenham.compile("discussion")
 
 		val route =
       pathPrefix("discussion") {

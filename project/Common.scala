@@ -35,8 +35,8 @@ object Common {
 	// Settings for every service, i.e. for admin and web subprojects
 
   val webDependencies = Seq(
-    "com.github.enpassant" %% "ickenham" % "1.0",
-    "com.github.enpassant" %% "ickenham-json4s" % "1.0"
+    "com.github.enpassant" %% "ickenham" % "1.4.1",
+    "com.github.enpassant" %% "ickenham-json4s" % "1.4.1"
   )
 
 	val commonDependencies = Seq(

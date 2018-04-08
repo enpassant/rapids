@@ -30,9 +30,9 @@ object Directives extends BaseFormats {
         handleReq(MediaTypes.`text/html`) {
           complete {
             makeObject map { obj =>
-            HttpEntity(
-              ContentTypes.`text/html(UTF-8)`,
-              render(obj))
+              HttpEntity(
+                ContentTypes.`text/html(UTF-8)`,
+                render(obj))
             }}
         } ~
         handleReq(MediaTypes.`application/json`)(complete(makeObject)) ~

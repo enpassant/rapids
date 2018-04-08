@@ -10,24 +10,34 @@
 
 ## Run in Docker Swarm
 
+### Init
 ```bash
 docker swarm init
 
 docker service create --name portainer -p 9090:9000 --constraint 'node.role == manager' --mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock portainer/portainer -H unix:///var/run/docker.sock
 
-docker network create -d overlay proxy
-
-docker service create --name haproxy --network proxy --mount target=/var/run/docker.sock,source=/var/run/docker.sock,type=bind -p 81:80 --constraint "node.role == manager" dockercloud/haproxy
-
-docker service create --network proxy -p 2181:2181 -p 9092:9092 --name kafka spotify/kafka
-
-docker service create --name mongodb --network proxy -p 27017:27017 mongo:latest
-
-docker service create --name app1 -e VIRTUAL_HOST_WEIGHT=1 -e SERVICE_PORTS="8080" -e VIRTUAL_HOST="*" -p 82:8080 --network proxy enpassant/rapids:1.0-SNAPSHOT -Dcasbah-snapshot.mongo-url="mongodb://mongodb/store.snapshots" -Dcasbah-journal.mongo-url="mongodb://mongodb/store.messages" -Ddiscussion.query.builder.mongodb.uri="mongodb://mongodb/blog" -Dblog.query.builder.mongodb.uri="mongodb://mongodb/blog" -Ddiscussion.query.mongodb.uri="mongodb://mongodb/blog" -Dblog.query.mongodb.uri="mongodb://mongodb/blog" -Dmicroservice.kafka.server="kafka:9092"
-
-docker service create --name appBlogQuery -e VIRTUAL_HOST_WEIGHT=10 -e SERVICE_PORTS="8083" -e VIRTUAL_HOST="test.*/blog*" -e COOKIE="test insert" -p 83:8083 --network proxy enpassant/rapids:1.0-SNAPSHOT -main blog.query.BlogQuery -Dblog.query.mongodb.uri="mongodb://mongodb/blog" -Dmicroservice.kafka.server="kafka:9092" -Dblog.query.title="Blogok teszt"
-
+mkdir -p ~/mongodbdata
+mkdir -p ~/kafkadata
 ```
+
+### Start
+```bash
+docker stack deploy --compose-file docker-compose.yml rapids
+```
+
+### Stop
+```bash
+docker stack rm rapids
+```
+
+## Show (consume) kafka messages:
+```bash
+docker exec -it `docker container ls | grep rapids_kafka | cut -d ' ' -f1` kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic blog-event --from-beginning --property print.key=true
+```
+
+### Used topics
+
+blog-command, client-commands, blog-event, performance, discussion-event, web-app, user, discussion-command
 
 ## Use docker for development
 

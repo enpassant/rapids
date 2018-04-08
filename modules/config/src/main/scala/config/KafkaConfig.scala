@@ -34,12 +34,12 @@ case class BlogQueryBuilderConfig(mongoDbUri: String)
 case class DiscussionQueryBuilderConfig(mongoDbUri: String)
   extends MongoClientConfig
 
-object ProductionKafkaConfig extends KafkaConfig("localhost:9092")
+object ProductionKafkaConfig extends KafkaConfig("kafka:9092")
 object ProductionDiscussionQueryConfig
-  extends DiscussionQueryConfig("mongodb://localhost/blog")
+  extends DiscussionQueryConfig("mongodb://mongodb/blog")
 object ProductionBlogQueryConfig
-  extends BlogQueryConfig("mongodb://localhost/blog", "Blogok")
+  extends BlogQueryConfig("mongodb://mongodb/blog", "Blogok")
 object ProductionBlogQueryBuilderConfig
-  extends BlogQueryBuilderConfig("mongodb://localhost/blog")
+  extends BlogQueryBuilderConfig("mongodb://mongodb/blog")
 object ProductionDiscussionQueryBuilderConfig
-  extends DiscussionQueryBuilderConfig("mongodb://localhost/blog")
+  extends DiscussionQueryBuilderConfig("mongodb://mongodb/blog")

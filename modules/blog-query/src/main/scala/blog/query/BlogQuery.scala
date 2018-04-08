@@ -31,15 +31,11 @@ class BlogQuery(config: BlogQueryConfig)
     val title = config.title
 
     val ickenham = new Ickenham(new Json4sAdapter)
-    val assemble = (template: String, templates: Map[String, Vector[Tag]]) =>
-      ickenham.assemble(template, templates)
 
-    val templates = ickenham.compiles("blog", "blogs", "blog-new", "blog-edit")
-
-    val blogs = assemble("blogs", templates)
-    val blog = assemble("blog", templates)
-    val blogNew = assemble("blog-new", templates)
-    val blogEdit = assemble("blog-edit", templates)
+    val blogs = ickenham.compile("blogs")
+    val blog = ickenham.compile("blog")
+    val blogNew = ickenham.compile("blog-new")
+    val blogEdit = ickenham.compile("blog-edit")
 
     val (statActor, producer) = statActorAndProducer(mq, "blog-query")
 

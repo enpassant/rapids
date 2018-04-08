@@ -18,6 +18,8 @@ object Main extends App {
   implicit val mq =
     if (isTest) new MQTest(system) else new Kafka(ProductionKafkaConfig)
 
+  Thread.sleep(10000)
+
   println("Program has started")
 
   val blogStore = new BlogStoreDB(ProductionBlogQueryBuilderConfig)
@@ -25,6 +27,9 @@ object Main extends App {
     ProductionDiscussionQueryBuilderConfig)
 
 	val routeWeb = new WebApp(OauthConfig.get).start
+
+  Thread.sleep(2000)
+
 	val routeBlogQuery =
     new blog.query.BlogQuery(ProductionBlogQueryConfig).start
 	val routeDiscussionQuery =
