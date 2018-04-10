@@ -4,7 +4,7 @@ import Keys._
 object Common {
 	def appName = "rapids"
 
-	val akkaVersion = "2.5.1"
+	val akkaVersion = "2.5.11"
 
 	// Common settings for every project
 	def settings (theName: String) = Seq(
@@ -43,7 +43,7 @@ object Common {
 		"com.typesafe.akka"      %% "akka-actor"            % akkaVersion,
 		"com.typesafe.akka"      %% "akka-persistence"      % akkaVersion,
 		"com.typesafe.akka"      %% "akka-stream"           % akkaVersion,
-		"com.typesafe.akka"      %% "akka-stream-kafka"     % "0.13",
+		"com.typesafe.akka"      %% "akka-stream-kafka"     % "0.20",
 		"com.typesafe.akka"      %% "akka-testkit"          % akkaVersion   % "test",
 		"com.typesafe.akka"      %% "akka-slf4j"            % akkaVersion,
 		"com.typesafe.akka"      %% "akka-http"             % "10.0.6",
