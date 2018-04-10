@@ -1,17 +1,14 @@
 (function() {
     var clientId = "clientId-" + Math.floor(Math.random() * (1000000 - 1) + 1)
-    console.log("WebSocket clientId: " + clientId);
 
-    var token = getCookie("X-Token");
+    var token = window.sessionStorage.getItem("X-Token");
     var baseUrl = undefined;
     var linkObjs = undefined;
     var websocket = undefined;
     var timeoutFn = undefined;
 
-    function WebSocketTest()
-    {
-        if ("WebSocket" in window)
-        {
+    function WebSocketTest() {
+        if ("WebSocket" in window) {
             console.log("WebSocket is supported by your Browser!");
 
             var self = this;
@@ -32,8 +29,7 @@
                 };
                 */
 
-                self.ws.onmessage = function (evt)
-                {
+                self.ws.onmessage = function (evt) {
                     var msg = JSON.parse(evt.data).value;
                     var br = document.createElement("br");
                     byId("messages").appendChild(br);
@@ -43,17 +39,13 @@
                     console.log(window.history);
                 };
 
-                self.ws.onclose = function()
-                {
+                self.ws.onclose = function() {
                     console.log("Connection is closed...");
                     if (token) open();
                 };
             }
             open();
-        }
-
-        else
-        {
+        } else {
             // The browser doesn't support WebSocket
             console.log("WebSocket NOT supported by your Browser!");
         }
@@ -102,6 +94,7 @@
                     var t = req.getResponseHeader("X-Token");
                     if (typeof t !== "undefined") {
                         token = t;
+                        window.sessionStorage.setItem("X-Token", token);
                     }
                     resolve(req.response);
                 } else {
@@ -118,7 +111,7 @@
     }
 
     function extractPayload() {
-        if (typeof token !== "undefined") {
+        if (token) {
             const parts = token.split('.');
             if (parts.length === 3) {
                 const payload = JSON.parse(
@@ -140,6 +133,7 @@
                 }
             }
             token = undefined;
+            window.sessionStorage.removeItem("X-Token");
             if (websocket) {
                 byId("login-user").innerHTML = "";
                 websocket.ws.close();
