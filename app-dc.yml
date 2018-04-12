@@ -1,0 +1,13 @@
+version: '3.2'
+services:
+  appRapids:
+    image: enpassant/rapids:1.0-SNAPSHOT
+    ports:
+      - "82:8080"
+    environment:
+      VIRTUAL_HOST_WEIGHT: 1
+      SERVICE_PORTS: "8080"
+      VIRTUAL_HOST: "*"
+    command:
+      -Dcasbah-snapshot.mongo-url="mongodb://mongodb/store.snapshots"
+      -Dcasbah-journal.mongo-url="mongodb://mongodb/store.messages"

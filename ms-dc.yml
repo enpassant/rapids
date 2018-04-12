@@ -1,0 +1,45 @@
+version: '3.2'
+services:
+  webApp:
+    image: enpassant/rapids:1.0-SNAPSHOT
+    ports:
+      - "81:8081"
+    environment:
+      VIRTUAL_HOST_WEIGHT: 1
+      SERVICE_PORTS: "8081"
+      VIRTUAL_HOST: "*"
+    command:
+      -main WebApp
+
+  blogQuery:
+    image: enpassant/rapids:1.0-SNAPSHOT
+    ports:
+      - "82:8082"
+    environment:
+      VIRTUAL_HOST_WEIGHT: 10
+      SERVICE_PORTS: "8082"
+      VIRTUAL_HOST: "*"
+      COOKIE: "test insert"
+    command:
+      -main blog.query.BlogQuery
+      -Dblog.query.title="Blogs"
+
+  discussionQuery:
+    image: enpassant/rapids:1.0-SNAPSHOT
+    ports:
+      - "83:8083"
+    environment:
+      VIRTUAL_HOST_WEIGHT: 10
+      SERVICE_PORTS: "8083"
+      VIRTUAL_HOST: "*"
+      COOKIE: "test insert"
+    command:
+      -main discussion.query.DiscussionQuery
+      -Ddiscussion.query.title="Discussion"
+
+  haproxy:
+    image: haproxy:1.8
+    ports:
+      - "90:80"
+    volumes:
+        - ~/haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg

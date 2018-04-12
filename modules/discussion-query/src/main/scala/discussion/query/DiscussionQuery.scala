@@ -18,7 +18,7 @@ import org.json4s.JsonDSL._
 import org.json4s.mongo.JObjectParser._
 
 class DiscussionQuery(config: DiscussionQueryConfig)
-  extends App with BaseFormats with Microservice
+  extends BaseFormats with Microservice
 {
 	def start(implicit
     mq: MQProtocol,
@@ -71,13 +71,14 @@ class DiscussionQuery(config: DiscussionQueryConfig)
 
     stat(statActorAndProducer(mq, "discussion-query")._1)(route)
 	}
+}
 
+object DiscussionQuery extends App {
 	implicit val mq = new Kafka(ProductionKafkaConfig)
 	implicit val system = ActorSystem("DiscussionQuery")
 	implicit val materializer = ActorMaterializer()
-	val bindingFuture = Http().bindAndHandle(start, "0.0.0.0", 8083)
 
-	scala.io.StdIn.readLine()
-	system.terminate
+	val route = new DiscussionQuery(ProductionDiscussionQueryConfig).start
+	val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8083)
 }
 

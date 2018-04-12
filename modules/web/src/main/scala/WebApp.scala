@@ -22,7 +22,7 @@ import org.json4s.jackson.JsonMethods._
 import scala.concurrent.Future
 import scala.collection.SortedSet
 
-class WebApp(oauthConfig: OauthConfig) extends App with Microservice {
+class WebApp(oauthConfig: OauthConfig) extends Microservice {
 	def start(implicit
     mq: MQProtocol,
     system: ActorSystem,
@@ -153,12 +153,13 @@ class WebApp(oauthConfig: OauthConfig) extends App with Microservice {
     User(id, id.capitalize,
       if (scala.util.Random.nextBoolean) "admin" else "user", "checker")
   }
+}
 
+object WebApp extends App {
 	implicit val mq = new Kafka(ProductionKafkaConfig)
 	implicit val system = ActorSystem("WebApp")
 	implicit val materializer = ActorMaterializer()
-	val bindingFuture = Http().bindAndHandle(start, "0.0.0.0", 8081)
 
-	scala.io.StdIn.readLine()
-	system.terminate
+	val routeWeb = new WebApp(OauthConfig.get).start
+	val bindingFuture = Http().bindAndHandle(routeWeb, "0.0.0.0", 8081)
 }
