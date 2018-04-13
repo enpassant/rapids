@@ -62,6 +62,4 @@ object DiscussionCommandApp extends App with Microservice {
 	implicit val system = ActorSystem("DiscussionCommandApp")
 
 	start
-	scala.io.StdIn.readLine()
-	system.terminate
 }

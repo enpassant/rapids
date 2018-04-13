@@ -68,7 +68,5 @@ object BlogCommandApp extends App with Microservice {
 	implicit val system = ActorSystem("BlogCommandApp")
 
 	start
-	scala.io.StdIn.readLine()
-	system.terminate
 }
 

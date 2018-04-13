@@ -74,6 +74,4 @@ object BlogQueryBuilder extends App with Microservice {
 	implicit val system = ActorSystem("DiscussionQueryBuilder")
 
 	start(blogStore)
-	scala.io.StdIn.readLine()
-	system.terminate
 }

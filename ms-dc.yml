@@ -19,7 +19,6 @@ services:
       VIRTUAL_HOST_WEIGHT: 10
       SERVICE_PORTS: "8082"
       VIRTUAL_HOST: "*"
-      COOKIE: "test insert"
     command:
       -main blog.query.BlogQuery
       -Dblog.query.title="Blogs"
@@ -32,10 +31,33 @@ services:
       VIRTUAL_HOST_WEIGHT: 10
       SERVICE_PORTS: "8083"
       VIRTUAL_HOST: "*"
-      COOKIE: "test insert"
     command:
       -main discussion.query.DiscussionQuery
       -Ddiscussion.query.title="Discussion"
+
+  blogCommandApp:
+    image: enpassant/rapids:1.0-SNAPSHOT
+    command:
+      -main blog.BlogCommandApp
+      -Dcasbah-snapshot.mongo-url="mongodb://mongodb/store.snapshots"
+      -Dcasbah-journal.mongo-url="mongodb://mongodb/store.messages"
+
+  blogQueryBuilder:
+    image: enpassant/rapids:1.0-SNAPSHOT
+    command:
+      -main blog.BlogQueryBuilder
+
+  discussionCommandApp:
+    image: enpassant/rapids:1.0-SNAPSHOT
+    command:
+      -main discussion.DiscussionCommandApp
+      -Dcasbah-snapshot.mongo-url="mongodb://mongodb/store.snapshots"
+      -Dcasbah-journal.mongo-url="mongodb://mongodb/store.messages"
+
+  discussionQueryBuilder:
+    image: enpassant/rapids:1.0-SNAPSHOT
+    command:
+      -main discussion.DiscussionQueryBuilder
 
   haproxy:
     image: haproxy:1.8

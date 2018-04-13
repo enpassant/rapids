@@ -67,6 +67,4 @@ object DiscussionQueryBuilder extends App with Microservice {
 	implicit val system = ActorSystem("DiscussionQueryBuilder")
 
 	start(discussionStore)
-	scala.io.StdIn.readLine()
-	system.terminate
 }
