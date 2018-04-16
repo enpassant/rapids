@@ -131,7 +131,7 @@
                     console.log("Connection is opened...");
                     self.ws = new WebSocket("ws://" + location.hostname
                         + (location.port ? ':' + location.port : '')
-                        + "/wsmonitor");
+                        + "/monitor/ws");
 
                     /*
                     self.ws.onopen = function()

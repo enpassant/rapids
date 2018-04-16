@@ -55,8 +55,8 @@ object Monitor extends App with BaseFormats with Microservice {
     producer.offer(ProducerData("web-app", "monitor", link))
 
 		val route =
-      pathPrefix("wsmonitor") {
-				pathEnd {
+      pathPrefix("monitor") {
+				path("ws") {
 					optionalHeaderValueByType[UpgradeToWebSocket]() {
 						case Some(upgrade) =>
 							complete(
@@ -64,10 +64,10 @@ object Monitor extends App with BaseFormats with Microservice {
 						case None =>
 							reject(ExpectedWebSocketRequestRejection)
 					}
-				}
-      } ~
-      path("monitor") {
-        getFromResource(s"public/html/monitor.html")
+        } ~
+				pathEnd {
+          getFromResource(s"public/html/monitor.html")
+        }
       }
 
     stat(statActor)(route)
@@ -77,8 +77,5 @@ object Monitor extends App with BaseFormats with Microservice {
 	implicit val system = ActorSystem("Monitor")
 	implicit val materializer = ActorMaterializer()
 	val bindingFuture = Http().bindAndHandle(start, "0.0.0.0", 8084)
-
-	scala.io.StdIn.readLine()
-	system.terminate
 }
 

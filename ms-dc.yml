@@ -15,7 +15,12 @@ services:
     image: enpassant/rapids:1.0-SNAPSHOT
     ports:
       - "82:8082"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     environment:
+      JAVA_OPTIONS: "-Xmx64m -Xms64m"
       VIRTUAL_HOST_WEIGHT: 10
       SERVICE_PORTS: "8082"
       VIRTUAL_HOST: "*"
@@ -27,7 +32,12 @@ services:
     image: enpassant/rapids:1.0-SNAPSHOT
     ports:
       - "83:8083"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     environment:
+      JAVA_OPTIONS: "-Xmx64m -Xms64m"
       VIRTUAL_HOST_WEIGHT: 10
       SERVICE_PORTS: "8083"
       VIRTUAL_HOST: "*"
@@ -37,6 +47,12 @@ services:
 
   blogCommandApp:
     image: enpassant/rapids:1.0-SNAPSHOT
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    environment:
+      JAVA_OPTIONS: "-Xmx128m -Xms128m"
     command:
       -main blog.BlogCommandApp
       -Dcasbah-snapshot.mongo-url="mongodb://mongodb/store.snapshots"
@@ -49,6 +65,12 @@ services:
 
   discussionCommandApp:
     image: enpassant/rapids:1.0-SNAPSHOT
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+      JAVA_OPTIONS: "-Xmx256m -Xms256m"
     command:
       -main discussion.DiscussionCommandApp
       -Dcasbah-snapshot.mongo-url="mongodb://mongodb/store.snapshots"
@@ -58,6 +80,18 @@ services:
     image: enpassant/rapids:1.0-SNAPSHOT
     command:
       -main discussion.DiscussionQueryBuilder
+
+  monitor:
+    image: enpassant/rapids:1.0-SNAPSHOT
+    ports:
+      - "84:8084"
+    environment:
+      VIRTUAL_HOST_WEIGHT: 20
+      SERVICE_PORTS: "8084"
+      VIRTUAL_HOST: "*"
+    command:
+      -main monitor.Monitor
+      -Dblog.query.title="Monitor"
 
   haproxy:
     image: haproxy:1.8
