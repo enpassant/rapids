@@ -20,9 +20,19 @@ mkdir -p ~/mongodbdata
 mkdir -p ~/kafkadata
 ```
 
-### Start
+### Start infra
 ```bash
-docker stack deploy --compose-file docker-compose.yml rapids
+docker stack deploy --compose-file infra-dc.yml rapids
+```
+
+### Start app (as monolit)
+```bash
+docker stack deploy --compose-file app-dc.yml rapids
+```
+
+### Start app (as microservices)
+```bash
+docker stack deploy --compose-file ms-dc.yml rapids
 ```
 
 ### Stop
