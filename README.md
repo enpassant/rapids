@@ -25,7 +25,7 @@ mkdir -p ~/kafkadata
 docker stack deploy --compose-file infra-dc.yml rapids
 ```
 
-### Start app (as monolit)
+### Start app (as monolith)
 ```bash
 docker stack deploy --compose-file app-dc.yml rapids
 ```
