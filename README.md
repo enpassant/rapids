@@ -51,11 +51,7 @@ blog-command, client-commands, blog-event, performance, discussion-event, web-ap
 
 ## Use docker for development
 
-```bash
-docker run --name mongodb -p 27017:27017 mongo:latest
-```
-
-In sbt console:
+Start infra, then in sbt console:
 ```bash
 ~runMain Main -t
 ```
