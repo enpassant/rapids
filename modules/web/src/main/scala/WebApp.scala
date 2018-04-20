@@ -71,10 +71,8 @@ object WebApp extends App with Microservice {
               authenticates(getUser) { loggedIn =>
                 respondWithHeader(RawHeader("X-Token", loggedIn.token)) {
                   entity(as[String]) { message =>
-                    println(s"message: $message")
                     onSuccess {
                       val msgLogged = BlogSerializer.toString(loggedIn)
-                      println(s"msgLogged: $msgLogged")
                       if (loggedIn.created > 0) {
                         producer.offer(
                           ProducerData("user", loggedIn.userId, msgLogged))
@@ -82,7 +80,6 @@ object WebApp extends App with Microservice {
                       producer.offer(
                         ProducerData("user", loggedIn.userId, message))
                       val json = parse(message)
-                      println(s"json: $json")
                       val result = json.values match {
                         case m: Map[String, _] @unchecked
                           if m.contains("loggedIn")

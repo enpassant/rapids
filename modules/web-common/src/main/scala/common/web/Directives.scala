@@ -111,7 +111,6 @@ object Directives extends BaseFormats {
         }
       }
       case _ =>
-        println("Missing X-Token cookie!")
         reject
     }
 
