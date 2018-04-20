@@ -26,14 +26,14 @@ object Main extends App {
   val discussionStore = new DiscussionStoreDB(
     ProductionDiscussionQueryBuilderConfig)
 
-	val routeWeb = new WebApp(OauthConfig.get).start
+	val routeWeb = WebApp.start(OauthConfig.get)
 
   Thread.sleep(2000)
 
 	val routeBlogQuery =
-    new blog.query.BlogQuery(ProductionBlogQueryConfig).start
+    blog.query.BlogQuery.start(ProductionBlogQueryConfig)
 	val routeDiscussionQuery =
-    new discussion.query.DiscussionQuery(ProductionDiscussionQueryConfig).start
+    discussion.query.DiscussionQuery.start(ProductionDiscussionQueryConfig)
 	val routeMonitor = monitor.Monitor.start
 	val route = routeBlogQuery ~ routeDiscussionQuery ~ routeMonitor ~ routeWeb
 	BlogCommandApp.start

@@ -17,11 +17,12 @@ import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
 import org.json4s.mongo.JObjectParser._
 
-class BlogQuery(config: BlogQueryConfig) extends BaseFormats with Microservice {
-  def start(implicit
-    mq: MQProtocol,
-    system: ActorSystem,
-    materializer: ActorMaterializer) =
+object BlogQuery extends App with BaseFormats with Microservice {
+  def start(config: BlogQueryConfig)
+    (implicit
+      mq: MQProtocol,
+      system: ActorSystem,
+      materializer: ActorMaterializer) =
   {
     implicit val executionContext = system.dispatcher
 
@@ -75,14 +76,12 @@ class BlogQuery(config: BlogQueryConfig) extends BaseFormats with Microservice {
 
     stat(statActor)(route)
   }
-}
 
-object BlogQuery extends App {
 	implicit val mq = new Kafka(ProductionKafkaConfig)
   implicit val system = ActorSystem("BlogQuery")
   implicit val materializer = ActorMaterializer()
 
-	val route = new BlogQuery(ProductionBlogQueryConfig).start
+	val route = BlogQuery.start(ProductionBlogQueryConfig)
   val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8082)
 }
 
