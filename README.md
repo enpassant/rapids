@@ -47,7 +47,7 @@ docker exec -it `docker container ls | grep rapids_kafka | cut -d ' ' -f1` kafka
 
 ### Used topics
 
-blog-command, client-commands, blog-event, performance, discussion-event, web-app, user, discussion-command
+blog-command, client-commands, blog-event, performance, discussion-event, web-app, user, discussion-command, error
 
 ## Use docker for development
 
