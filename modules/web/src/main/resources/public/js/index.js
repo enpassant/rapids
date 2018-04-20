@@ -158,7 +158,7 @@
     function router () {
         el = el || byId('view');
         var url = fullUrl(location.hash.slice(2)) || baseUrl;
-        if (!url && !linkObjs) {
+        if (!url || !linkObjs || linkObjs.length === 0) {
             ajaxGet(window.location.href, "HEAD").then(
                 function(data) {
                     url = baseUrl;
@@ -168,7 +168,13 @@
             return;
         }
 
-        if (el && url) {
+        if (location.hash === "") {
+            var menu = linkObjs
+                .filter(link => !link.rel)
+                .map(link =>
+                    '<a href="#/' + link.url + '">' + link.title + '</a>');
+            el.innerHTML = "<ul><li>" + menu.join("</li><li>") + "</li>";
+        } else if (el && url) {
             ajaxGet(url)
                 .then(function(data) {
                     el.innerHTML =
