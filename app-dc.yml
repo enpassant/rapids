@@ -3,7 +3,7 @@ services:
   appRapids:
     image: enpassant/rapids:1.0-SNAPSHOT
     ports:
-      - "82:8080"
+      - "90:8080"
     environment:
       VIRTUAL_HOST_WEIGHT: 1
       SERVICE_PORTS: "8080"
