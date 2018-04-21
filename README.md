@@ -49,9 +49,26 @@ docker exec -it `docker container ls | grep rapids_kafka | cut -d ' ' -f1` kafka
 
 blog-command, client-commands, blog-event, performance, discussion-event, web-app, user, discussion-command, error
 
-## Use docker for development
+## Use docker for development without kafka
 
-Start infra, then in sbt console:
+Start MongoDB:
+```bash
+docker stack deploy --compose-file mongo-dc.yml rapids
+```
+
+In sbt console:
 ```bash
 ~runMain Main -t
+```
+
+## Use docker for development with kafka
+
+Start infra:
+```bash
+docker stack deploy --compose-file infra-dc.yml rapids
+```
+
+In sbt console:
+```bash
+~runMain Main -d
 ```

@@ -1,0 +1,12 @@
+version: '3.2'
+services:
+  mongodb:
+    image: mongo:latest
+    deploy:
+      mode: global
+    ports:
+      - "27017:27017"
+    volumes:
+      - type: bind
+        source: ~/mongodbdata
+        target: /data/db
