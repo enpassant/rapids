@@ -12,28 +12,42 @@ import scala.util.{Failure, Success}
 
 object Main extends App {
   val isTest = args.length > 0 && args(0) == "-t"
+  val isDev = args.length > 0 && args(0) == "-d"
+  val isProd = !isTest && !isDev
+
 	implicit val system = ActorSystem("Main")
 	implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
   implicit val mq =
-    if (isTest) new MQTest(system) else new Kafka(ProductionKafkaConfig)
-
-  Thread.sleep(10000)
+    if (isTest) new MQTest(system)
+    else if (isDev) new Kafka(DevelopmentKafkaConfig)
+    else new Kafka(ProductionKafkaConfig)
 
   println("Program has started")
 
-  val blogStore = new BlogStoreDB(ProductionBlogQueryBuilderConfig)
+  val blogStore = new BlogStoreDB(
+    if (isProd) ProductionBlogQueryBuilderConfig
+    else DevelopmentBlogQueryBuilderConfig
+  )
   val discussionStore = new DiscussionStoreDB(
-    ProductionDiscussionQueryBuilderConfig)
+    if (isProd) ProductionDiscussionQueryBuilderConfig
+    else DevelopmentDiscussionQueryBuilderConfig
+  )
 
 	val routeWeb = WebApp.start(OauthConfig.get)
 
   Thread.sleep(2000)
 
 	val routeBlogQuery =
-    blog.query.BlogQuery.start(ProductionBlogQueryConfig)
+    blog.query.BlogQuery.start(
+      if (isProd) ProductionBlogQueryConfig
+      else DevelopmentBlogQueryConfig
+    )
 	val routeDiscussionQuery =
-    discussion.query.DiscussionQuery.start(ProductionDiscussionQueryConfig)
+    discussion.query.DiscussionQuery.start(
+      if (isProd) ProductionDiscussionQueryConfig
+      else DevelopmentDiscussionQueryConfig
+    )
 	val routeMonitor = monitor.Monitor.start
 	val route = routeBlogQuery ~ routeDiscussionQuery ~ routeMonitor ~ routeWeb
 	BlogCommandApp.start
@@ -57,7 +71,7 @@ object Main extends App {
     system.terminate()
   }
 
-  if (isTest) {
+  if (!isProd) {
     testError.TestError.start
     println("Press ENTER to exit!")
     scala.io.StdIn.readLine()
