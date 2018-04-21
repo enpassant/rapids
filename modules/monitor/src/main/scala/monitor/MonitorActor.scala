@@ -38,6 +38,6 @@ class MonitorActor(producer: SourceQueue[String]) extends Actor {
 object MonitorActor {
   import scala.concurrent.ExecutionContext.Implicits.global
 
-	def props(producer: SourceQueue[String]) =
+  def props(producer: SourceQueue[String]) =
     Props(new MonitorActor(producer))
 }

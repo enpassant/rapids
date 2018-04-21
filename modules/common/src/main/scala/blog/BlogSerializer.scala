@@ -27,76 +27,76 @@ case class BlogCreated(
   userName: String,
   title: String,
   content: String
-)	extends BlogEvent
+) extends BlogEvent
 case class BlogModified(
   id: String,
   userId: String,
   userName: String,
   title: String,
   content: String
-)	extends BlogEvent
+) extends BlogEvent
 
 case class DiscussionItem(id: String, title: String)
 case class Blog(
   userId: String = "",
   userName: String = "",
-	title: String = "",
+  title: String = "",
   content: String = "",
-	discussions: List[DiscussionItem] = Nil
+  discussions: List[DiscussionItem] = Nil
 ) extends BlogMessage
 
 trait DiscussionCommand extends BlogMessage
 case class StartDiscussion(
-	id: String,
-	blogId: String,
-	title: String,
+  id: String,
+  blogId: String,
+  title: String,
   userId: String,
   userName: String
-)	extends DiscussionCommand
+) extends DiscussionCommand
 
 case class AddComment(
-	id: String,
+  id: String,
   content: String,
   loggedIn: LoggedIn
-)	extends DiscussionCommand
+) extends DiscussionCommand
 
 case class ReplyComment(
-	id: String,
-	parentId: String,
+  id: String,
+  parentId: String,
   content: String,
   loggedIn: LoggedIn
-)	extends DiscussionCommand
+) extends DiscussionCommand
 
 trait DiscussionEvent extends BlogMessage {
   def id: String
 }
 
 case class DiscussionStarted(
-	id: String,
+  id: String,
   userId: String,
   userName: String,
-	blogId: String,
-	title: String
-)	extends DiscussionEvent
+  blogId: String,
+  title: String
+) extends DiscussionEvent
 
 case class CommentAdded(
   id: String,
-	commentId: String,
+  commentId: String,
   userId: String,
   userName: String,
   content: String,
   index: Int
-)	extends DiscussionEvent
+) extends DiscussionEvent
 
 case class CommentReplied(
   id: String,
-	commentId: String,
+  commentId: String,
   userId: String,
   userName: String,
-	parentId: String,
+  parentId: String,
   content: String,
   path: List[Int]
-)	extends DiscussionEvent
+) extends DiscussionEvent
 
 case class CommentIndex(path: List[Int], childCount: Int)
 
@@ -107,19 +107,19 @@ case class Comment(
   content: String
 )
 case class Discussion(
-	id: String = "",
+  id: String = "",
   userId: String,
   userName: String,
-	blogId: String = "",
-	title: String = "",
-	comments: TreeMap[String, CommentIndex] = TreeMap(),
+  blogId: String = "",
+  title: String = "",
+  comments: TreeMap[String, CommentIndex] = TreeMap(),
   childCount: Int = 0
 ) extends BlogMessage
 
 class BlogSerializer extends common.JsonSerializer {
-	def identifier = 0xfecb
+  def identifier = 0xfecb
 
-	implicit val formats = CommonSerializer.getFormats(List(
+  implicit val formats = CommonSerializer.getFormats(List(
     classOf[LoggedIn],
     classOf[Blog],
     classOf[CreateBlog],
@@ -133,7 +133,7 @@ class BlogSerializer extends common.JsonSerializer {
     classOf[CommentAdded],
     classOf[CommentReplied],
     classOf[StartDiscussion]
-	))
+  ))
 
   val config = ConfigFactory.load()
 

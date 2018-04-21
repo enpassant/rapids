@@ -15,15 +15,15 @@ import scala.util.{Failure, Success}
 import scala.util.{Try, Success, Failure}
 
 object DiscussionQueryBuilder extends App with Microservice {
-	def start(discussionStore: DiscussionStore)
+  def start(discussionStore: DiscussionStore)
     (implicit mq: MQProtocol, system: ActorSystem) =
   {
-		implicit val executionContext = system.dispatcher
+    implicit val executionContext = system.dispatcher
 
     val (statActor, producer) = statActorAndProducer(mq, "disc-query-builder")
 
-		val consumer = mq.createConsumer("discussion-query", "discussion-event")
-		{ msg =>
+    val consumer = mq.createConsumer("discussion-query", "discussion-event")
+    { msg =>
       Performance.statF(statActor) {
         implicit val timeout = Timeout(1000.milliseconds)
         val key = msg.key
@@ -53,18 +53,18 @@ object DiscussionQueryBuilder extends App with Microservice {
         } }
         result
       }
-		}
+    }
     consumer._2.onComplete {
       case Success(done) =>
       case Failure(throwable) => println(throwable)
     }
-	}
+  }
 
   val discussionStore = new DiscussionStoreDB(
     ProductionDiscussionQueryBuilderConfig)
 
-	implicit val mq = new Kafka(ProductionKafkaConfig)
-	implicit val system = ActorSystem("DiscussionQueryBuilder")
+  implicit val mq = new Kafka(ProductionKafkaConfig)
+  implicit val system = ActorSystem("DiscussionQueryBuilder")
 
-	start(discussionStore)
+  start(discussionStore)
 }

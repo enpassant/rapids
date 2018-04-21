@@ -20,13 +20,13 @@ import org.json4s.mongo.JObjectParser._
 object DiscussionQuery
   extends App with BaseFormats with Microservice
 {
-	def start(config: DiscussionQueryConfig)
+  def start(config: DiscussionQueryConfig)
     (implicit
       mq: MQProtocol,
       system: ActorSystem,
       materializer: ActorMaterializer) =
   {
-		implicit val executionContext = system.dispatcher
+    implicit val executionContext = system.dispatcher
 
     val collDiscussion = config.mongoClient.getDB("blog")("discussion")
 
@@ -37,7 +37,7 @@ object DiscussionQuery
     val commentReply = ickenham.compile("comment-reply")
     val discussion = ickenham.compile("discussion")
 
-		val route =
+    val route =
       pathPrefix("discussion") {
         pathPrefix(Segment) { id =>
           path("new") {
@@ -71,13 +71,13 @@ object DiscussionQuery
       }
 
     stat(statActorAndProducer(mq, "discussion-query")._1)(route)
-	}
+  }
 
-	implicit val mq = new Kafka(ProductionKafkaConfig)
-	implicit val system = ActorSystem("DiscussionQuery")
-	implicit val materializer = ActorMaterializer()
+  implicit val mq = new Kafka(ProductionKafkaConfig)
+  implicit val system = ActorSystem("DiscussionQuery")
+  implicit val materializer = ActorMaterializer()
 
-	val route = DiscussionQuery.start(ProductionDiscussionQueryConfig)
-	val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8083)
+  val route = DiscussionQuery.start(ProductionDiscussionQueryConfig)
+  val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8083)
 }
 

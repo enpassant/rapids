@@ -22,7 +22,7 @@ trait UserCommand {
 case class LoggedIn(userId: String, token: String, validTo: Long, created: Long)
 
 object CommonUtil {
-	def uuid = java.util.UUID.randomUUID.toString
+  def uuid = java.util.UUID.randomUUID.toString
 
   val encoder = Base64.getEncoder()
   val decoder = Base64.getDecoder()

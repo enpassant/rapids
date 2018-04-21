@@ -23,29 +23,29 @@ import scala.concurrent.Future
 import scala.collection.SortedSet
 
 object WebApp extends App with Microservice {
-	def start(oauthConfig: OauthConfig)
+  def start(oauthConfig: OauthConfig)
     (implicit mq: MQProtocol,
       system: ActorSystem,
       materializer: ActorMaterializer) =
   {
-		implicit val executionContext = system.dispatcher
+    implicit val executionContext = system.dispatcher
 
     val (statActor, producer) = statActorAndProducer(mq, "web-app")
 
-		lazy val consumerSource =
+    lazy val consumerSource =
       mq.createConsumerSource("webapp", "client-commands")
     {
       msg => Future(TextMessage(msg.value))
     }.toMat(BroadcastHub.sink(bufferSize = 256))(Keep.right).run()
 
-		def consumer(clientId: String) = consumerSource.filter {
+    def consumer(clientId: String) = consumerSource.filter {
       msg => msg._1 == clientId
     }.map(_._2)
 
     var links = SortedSet.empty[FunctionLink]
 
-		val webAppConsumer = mq.createConsumer("webapp", "web-app") { msg =>
-			val json = CommonSerializer.fromString(msg.value)
+    val webAppConsumer = mq.createConsumer("webapp", "web-app") { msg =>
+      val json = CommonSerializer.fromString(msg.value)
       json match {
         case link: FunctionLink =>
           println("New link has added: " + link)
@@ -63,10 +63,10 @@ object WebApp extends App with Microservice {
       )
     }
 
-		val route =
-			pathPrefix("commands") {
-				pathPrefix(Segment) { topic =>
-					path(Segment) { id =>
+    val route =
+      pathPrefix("commands") {
+        pathPrefix(Segment) { topic =>
+          path(Segment) { id =>
             post {
               authenticates(getUser) { loggedIn =>
                 respondWithHeader(RawHeader("X-Token", loggedIn.token)) {
@@ -101,24 +101,24 @@ object WebApp extends App with Microservice {
                 }
               }
             }
-					}
-				}
-			} ~
-			pathPrefix("updates") {
-				path(Segment) { id =>
-					optionalHeaderValueByType[UpgradeToWebSocket]() {
-						case Some(upgrade) =>
-							complete(
-								upgrade.handleMessagesWithSinkSource(Sink.ignore, consumer(id)))
-						case None =>
-							reject(ExpectedWebSocketRequestRejection)
-					}
-				}
-			} ~
-			path("auth" / "callback") {
+          }
+        }
+      } ~
+      pathPrefix("updates") {
+        path(Segment) { id =>
+          optionalHeaderValueByType[UpgradeToWebSocket]() {
+            case Some(upgrade) =>
+              complete(
+                upgrade.handleMessagesWithSinkSource(Sink.ignore, consumer(id)))
+            case None =>
+              reject(ExpectedWebSocketRequestRejection)
+          }
+        }
+      } ~
+      path("auth" / "callback") {
         auth.GoogleOauth.route(oauthConfig)
       } ~
-			path("login") {
+      path("login") {
         post {
           authenticates(getUser) { loggedIn =>
             respondWithHeader(RawHeader("X-Token", loggedIn.token)) {
@@ -127,34 +127,34 @@ object WebApp extends App with Microservice {
           }
         }
       } ~
-			path("") {
+      path("") {
         (get | head) {
           respondWithHeader(getLink()) {
             getFromResource(s"public/html/index.html")
           }
         }
-			} ~
-			path("""([^/]+\.html).*""".r) { path =>
-				getFromResource(s"public/html/$path")
-			} ~
-			path(Remaining) { path =>
-				getFromResource(s"public/$path")
+      } ~
+      path("""([^/]+\.html).*""".r) { path =>
+        getFromResource(s"public/html/$path")
+      } ~
+      path(Remaining) { path =>
+        getFromResource(s"public/$path")
       }
 
     stat(statActor) {
-  		encodeResponse { route }
+      encodeResponse { route }
     }
-	}
+  }
 
   def getUser(id: String) = {
     User(id, id.capitalize,
       if (scala.util.Random.nextBoolean) "admin" else "user", "checker")
   }
 
-	implicit val mq = new Kafka(ProductionKafkaConfig)
-	implicit val system = ActorSystem("WebApp")
-	implicit val materializer = ActorMaterializer()
+  implicit val mq = new Kafka(ProductionKafkaConfig)
+  implicit val system = ActorSystem("WebApp")
+  implicit val materializer = ActorMaterializer()
 
-	val routeWeb = WebApp.start(OauthConfig.get)
-	val bindingFuture = Http().bindAndHandle(routeWeb, "0.0.0.0", 8081)
+  val routeWeb = WebApp.start(OauthConfig.get)
+  val bindingFuture = Http().bindAndHandle(routeWeb, "0.0.0.0", 8081)
 }

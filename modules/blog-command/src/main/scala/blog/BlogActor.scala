@@ -8,11 +8,11 @@ import com.mongodb.casbah.commons.Imports._
 import scala.concurrent.duration._
 
 object BlogActor {
-	def props(id: String) = Props(new BlogActor(id))
+  def props(id: String) = Props(new BlogActor(id))
 }
 
 class BlogActor(val id: String) extends CommandActor {
-	import BlogActor._
+  import BlogActor._
 
   override def persistenceId = s"blog-$id"
 
@@ -31,7 +31,7 @@ class BlogActor(val id: String) extends CommandActor {
   }
 
   val receiveRecover: Receive = {
-    case event: BlogMessage =>	updateState(event)
+    case event: BlogMessage =>  updateState(event)
     case SnapshotOffer(_, snapshot: Blog) => state = Some(snapshot)
   }
 
@@ -46,7 +46,7 @@ class BlogActor(val id: String) extends CommandActor {
             sender ! event
             updateState(event)
         }
-			}
+      }
     case ModifyBlog(title, content, loggedIn) if state.isDefined =>
       val payload = CommonUtil.extractPayload(loggedIn.token)
       payload foreach { p =>
@@ -56,13 +56,13 @@ class BlogActor(val id: String) extends CommandActor {
             sender ! event
             updateState(event)
         }
-			}
+      }
     case event: DiscussionStarted =>
       persistAsync(event) {
-				event =>
-					sender ! event
-					updateState(event)
-			}
+        event =>
+          sender ! event
+          updateState(event)
+      }
     case msg =>
       sender ! WrongMessage(msg.toString)
   }

@@ -7,11 +7,11 @@ import akka.actor._
 import akka.persistence._
 
 object DiscussionActor {
-	def props(id: String) = Props(new DiscussionActor(id))
+  def props(id: String) = Props(new DiscussionActor(id))
 }
 
 class DiscussionActor(val id: String) extends CommandActor {
-	import DiscussionActor._
+  import DiscussionActor._
 
   override def persistenceId = s"discussion-$id"
 
@@ -38,7 +38,7 @@ class DiscussionActor(val id: String) extends CommandActor {
   }
 
   val receiveRecover: Receive = {
-    case event: DiscussionEvent =>	updateState(event)
+    case event: DiscussionEvent =>  updateState(event)
     case SnapshotOffer(_, snapshot: Discussion) => state = Some(snapshot)
   }
 
@@ -46,11 +46,11 @@ class DiscussionActor(val id: String) extends CommandActor {
     case "snap" if state.isDefined => saveSnapshot(state.get)
     case StartDiscussion(id, blogId, title, userId, userName)
         if !state.isDefined =>
-			val event = DiscussionStarted(id, userId, userName, blogId, title)
+      val event = DiscussionStarted(id, userId, userName, blogId, title)
       persistAsync(event) { event =>
         sender ! event
         updateState(event)
-			}
+      }
     case AddComment(commentId, content, loggedIn) if state.isDefined &&
         !state.get.comments.contains(commentId) =>
       val payload = CommonUtil.extractPayload(loggedIn.token)

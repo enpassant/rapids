@@ -6,25 +6,25 @@ import org.json4s.{ DefaultFormats, Formats, jackson, Serialization }
 
 abstract class JsonSerializer extends Serializer {
   implicit val serialization = jackson.Serialization
-	implicit def formats: Formats
+  implicit def formats: Formats
 
-	def includeManifest: Boolean = false
+  def includeManifest: Boolean = false
 
-	def toString(obj: AnyRef): String = {
-		serialization.write(obj)
-	}
+  def toString(obj: AnyRef): String = {
+    serialization.write(obj)
+  }
 
-	def fromString(json: String): AnyRef = {
-		serialization.read[AnyRef](json)
-	}
+  def fromString(json: String): AnyRef = {
+    serialization.read[AnyRef](json)
+  }
 
-	def toBinary(obj: AnyRef): Array[Byte] = {
-		toString(obj).getBytes
-	}
+  def toBinary(obj: AnyRef): Array[Byte] = {
+    toString(obj).getBytes
+  }
 
-	def fromBinary(
-		bytes: Array[Byte],
-		clazz: Option[Class[_]]): AnyRef = {
-			fromString(new String(bytes))
-	}
+  def fromBinary(
+    bytes: Array[Byte],
+    clazz: Option[Class[_]]): AnyRef = {
+      fromString(new String(bytes))
+  }
 }

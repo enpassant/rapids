@@ -77,11 +77,11 @@ object BlogQuery extends App with BaseFormats with Microservice {
     stat(statActor)(route)
   }
 
-	implicit val mq = new Kafka(ProductionKafkaConfig)
+  implicit val mq = new Kafka(ProductionKafkaConfig)
   implicit val system = ActorSystem("BlogQuery")
   implicit val materializer = ActorMaterializer()
 
-	val route = BlogQuery.start(ProductionBlogQueryConfig)
+  val route = BlogQuery.start(ProductionBlogQueryConfig)
   val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8082)
 }
 

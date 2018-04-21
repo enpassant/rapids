@@ -20,18 +20,18 @@ case class FunctionLink(order: Int, url: String, title: String)
 }
 
 object CommonSerializer extends JsonSerializer {
-	def identifier = 0xfeca
+  def identifier = 0xfeca
 
-	implicit val formats = getFormats()
+  implicit val formats = getFormats()
 
   def getFormats(ls: List[Class[_]] = Nil): Formats = new DefaultFormats {
     override val typeHintFieldName = "_t"
     override val typeHints = ShortTypeHints(
-			classOf[FunctionLink] ::
-			classOf[Stat] ::
+      classOf[FunctionLink] ::
+      classOf[Stat] ::
       ls
     )
-	} ++ org.json4s.ext.JodaTimeSerializers.all + LocalDateSerializer
+  } ++ org.json4s.ext.JodaTimeSerializers.all + LocalDateSerializer
 
   def read[T: Manifest](data: Array[Byte])
     (implicit formats: Formats, transformation: Transformation) =

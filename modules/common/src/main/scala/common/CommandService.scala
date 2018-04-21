@@ -11,7 +11,7 @@ import scala.util.{Try, Success, Failure}
 import blog._
 
 object CommandService {
-	def props(
+  def props(
     fromString: String => AnyRef,
     name: String,
     props: String => Props
@@ -33,18 +33,18 @@ extends Actor with ActorLogging
         actors.filter { case (key, actorRef) => actorRef != actor }
       )
     case message @ ConsumerData(key, value) =>
-			val jsonTry = Try(fromString(value))
-			jsonTry match {
-				case Success(json) =>
-					val actor = actors get key getOrElse {
-						val actorRef = context.actorOf(props(key), s"$name-$key")
+      val jsonTry = Try(fromString(value))
+      jsonTry match {
+        case Success(json) =>
+          val actor = actors get key getOrElse {
+            val actorRef = context.actorOf(props(key), s"$name-$key")
             context.watch(actorRef)
-						context become process(actors + (key -> actorRef))
-						actorRef
-					}
-					actor.tell(json, sender)
-				case Failure(e) =>
-					sender ! WrongMessage(e + ": " + message.toString)
-			}
+            context become process(actors + (key -> actorRef))
+            actorRef
+          }
+          actor.tell(json, sender)
+        case Failure(e) =>
+          sender ! WrongMessage(e + ": " + message.toString)
+      }
   }
 }

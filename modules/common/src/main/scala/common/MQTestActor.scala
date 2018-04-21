@@ -50,5 +50,5 @@ class MQTestActor extends Actor {
 }
 
 object MQTestActor {
-	def props() = Props(new MQTestActor())
+  def props() = Props(new MQTestActor())
 }

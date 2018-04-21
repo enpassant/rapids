@@ -37,10 +37,10 @@ trait BaseFormats {
     BaseFormats.marshaller[Seq[JValue]](MediaTypes.`application/json`)
 
   lazy val `text/html+xml` =
-		customMediaTypeUTF8("html+xml", "text")
+    customMediaTypeUTF8("html+xml", "text")
 
   lazy val `application/collection+json` =
-		customMediaTypeUTF8("collection+json")
+    customMediaTypeUTF8("collection+json")
 
   def customMediaTypeUTF8(name: String, topLevel: String = "application"):
     MediaType.WithFixedCharset =
@@ -53,19 +53,19 @@ trait BaseFormats {
   }
 
   def json4sUnmarshallMediaType[A: Manifest]
-		(mediaType: MediaType)
+    (mediaType: MediaType)
     (serialization: Serialization, formats: Formats)
-		: FromEntityUnmarshaller[A] =
-	{
-	    unmarshaller(mediaType)(manifest, serialization, formats)
-	}
+    : FromEntityUnmarshaller[A] =
+  {
+      unmarshaller(mediaType)(manifest, serialization, formats)
+  }
 
-	implicit def json4sUnmarshallerConverter[A <: Json : Manifest]
-		(implicit serialization: Serialization, formats: Formats)
-		: FromEntityUnmarshaller[A] =
-	{
-		unmarshaller(MediaTypes.`application/json`)(manifest, serialization, formats)
-	}
+  implicit def json4sUnmarshallerConverter[A <: Json : Manifest]
+    (implicit serialization: Serialization, formats: Formats)
+    : FromEntityUnmarshaller[A] =
+  {
+    unmarshaller(MediaTypes.`application/json`)(manifest, serialization, formats)
+  }
 
   /**
    * HTTP entity => `A`
@@ -75,32 +75,32 @@ trait BaseFormats {
    */
   def unmarshaller[A: Manifest](mediaType: MediaType)
     (implicit serialization: Serialization, formats: Formats)
-		: FromEntityUnmarshaller[A] =
-	{
+    : FromEntityUnmarshaller[A] =
+  {
     Unmarshaller
       .stringUnmarshaller
       .forContentTypes(mediaType)
       .map { data =>
         serialization.read(data)
       }
-	}
+  }
 
   def json4sMarshallMediaType[A <: AnyRef](mediaType: MediaType)
     (serialization: Serialization, formats: Formats,
       shouldWritePretty: ShouldWritePretty = ShouldWritePretty.False)
-		: ToEntityMarshaller[A] =
-	{
+    : ToEntityMarshaller[A] =
+  {
     marshaller(mediaType)(serialization, formats, shouldWritePretty)
-	}
+  }
 
   //implicit def json4sMarshallerConverter[A <: AnyRef]
     //(implicit serialization: Serialization, formats: Formats,
-		//	shouldWritePretty: ShouldWritePretty = ShouldWritePretty.False)
-		//: ToEntityMarshaller[A] =
-	//{
+    //  shouldWritePretty: ShouldWritePretty = ShouldWritePretty.False)
+    //: ToEntityMarshaller[A] =
+  //{
     //marshaller(MediaTypes.`application/json`)
-		//	(serialization, formats, shouldWritePretty)
-	//}
+    //  (serialization, formats, shouldWritePretty)
+  //}
 
   /**
    * `A` => HTTP entity
@@ -111,15 +111,15 @@ trait BaseFormats {
   def marshaller[A <: AnyRef](mediaType: MediaType)
     (implicit serialization: Serialization, formats: Formats,
       shouldWritePretty: ShouldWritePretty = ShouldWritePretty.False)
-		: ToEntityMarshaller[A] =
-	{
+    : ToEntityMarshaller[A] =
+  {
     shouldWritePretty match {
       case ShouldWritePretty.False =>
         Marshaller.StringMarshaller.wrap(mediaType)(serialization.write[A])
       case _ =>
         Marshaller.StringMarshaller.wrap(mediaType)(serialization.writePretty[A])
     }
-	}
+  }
 }
 
 

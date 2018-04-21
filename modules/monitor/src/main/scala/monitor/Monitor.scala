@@ -21,12 +21,12 @@ import scala.concurrent.duration._
 import scala.util.{Try, Success, Failure}
 
 object Monitor extends App with BaseFormats with Microservice {
-	def start(implicit
+  def start(implicit
     mq: MQProtocol,
     system: ActorSystem,
     materializer: ActorMaterializer) =
   {
-		implicit val executionContext = system.dispatcher
+    implicit val executionContext = system.dispatcher
 
     val (wsSourceQueue, wsSource) =
       Source.queue[String](100, OverflowStrategy.backpressure)
@@ -36,7 +36,7 @@ object Monitor extends App with BaseFormats with Microservice {
 
     val monitorActor = system.actorOf(MonitorActor.props(wsSourceQueue))
 
-		val consumer = mq.createConsumer("monitor", "performance") { msg =>
+    val consumer = mq.createConsumer("monitor", "performance") { msg =>
       val jsonTry = Try(CommonSerializer.fromString(msg.value))
       val result = Future { jsonTry match {
         case Success(json) =>
@@ -54,28 +54,28 @@ object Monitor extends App with BaseFormats with Microservice {
     val link = CommonSerializer.toString(FunctionLink(10, "/monitor", "Monitor"))
     producer.offer(ProducerData("web-app", "monitor", link))
 
-		val route =
+    val route =
       pathPrefix("monitor") {
-				path("ws") {
-					optionalHeaderValueByType[UpgradeToWebSocket]() {
-						case Some(upgrade) =>
-							complete(
-								upgrade.handleMessagesWithSinkSource(Sink.ignore, wsSource))
-						case None =>
-							reject(ExpectedWebSocketRequestRejection)
-					}
+        path("ws") {
+          optionalHeaderValueByType[UpgradeToWebSocket]() {
+            case Some(upgrade) =>
+              complete(
+                upgrade.handleMessagesWithSinkSource(Sink.ignore, wsSource))
+            case None =>
+              reject(ExpectedWebSocketRequestRejection)
+          }
         } ~
-				pathEnd {
+        pathEnd {
           getFromResource(s"public/html/monitor.html")
         }
       }
 
     stat(statActor)(route)
-	}
+  }
 
-	implicit val mq = new Kafka(ProductionKafkaConfig)
-	implicit val system = ActorSystem("Monitor")
-	implicit val materializer = ActorMaterializer()
-	val bindingFuture = Http().bindAndHandle(start, "0.0.0.0", 8084)
+  implicit val mq = new Kafka(ProductionKafkaConfig)
+  implicit val system = ActorSystem("Monitor")
+  implicit val materializer = ActorMaterializer()
+  val bindingFuture = Http().bindAndHandle(start, "0.0.0.0", 8084)
 }
 

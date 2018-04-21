@@ -77,7 +77,7 @@ class StatActor(msId: String, producer: SourceQueue[ProducerData[String]])
 object Performance {
   import scala.concurrent.ExecutionContext.Implicits.global
 
-	def props(msId: String, producer: SourceQueue[ProducerData[String]]) =
+  def props(msId: String, producer: SourceQueue[ProducerData[String]]) =
     Props(new StatActor(msId, producer))
 
   def stat[T](statActor: ActorRef)(process: => T) = {

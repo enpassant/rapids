@@ -15,8 +15,8 @@ object Main extends App {
   val isDev = args.length > 0 && args(0) == "-d"
   val isProd = !isTest && !isDev
 
-	implicit val system = ActorSystem("Main")
-	implicit val materializer = ActorMaterializer()
+  implicit val system = ActorSystem("Main")
+  implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
   implicit val mq =
     if (isTest) new MQTest(system)
@@ -34,28 +34,28 @@ object Main extends App {
     else DevelopmentDiscussionQueryBuilderConfig
   )
 
-	val routeWeb = WebApp.start(OauthConfig.get)
+  val routeWeb = WebApp.start(OauthConfig.get)
 
   Thread.sleep(2000)
 
-	val routeBlogQuery =
+  val routeBlogQuery =
     blog.query.BlogQuery.start(
       if (isProd) ProductionBlogQueryConfig
       else DevelopmentBlogQueryConfig
     )
-	val routeDiscussionQuery =
+  val routeDiscussionQuery =
     discussion.query.DiscussionQuery.start(
       if (isProd) ProductionDiscussionQueryConfig
       else DevelopmentDiscussionQueryConfig
     )
-	val routeMonitor = monitor.Monitor.start
-	val route = routeBlogQuery ~ routeDiscussionQuery ~ routeMonitor ~ routeWeb
-	BlogCommandApp.start
-	DiscussionCommandApp.start
-	BlogQueryBuilder.start(blogStore)
-	DiscussionQueryBuilder.start(discussionStore)
+  val routeMonitor = monitor.Monitor.start
+  val route = routeBlogQuery ~ routeDiscussionQuery ~ routeMonitor ~ routeWeb
+  BlogCommandApp.start
+  DiscussionCommandApp.start
+  BlogQueryBuilder.start(blogStore)
+  DiscussionQueryBuilder.start(discussionStore)
 
-	val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8080)
+  val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8080)
 
   bindingFuture.onComplete {
     case Failure(ex) =>

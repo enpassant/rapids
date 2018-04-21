@@ -11,23 +11,23 @@ import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
 object BlogCommandApp extends App with Microservice {
-	def start(implicit mq: MQProtocol, system: ActorSystem) = {
-		implicit val executionContext = system.dispatcher
+  def start(implicit mq: MQProtocol, system: ActorSystem) = {
+    implicit val executionContext = system.dispatcher
 
-		val producer = mq.createProducer[ProducerData[BlogMessage]]()
+    val producer = mq.createProducer[ProducerData[BlogMessage]]()
     {
-			case ProducerData(topic, id, event) =>
-				val value = BlogSerializer.toString(event)
-				ProducerData(topic, id, value)
-		}
+      case ProducerData(topic, id, event) =>
+        val value = BlogSerializer.toString(event)
+        ProducerData(topic, id, value)
+    }
 
     val (statActor, producerStat) = statActorAndProducer(mq, "blog-command")
 
-		val service = system.actorOf(
+    val service = system.actorOf(
       CommandService.props(BlogSerializer.fromString, "blog", BlogActor.props),
       "blog-service")
 
-		val consumer = mq.createConsumer("blog-command", "blog-command") { msg =>
+    val consumer = mq.createConsumer("blog-command", "blog-command") { msg =>
       Performance.statF(statActor) {
         implicit val timeout = Timeout(3000.milliseconds)
         val result = service ? common.ConsumerData(msg.key, msg.value)
@@ -57,16 +57,16 @@ object BlogCommandApp extends App with Microservice {
               ProducerData("error", "FATAL", WrongMessage(e.toString)))
         }
       }
-		}
+    }
     consumer._2.onComplete {
       case Success(done) =>
       case Failure(throwable) => println(throwable)
     }
-	}
+  }
 
-	implicit val mq = new Kafka(ProductionKafkaConfig)
-	implicit val system = ActorSystem("BlogCommandApp")
+  implicit val mq = new Kafka(ProductionKafkaConfig)
+  implicit val system = ActorSystem("BlogCommandApp")
 
-	start
+  start
 }
 

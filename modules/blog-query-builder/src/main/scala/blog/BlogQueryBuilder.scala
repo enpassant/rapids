@@ -17,10 +17,10 @@ import scala.util.{Failure, Success}
 import scala.util.{Try, Success, Failure}
 
 object BlogQueryBuilder extends App with Microservice {
-	def start(blogStore: BlogStore)
+  def start(blogStore: BlogStore)
     (implicit mq: MQProtocol, system: ActorSystem) =
   {
-		implicit val executionContext = system.dispatcher
+    implicit val executionContext = system.dispatcher
 
     val options = new MutableDataSet()
     val parser = Parser.builder(options).build()
@@ -28,7 +28,7 @@ object BlogQueryBuilder extends App with Microservice {
 
     val (statActor, producer) = statActorAndProducer(mq, "blog-query-builder")
 
-		val consumer = mq.createConsumer("blog-query", "blog-event") { msg =>
+    val consumer = mq.createConsumer("blog-query", "blog-event") { msg =>
       Performance.statF(statActor) {
         implicit val timeout = Timeout(1000.milliseconds)
         val jsonTry = Try(BlogSerializer.fromString(msg.value))
@@ -61,17 +61,17 @@ object BlogQueryBuilder extends App with Microservice {
         } }
         result
       }
-		}
+    }
     consumer._2.onComplete {
       case Success(done) =>
       case Failure(throwable) => println(throwable)
     }
-	}
+  }
 
   val blogStore = new BlogStoreDB(ProductionBlogQueryBuilderConfig)
 
-	implicit val mq = new Kafka(ProductionKafkaConfig)
-	implicit val system = ActorSystem("DiscussionQueryBuilder")
+  implicit val mq = new Kafka(ProductionKafkaConfig)
+  implicit val system = ActorSystem("DiscussionQueryBuilder")
 
-	start(blogStore)
+  start(blogStore)
 }
