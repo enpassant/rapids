@@ -3,10 +3,10 @@ package discussion
 import blog._
 
 trait DiscussionStore {
-  def insert(discussionStarted: DiscussionStarted)
+  def insert(discussionStarted: DiscussionStarted): Unit
 
-  def addComment(commentAdded: CommentAdded)
+  def addComment(commentAdded: CommentAdded): Unit
 
-  def replayComment(commentReplied: CommentReplied)
+  def replayComment(commentReplied: CommentReplied): Unit
 }
 

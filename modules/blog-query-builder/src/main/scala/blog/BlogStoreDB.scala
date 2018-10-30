@@ -7,7 +7,7 @@ import com.mongodb.casbah.Imports._
 class BlogStoreDB(config: BlogQueryBuilderConfig) extends BlogStore {
   val collection = config.mongoClient.getDB("blog")("blog")
 
-  def insert(blogCreated: BlogCreated, htmlContent: String) {
+  def insert(blogCreated: BlogCreated, htmlContent: String): Unit = {
     collection.insert(MongoDBObject(
       "_id" -> blogCreated.id,
       "userId" -> blogCreated.userId,
@@ -22,7 +22,7 @@ class BlogStoreDB(config: BlogQueryBuilderConfig) extends BlogStore {
     collection.findOne(MongoDBObject("_id" -> id)).isDefined
   }
 
-  def update(blogModified: BlogModified, htmlContent: String) {
+  def update(blogModified: BlogModified, htmlContent: String): Unit = {
     collection.update(
       MongoDBObject("_id" -> blogModified.id),
       MongoDBObject("$set" -> MongoDBObject(
@@ -31,7 +31,7 @@ class BlogStoreDB(config: BlogQueryBuilderConfig) extends BlogStore {
         "htmlContent" -> htmlContent)))
   }
 
-  def addDiscussion(discussionStarted: DiscussionStarted) {
+  def addDiscussion(discussionStarted: DiscussionStarted): Unit = {
     collection.update(
       MongoDBObject("_id" -> discussionStarted.blogId),
       $push("discussions" ->
