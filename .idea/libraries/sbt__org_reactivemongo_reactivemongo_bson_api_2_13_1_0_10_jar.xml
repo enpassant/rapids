@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: org.reactivemongo:reactivemongo-bson-api_2.13:1.0.10:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="org.reactivemongo" artifactId="reactivemongo-bson-api_2.13" version="1.0.10" baseVersion="1.0.10" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/reactivemongo/reactivemongo-bson-api_2.13/1.0.10/reactivemongo-bson-api_2.13-1.0.10.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/reactivemongo/reactivemongo-bson-api_2.13/1.0.10/reactivemongo-bson-api_2.13-1.0.10-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

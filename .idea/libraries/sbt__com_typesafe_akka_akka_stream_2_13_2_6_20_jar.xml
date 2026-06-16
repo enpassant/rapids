@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: com.typesafe.akka:akka-stream_2.13:2.6.20:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="com.typesafe.akka" artifactId="akka-stream_2.13" version="2.6.20" baseVersion="2.6.20" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/akka/akka-stream_2.13/2.6.20/akka-stream_2.13-2.6.20.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/akka/akka-stream_2.13/2.6.20/akka-stream_2.13-2.6.20-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

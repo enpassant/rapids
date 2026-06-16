@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="sbt: io.netty:netty-tcnative-boringssl-static:2.0.65.Final:osx-x86_64:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="io.netty" artifactId="netty-tcnative-boringssl-static" version="2.0.65.Final" baseVersion="2.0.65.Final" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-tcnative-boringssl-static/2.0.65.Final/netty-tcnative-boringssl-static-2.0.65.Final-osx-x86_64.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

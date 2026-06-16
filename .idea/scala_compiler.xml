@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ScalaCompilerConfiguration">
+    <option name="separateProdTestSources" value="true" />
+    <profile name="sbt 1" modules="rapids,rapids.blog-command,rapids.blog-query,rapids.blog-query-builder,rapids.common,rapids.config,rapids.discussion-command,rapids.discussion-query,rapids.discussion-query-builder,rapids.monitor,rapids.test-error,rapids.web,rapids.web-common" />
+    <profile name="sbt 2" modules="rapids.blog-command.main,rapids.blog-command.test,rapids.blog-query-builder.main,rapids.blog-query-builder.test,rapids.blog-query.main,rapids.blog-query.test,rapids.common.main,rapids.common.test,rapids.config.main,rapids.config.test,rapids.discussion-command.main,rapids.discussion-command.test,rapids.discussion-query-builder.main,rapids.discussion-query-builder.test,rapids.discussion-query.main,rapids.discussion-query.test,rapids.main,rapids.monitor.main,rapids.monitor.test,rapids.test,rapids.test-error.main,rapids.test-error.test,rapids.web-common.main,rapids.web-common.test,rapids.web.main,rapids.web.test">
+      <option name="deprecationWarnings" value="true" />
+      <option name="uncheckedWarnings" value="true" />
+      <option name="featureWarnings" value="true" />
+      <parameters>
+        <parameter value="-Xlint" />
+        <parameter value="-Ywarn-dead-code" />
+        <parameter value="-language:_" />
+        <parameter value="-target:jvm-1.8" />
+        <parameter value="-encoding" />
+        <parameter value="UTF-8" />
+      </parameters>
+    </profile>
+  </component>
+</project>

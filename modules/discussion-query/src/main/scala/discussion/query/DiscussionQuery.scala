@@ -11,7 +11,10 @@ import akka.http.scaladsl.server.Directives._
 import akka.stream._
 import com.github.enpassant.ickenham._
 import com.github.enpassant.ickenham.adapter.Json4sAdapter
-import com.mongodb.casbah.Imports._
+import org.mongodb.scala._
+import org.mongodb.scala.model.Filters._
+import scala.concurrent.Await
+import scala.concurrent.duration._
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
@@ -28,7 +31,8 @@ object DiscussionQuery
   {
     implicit val executionContext = system.dispatcher
 
-    val collDiscussion = config.mongoClient.getDB("blog")("discussion")
+    val collDiscussion = config.mongoClient.getDatabase("blog")
+      .getCollection("discussion")
 
     val ickenham = new Ickenham(new Json4sAdapter)
 
@@ -63,8 +67,13 @@ object DiscussionQuery
           } ~
           pathEnd {
             completePage(discussion, "discussion") {
-              collDiscussion.findOne(MongoDBObject("_id" -> id))
-                .map(o => serialize(o))
+              Await.result(
+                collDiscussion.find(equal("_id", id)).first().toFuture(),
+                10.seconds
+              ) match {
+                case null => None
+                case o => Some(serialize(o))
+              }
             }
           }
         }

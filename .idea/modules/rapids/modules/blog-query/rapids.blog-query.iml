@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id="blogQuery [file:///home/feca/projects/rapids/]" external.linked.project.path="$MODULE_DIR$/../../../../../modules/blog-query" external.root.project.path="$MODULE_DIR$/../../../../.." external.system.id="SBT" external.system.module.type="nestedProject" type="JAVA_MODULE" version="4">
+  <component name="DisplayModuleName">
+    <option name="name" value="blog-query" />
+  </component>
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_21" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../../../modules/blog-query">
+      <excludeFolder url="file://$MODULE_DIR$/../../../../../modules/blog-query/target" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="rapids.blog-query.main" />
+    <orderEntry type="module" module-name="rapids.blog-query.test" production-on-test="" />
+  </component>
+</module>

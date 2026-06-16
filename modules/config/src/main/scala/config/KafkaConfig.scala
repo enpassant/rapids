@@ -1,15 +1,18 @@
 package config
 
-import com.mongodb.casbah.Imports._
+import org.mongodb.scala._
 import com.typesafe.config.ConfigFactory
 
 object OauthConfig {
   def get = {
     val config = ConfigFactory.load("oauth")
-    OauthConfig(
+    val oauthConfig = OauthConfig(
       config.getString("clientId"),
       config.getString("clientSecret"),
-      config.getString("redirectUri"))
+      config.getString("redirectUri")
+    )
+    println(oauthConfig)
+    oauthConfig
   }
 }
 
@@ -20,7 +23,7 @@ case class OauthConfig(
 
 trait MongoClientConfig {
   def mongoDbUri: String
-  val mongoClient = MongoClient(MongoClientURI(mongoDbUri))
+  val mongoClient = MongoClient(mongoDbUri)
 }
 
 case class KafkaConfig(server: String)

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id="root:main [file:///home/feca/projects/rapids/]" external.linked.project.path="$MODULE_DIR$/../../.." external.root.project.path="$MODULE_DIR$/../../.." external.system.id="SBT" external.system.module.type="sbtSourceSet" type="JAVA_MODULE" version="4">
+  <component name="DisplayModuleName">
+    <option name="name" value="rapids.main" />
+  </component>
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_21">
+    <output url="file://$MODULE_DIR$/../../../target/scala-2.13/classes" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../src/main">
+      <sourceFolder url="file://$MODULE_DIR$/../../../src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../src/main/scala" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../src/scalafix" />
+    <content url="file://$MODULE_DIR$/../../../target/scala-2.13/resource_managed/main" />
+    <content url="file://$MODULE_DIR$/../../../target/scala-2.13/resource_managed/scalafix" />
+    <content url="file://$MODULE_DIR$/../../../target/scala-2.13/src_managed/main" />
+    <content url="file://$MODULE_DIR$/../../../target/scala-2.13/src_managed/scalafix" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="sbt: scala-sdk-2.13.16" level="project" />
+    <orderEntry type="module" module-name="rapids.common.main" />
+    <orderEntry type="module" module-name="rapids.config.main" />
+    <orderEntry type="module" module-name="rapids.web-common.main" />
+    <orderEntry type="module" module-name="rapids.blog-command.main" />
+    <orderEntry type="module" module-name="rapids.web.main" />
+    <orderEntry type="module" module-name="rapids.discussion-command.main" />
+    <orderEntry type="module" module-name="rapids.blog-query-builder.main" />
+    <orderEntry type="module" module-name="rapids.discussion-query-builder.main" />
+    <orderEntry type="module" module-name="rapids.blog-query.main" />
+    <orderEntry type="module" module-name="rapids.discussion-query.main" />
+    <orderEntry type="module" module-name="rapids.monitor.main" />
+    <orderEntry type="module" module-name="rapids.test-error.main" />
+    <orderEntry type="module-library">
+      <library name="sbt: unmanaged-sources-and-docs">
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.27.1/jline-3.27.1-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-transport-native-epoll/4.1.109.Final/netty-transport-native-epoll-4.1.109.Final-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/io/netty/incubator/netty-incubator-transport-native-io_uring/0.0.25.Final/netty-incubator-transport-native-io_uring-0.0.25.Final-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="sbt: org.scala-lang:scala-library:2.13.16:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.github.scopt:scopt_2.13:4.1.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang:scala-compiler:2.13.16:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.typesafe.akka:akka-actor_2.13:2.6.20:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.typesafe.akka:akka-persistence_2.13:2.6.20:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.typesafe.akka:akka-stream_2.13:2.6.20:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.typesafe.akka:akka-stream-kafka_2.13:2.1.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.typesafe.akka:akka-slf4j_2.13:2.6.20:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.typesafe.akka:akka-persistence-query_2.13:2.6.20:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.typesafe.akka:akka-http_2.13:10.2.10:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.json4s:json4s-jackson_2.13:3.6.12:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.json4s:json4s-ext_2.13:3.6.12:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.json4s:json4s-mongo_2.13:3.6.12:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.mongodb:mongodb-driver-core:4.11.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.mongodb:mongodb-driver-reactivestreams:4.11.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.mongodb:bson:4.11.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.mongodb.scala:mongo-scala-driver_2.13:4.11.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-all:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: ch.qos.logback:logback-classic:1.3.14:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.github.scullxbones:akka-persistence-mongo-rxmongo_2.13:3.0.8:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.github.enpassant:ickenham_2.13:1.5.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.github.enpassant:ickenham-json4s_2.13:1.5.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang:scala-reflect:2.13.16:jar" level="project" />
+    <orderEntry type="library" name="sbt: io.github.java-diff-utils:java-diff-utils:4.15:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.jline:jline:3.27.1:jdk8:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.typesafe:config:1.4.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-java8-compat_2.13:1.0.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.typesafe.akka:akka-protobuf-v3_2.13:2.6.20:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.reactivestreams:reactive-streams:1.0.4:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.typesafe:ssl-config-core_2.13:0.4.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.kafka:kafka-clients:2.7.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-collection-compat_2.13:2.4.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.slf4j:slf4j-api:2.0.7:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.typesafe.akka:akka-http-core_2.13:10.2.10:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.json4s:json4s-core_2.13:3.6.12:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.fasterxml.jackson.core:jackson-databind:2.9.10.8:jar" level="project" />
+    <orderEntry type="library" name="sbt: joda-time:joda-time:2.10.13:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.joda:joda-convert:2.2.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.mongodb:mongo-java-driver:3.8.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.mongodb:bson-record-codec:4.11.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: io.projectreactor:reactor-core:3.5.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.mongodb.scala:mongo-scala-bson_2.13:4.11.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-abbreviation:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-anchorlink:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-aside:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-autolink:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-definition:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-emoji:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-escaped-character:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-footnotes:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-gfm-tables:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-jekyll-front-matter:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-jekyll-tag:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-ins:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-xwiki-macros:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-spec-example:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-superscript:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-tables:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-toc:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-typographic:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-wikilink:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-ext-yaml-front-matter:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-formatter:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-html-parser:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-jira-converter:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-pdf-converter:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-profile-pegdown:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-util:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-youtrack-converter:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: ch.qos.logback:logback-core:1.3.14:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.github.scullxbones:akka-persistence-mongo-common_2.13:3.0.8:jar" level="project" />
+    <orderEntry type="library" name="sbt: nl.grons:metrics4-akka_a25_2.13:4.1.19:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.reactivemongo:reactivemongo_2.13:1.0.10:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.reactivemongo:reactivemongo-akkastream_2.13:1.0.10:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-parser-combinators_2.13:1.1.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.github.luben:zstd-jni:1.5.0-5:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.lz4:lz4-java:1.7.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.xerial.snappy:snappy-java:1.1.8.4:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.typesafe.akka:akka-parsing_2.13:10.2.10:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.json4s:json4s-ast_2.13:3.6.12:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.json4s:json4s-scalap_2.13:3.6.12:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.thoughtworks.paranamer:paranamer:2.8:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.fasterxml.jackson.core:jackson-annotations:2.9.10:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.fasterxml.jackson.core:jackson-core:2.9.10:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.nibor.autolink:autolink:0.6.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.vladsch.flexmark:flexmark-test-util:0.19.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.jsoup:jsoup:1.10.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.openhtmltopdf:openhtmltopdf-core:0.0.1-RC9:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.openhtmltopdf:openhtmltopdf-pdfbox:0.0.1-RC9:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.openhtmltopdf:openhtmltopdf-rtl-support:0.0.1-RC9:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.openhtmltopdf:openhtmltopdf-jsoup-dom-converter:0.0.1-RC9:jar" level="project" />
+    <orderEntry type="library" name="sbt: nl.grons:metrics4-scala_2.13:4.1.19:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.reactivemongo:reactivemongo-core_2.13:1.0.10:jar" level="project" />
+    <orderEntry type="library" name="sbt: dnsjava:dnsjava:3.4.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: commons-codec:commons-codec:1.15:jar" level="project" />
+    <orderEntry type="library" name="sbt: junit:junit:4.12:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.pdfbox:pdfbox:2.0.4:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.ibm.icu:icu4j:58.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: io.dropwizard.metrics:metrics-core:4.1.19:jar" level="project" />
+    <orderEntry type="library" name="sbt: io.dropwizard.metrics:metrics-healthchecks:4.1.19:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.reactivemongo:reactivemongo-bson-api_2.13:1.0.10:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.reactivemongo:reactivemongo-shaded:1.0.10:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.hamcrest:hamcrest-core:1.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.apache.pdfbox:fontbox:2.0.4:jar" level="project" />
+    <orderEntry type="library" name="sbt: commons-logging:commons-logging:1.2:jar" level="project" />
+  </component>
+</module>

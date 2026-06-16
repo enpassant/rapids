@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: io.netty:netty-tcnative-classes:2.0.65.Final:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="io.netty" artifactId="netty-tcnative-classes" version="2.0.65.Final" baseVersion="2.0.65.Final" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-tcnative-classes/2.0.65.Final/netty-tcnative-classes-2.0.65.Final.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-tcnative-classes/2.0.65.Final/netty-tcnative-classes-2.0.65.Final-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

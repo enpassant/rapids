@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: com.github.spotbugs:spotbugs-annotations:4.8.5:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="com.github.spotbugs" artifactId="spotbugs-annotations" version="4.8.5" baseVersion="4.8.5" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/com/github/spotbugs/spotbugs-annotations/4.8.5/spotbugs-annotations-4.8.5.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/com/github/spotbugs/spotbugs-annotations/4.8.5/spotbugs-annotations-4.8.5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

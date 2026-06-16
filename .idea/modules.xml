@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/rapids.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/rapids.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/blog-command/rapids.blog-command.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/blog-command/rapids.blog-command.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/blog-command/rapids.blog-command.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/blog-command/rapids.blog-command.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/blog-command/rapids.blog-command.test.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/blog-command/rapids.blog-command.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/blog-query/rapids.blog-query.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/blog-query/rapids.blog-query.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/blog-query-builder/rapids.blog-query-builder.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/blog-query-builder/rapids.blog-query-builder.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/blog-query-builder/rapids.blog-query-builder.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/blog-query-builder/rapids.blog-query-builder.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/blog-query-builder/rapids.blog-query-builder.test.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/blog-query-builder/rapids.blog-query-builder.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/blog-query/rapids.blog-query.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/blog-query/rapids.blog-query.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/blog-query/rapids.blog-query.test.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/blog-query/rapids.blog-query.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/common/rapids.common.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/common/rapids.common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/common/rapids.common.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/common/rapids.common.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/common/rapids.common.test.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/common/rapids.common.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/config/rapids.config.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/config/rapids.config.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/config/rapids.config.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/config/rapids.config.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/config/rapids.config.test.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/config/rapids.config.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/discussion-command/rapids.discussion-command.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/discussion-command/rapids.discussion-command.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/discussion-command/rapids.discussion-command.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/discussion-command/rapids.discussion-command.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/discussion-command/rapids.discussion-command.test.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/discussion-command/rapids.discussion-command.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/discussion-query/rapids.discussion-query.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/discussion-query/rapids.discussion-query.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/discussion-query-builder/rapids.discussion-query-builder.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/discussion-query-builder/rapids.discussion-query-builder.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/discussion-query-builder/rapids.discussion-query-builder.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/discussion-query-builder/rapids.discussion-query-builder.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/discussion-query-builder/rapids.discussion-query-builder.test.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/discussion-query-builder/rapids.discussion-query-builder.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/discussion-query/rapids.discussion-query.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/discussion-query/rapids.discussion-query.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/discussion-query/rapids.discussion-query.test.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/discussion-query/rapids.discussion-query.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/rapids.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/rapids.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/monitor/rapids.monitor.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/monitor/rapids.monitor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/monitor/rapids.monitor.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/monitor/rapids.monitor.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/monitor/rapids.monitor.test.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/monitor/rapids.monitor.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/rapids.rapids-build.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/rapids.rapids-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/rapids.test.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/rapids.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/test-error/rapids.test-error.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/test-error/rapids.test-error.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/test-error/rapids.test-error.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/test-error/rapids.test-error.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/test-error/rapids.test-error.test.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/test-error/rapids.test-error.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/web/rapids.web.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/web/rapids.web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/web-common/rapids.web-common.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/web-common/rapids.web-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/web-common/rapids.web-common.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/web-common/rapids.web-common.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/web-common/rapids.web-common.test.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/web-common/rapids.web-common.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/web/rapids.web.main.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/web/rapids.web.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/rapids/modules/web/rapids.web.test.iml" filepath="$PROJECT_DIR$/.idea/modules/rapids/modules/web/rapids.web.test.iml" />
+    </modules>
+  </component>
+</project>

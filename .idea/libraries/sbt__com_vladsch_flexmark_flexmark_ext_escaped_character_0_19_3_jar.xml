@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: com.vladsch.flexmark:flexmark-ext-escaped-character:0.19.3:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="com.vladsch.flexmark" artifactId="flexmark-ext-escaped-character" version="0.19.3" baseVersion="0.19.3" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-escaped-character/0.19.3/flexmark-ext-escaped-character-0.19.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/com/vladsch/flexmark/flexmark-ext-escaped-character/0.19.3/flexmark-ext-escaped-character-0.19.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

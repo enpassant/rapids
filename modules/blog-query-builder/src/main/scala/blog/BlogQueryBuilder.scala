@@ -6,7 +6,7 @@ import config._
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
-import com.mongodb.casbah.Imports._
+import org.mongodb.scala._
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.options.MutableDataSet;

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: com.eatthepath:fast-uuid:0.2.0:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="com.eatthepath" artifactId="fast-uuid" version="0.2.0" baseVersion="0.2.0" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/com/eatthepath/fast-uuid/0.2.0/fast-uuid-0.2.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/com/eatthepath/fast-uuid/0.2.0/fast-uuid-0.2.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

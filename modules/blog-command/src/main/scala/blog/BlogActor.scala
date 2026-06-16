@@ -4,8 +4,6 @@ import common._
 
 import akka.actor._
 import akka.persistence._
-import com.mongodb.casbah.commons.Imports._
-import scala.concurrent.duration._
 
 object BlogActor {
   def props(id: String) = Props(new BlogActor(id))

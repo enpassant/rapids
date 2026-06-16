@@ -4,7 +4,7 @@ import common._
 import blog._
 import config._
 
-import com.mongodb.casbah.Imports._
+import org.mongodb.scala._
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout

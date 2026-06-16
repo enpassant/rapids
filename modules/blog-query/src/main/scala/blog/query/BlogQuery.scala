@@ -11,7 +11,11 @@ import akka.http.scaladsl.server.Directives._
 import akka.stream._
 import com.github.enpassant.ickenham._
 import com.github.enpassant.ickenham.adapter.Json4sAdapter
-import com.mongodb.casbah.Imports._
+import org.mongodb.scala._
+import org.mongodb.scala.model.Filters._
+import org.mongodb.scala.model.Projections._
+import scala.concurrent.Await
+import scala.concurrent.duration._
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
@@ -26,7 +30,8 @@ object BlogQuery extends App with BaseFormats with Microservice {
   {
     implicit val executionContext = system.dispatcher
 
-    val collBlog = config.mongoClient.getDB("blog")("blog")
+    val collBlog = config.mongoClient.getDatabase("blog")
+      .getCollection("blog")
     val title = config.title
 
     val ickenham = new Ickenham(new Json4sAdapter)
@@ -45,11 +50,12 @@ object BlogQuery extends App with BaseFormats with Microservice {
       pathPrefix("blog") {
         pathEnd {
           completePage(blogs, "blogs") {
-            val blogs = collBlog.find(
-              MongoDBObject(),
-              MongoDBObject("content" -> 0)
-            )
-              .map(o => serialize(o)).toList
+            val blogs = Await.result(
+              collBlog.find()
+                .projection(exclude("content"))
+                .toFuture(),
+              10.seconds
+            ).map(o => serialize(o)).toList
             Some(JObject(JField("blogs", blogs), JField("title", title)))
           }
         } ~
@@ -61,14 +67,24 @@ object BlogQuery extends App with BaseFormats with Microservice {
         pathPrefix(Segment) { id =>
           pathEnd {
             completePage(blog, "blog") {
-              collBlog.findOne(MongoDBObject("_id" -> id))
-                .map(o => serialize(o))
+              Await.result(
+                collBlog.find(equal("_id", id)).first().toFuture(),
+                10.seconds
+              ) match {
+                case null => None
+                case o => Some(serialize(o))
+              }
             }
           } ~
           path("edit") {
             completePage(blogEdit, "blog-edit") {
-              collBlog.findOne(MongoDBObject("_id" -> id))
-                .map(o => serialize(o))
+              Await.result(
+                collBlog.find(equal("_id", id)).first().toFuture(),
+                10.seconds
+              ) match {
+                case null => None
+                case o => Some(serialize(o))
+              }
             }
           }
         }

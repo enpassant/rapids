@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: org.simpleflatmapper:lightning-csv:8.2.3:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="org.simpleflatmapper" artifactId="lightning-csv" version="8.2.3" baseVersion="8.2.3" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/simpleflatmapper/lightning-csv/8.2.3/lightning-csv-8.2.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/simpleflatmapper/lightning-csv/8.2.3/lightning-csv-8.2.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: org.scala-lang.modules:scala-parser-combinators_2.13:1.1.2:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="org.scala-lang.modules" artifactId="scala-parser-combinators_2.13" version="1.1.2" baseVersion="1.1.2" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-parser-combinators_2.13/1.1.2/scala-parser-combinators_2.13-1.1.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/modules/scala-parser-combinators_2.13/1.1.2/scala-parser-combinators_2.13-1.1.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

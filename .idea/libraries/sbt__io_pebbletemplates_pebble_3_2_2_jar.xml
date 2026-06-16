@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: io.pebbletemplates:pebble:3.2.2:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="io.pebbletemplates" artifactId="pebble" version="3.2.2" baseVersion="3.2.2" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/io/pebbletemplates/pebble/3.2.2/pebble-3.2.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/io/pebbletemplates/pebble/3.2.2/pebble-3.2.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

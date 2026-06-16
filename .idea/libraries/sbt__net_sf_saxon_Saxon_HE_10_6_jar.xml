@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: net.sf.saxon:Saxon-HE:10.6:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="net.sf.saxon" artifactId="Saxon-HE" version="10.6" baseVersion="10.6" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/net/sf/saxon/Saxon-HE/10.6/Saxon-HE-10.6.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/net/sf/saxon/Saxon-HE/10.6/Saxon-HE-10.6-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

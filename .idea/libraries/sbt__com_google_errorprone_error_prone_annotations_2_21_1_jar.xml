@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: com.google.errorprone:error_prone_annotations:2.21.1:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="com.google.errorprone" artifactId="error_prone_annotations" version="2.21.1" baseVersion="2.21.1" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/errorprone/error_prone_annotations/2.21.1/error_prone_annotations-2.21.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/com/google/errorprone/error_prone_annotations/2.21.1/error_prone_annotations-2.21.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

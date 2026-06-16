@@ -14,7 +14,7 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directive1
 import akka.stream._
 import java.util.Base64
-import com.mongodb.casbah.Imports._
+import org.mongodb.scala._
 import org.json4s._
 import org.json4s.jackson.JsonMethods.{parse => jparse}
 import org.json4s.JsonAST._

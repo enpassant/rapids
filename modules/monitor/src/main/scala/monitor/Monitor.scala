@@ -12,7 +12,7 @@ import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.Directives._
 import akka.stream._
 import akka.stream.scaladsl._
-import com.mongodb.casbah.Imports._
+import org.mongodb.scala._
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.json4s._
 import org.json4s.mongo.JObjectParser._

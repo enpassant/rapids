@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: org.reactivestreams:reactive-streams:1.0.4:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="org.reactivestreams" artifactId="reactive-streams" version="1.0.4" baseVersion="1.0.4" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/reactivestreams/reactive-streams/1.0.4/reactive-streams-1.0.4-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

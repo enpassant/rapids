@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: com.openhtmltopdf:openhtmltopdf-jsoup-dom-converter:0.0.1-RC9:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="com.openhtmltopdf" artifactId="openhtmltopdf-jsoup-dom-converter" version="0.0.1-RC9" baseVersion="0.0.1-RC9" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/com/openhtmltopdf/openhtmltopdf-jsoup-dom-converter/0.0.1-RC9/openhtmltopdf-jsoup-dom-converter-0.0.1-RC9.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/com/openhtmltopdf/openhtmltopdf-jsoup-dom-converter/0.0.1-RC9/openhtmltopdf-jsoup-dom-converter-0.0.1-RC9-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

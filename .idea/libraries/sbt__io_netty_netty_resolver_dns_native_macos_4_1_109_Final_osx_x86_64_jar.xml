@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="sbt: io.netty:netty-resolver-dns-native-macos:4.1.109.Final:osx-x86_64:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="io.netty" artifactId="netty-resolver-dns-native-macos" version="4.1.109.Final" baseVersion="4.1.109.Final" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-resolver-dns-native-macos/4.1.109.Final/netty-resolver-dns-native-macos-4.1.109.Final-osx-x86_64.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

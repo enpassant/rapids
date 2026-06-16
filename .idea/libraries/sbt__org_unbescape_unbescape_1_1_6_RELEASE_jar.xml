@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: org.unbescape:unbescape:1.1.6.RELEASE:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="org.unbescape" artifactId="unbescape" version="1.1.6.RELEASE" baseVersion="1.1.6.RELEASE" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/unbescape/unbescape/1.1.6.RELEASE/unbescape-1.1.6.RELEASE.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/unbescape/unbescape/1.1.6.RELEASE/unbescape-1.1.6.RELEASE-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

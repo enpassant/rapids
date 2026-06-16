@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: com.typesafe.akka:akka-http-core_2.13:10.2.10:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="com.typesafe.akka" artifactId="akka-http-core_2.13" version="10.2.10" baseVersion="10.2.10" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/akka/akka-http-core_2.13/10.2.10/akka-http-core_2.13-10.2.10.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/com/typesafe/akka/akka-http-core_2.13/10.2.10/akka-http-core_2.13-10.2.10-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

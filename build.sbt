@@ -6,7 +6,7 @@ enablePlugins(JavaAppPackaging)
 
 enablePlugins(DockerPlugin)
 
-dockerBaseImage := "frolvlad/alpine-oraclejdk8"
+dockerBaseImage := "docker.io/library/eclipse-temurin:21-jre"
 
 dockerCommands := dockerCommands.value.flatMap{
  case cmd@Cmd("FROM",_) => List(cmd, Cmd("RUN", "apk update && apk add bash"))
@@ -17,10 +17,8 @@ dockerRepository := Some("enpassant")
 
 dockerExposedPorts := Seq(8080)
 
-ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
-
 libraryDependencies ++= Seq(
-  "com.github.scopt"       %% "scopt"                 % "3.3.0",
+  "com.github.scopt"       %% "scopt"                 % "4.1.0",
   "org.scala-lang"          % "scala-compiler"        % scalaVersion.value
 )
 
@@ -70,10 +68,14 @@ lazy val testError = (project in file("modules/test-error"))
 
 lazy val root = (project in file("."))
   .enablePlugins(GatlingPlugin)
-  .settings(libraryDependencies ++= Seq(
-    "io.gatling.highcharts" % "gatling-charts-highcharts" % "2.2.1" % "it",
-    "io.gatling"            % "gatling-test-framework"    % "2.2.1" % "it"
-  ))
+  .configs(IntegrationTest) 
+  .settings(
+    inConfig(Gatling)(Defaults.itSettings),
+    libraryDependencies ++= Seq(
+      "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.11.3" % "it",
+      "io.gatling"            % "gatling-test-framework"    % "3.11.3" % "it"
+    )
+  )
   .aggregate(
     common,
     webCommon,
@@ -104,5 +106,5 @@ lazy val root = (project in file("."))
 
 libraryDependencies ++= Common.commonDependencies
 
-javaOptions in GatlingIt := overrideDefaultJavaOptions("-Xms1024m", "-Xmx2048m")
+GatlingIt / javaOptions := overrideDefaultJavaOptions("-Xms1024m", "-Xmx2048m")
 

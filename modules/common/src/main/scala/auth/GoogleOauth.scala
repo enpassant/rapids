@@ -140,7 +140,7 @@ object GoogleOauth {
             uri = "https://www.googleapis.com/oauth2/v4/token",
             entity = HttpEntity(
               MediaTypes.`application/x-www-form-urlencoded`
-                .toContentType(HttpCharsets.`UTF-8`),
+                .toContentType,
               "grant_type=authorization_code" +
               "&code=" + code +
               "&client_id=" + config.clientId +

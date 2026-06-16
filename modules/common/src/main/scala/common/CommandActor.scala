@@ -2,7 +2,7 @@ package common
 
 import akka.actor._
 import akka.persistence._
-import com.mongodb.casbah.commons.Imports._
+import org.mongodb.scala._
 import scala.concurrent.duration._
 
 abstract class CommandActor extends Actor with PersistentActor {

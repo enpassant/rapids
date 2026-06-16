@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: dnsjava:dnsjava:3.4.3:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="dnsjava" artifactId="dnsjava" version="3.4.3" baseVersion="3.4.3" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/dnsjava/dnsjava/3.4.3/dnsjava-3.4.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/dnsjava/dnsjava/3.4.3/dnsjava-3.4.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -2,43 +2,62 @@ package blog
 
 import config._
 
-import com.mongodb.casbah.Imports._
+import org.mongodb.scala._
+import org.mongodb.scala.bson.collection.immutable.Document
+import org.mongodb.scala.bson.BsonArray
+import org.mongodb.scala.model.Filters._
+import org.mongodb.scala.model.Updates._
+import scala.concurrent.Await
+import scala.concurrent.duration._
 
 class BlogStoreDB(config: BlogQueryBuilderConfig) extends BlogStore {
-  val collection = config.mongoClient.getDB("blog")("blog")
+  val collection = config.mongoClient.getDatabase("blog")
+    .getCollection("blog")
 
   def insert(blogCreated: BlogCreated, htmlContent: String): Unit = {
-    collection.insert(MongoDBObject(
+    val doc = Document(
       "_id" -> blogCreated.id,
       "userId" -> blogCreated.userId,
       "userName" -> blogCreated.userName,
       "title" -> blogCreated.title,
       "content" -> blogCreated.content,
       "htmlContent" -> htmlContent,
-      "discussions" -> Seq()))
+      "discussions" -> BsonArray()
+    )
+    Await.result(collection.insertOne(doc).toFuture(), 10.seconds)
   }
 
   def existsBlog(id: String) = {
-    collection.findOne(MongoDBObject("_id" -> id)).isDefined
+    Await.result(collection.find(equal("_id", id)).first().toFuture(), 10.seconds) != null
   }
 
   def update(blogModified: BlogModified, htmlContent: String): Unit = {
-    collection.update(
-      MongoDBObject("_id" -> blogModified.id),
-      MongoDBObject("$set" -> MongoDBObject(
-        "title" -> blogModified.title,
-        "content" -> blogModified.content,
-        "htmlContent" -> htmlContent)))
+    Await.result(
+      collection.updateOne(
+        equal("_id", blogModified.id),
+        combine(
+          set("title", blogModified.title),
+          set("content", blogModified.content),
+          set("htmlContent", htmlContent)
+        )
+      ).toFuture(),
+      10.seconds
+    )
   }
 
   def addDiscussion(discussionStarted: DiscussionStarted): Unit = {
-    collection.update(
-      MongoDBObject("_id" -> discussionStarted.blogId),
-      $push("discussions" ->
-        MongoDBObject(
-          "id" -> discussionStarted.id,
-          "userId" -> discussionStarted.userId,
-          "userName" -> discussionStarted.userName,
-          "title" -> discussionStarted.title)))
+    val doc = Document(
+      "id" -> discussionStarted.id,
+      "userId" -> discussionStarted.userId,
+      "userName" -> discussionStarted.userName,
+      "title" -> discussionStarted.title
+    )
+    Await.result(
+      collection.updateOne(
+        equal("_id", discussionStarted.blogId),
+        push("discussions", doc)
+      ).toFuture(),
+      10.seconds
+    )
   }
 }

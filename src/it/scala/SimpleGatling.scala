@@ -22,7 +22,7 @@ class SimpleGatling extends Simulation {
     .exec(Command.replyComment("simple", "r2", "r4"))
 
   val httpConf = http
-    .baseURL("http://localhost:8080")
+    .baseUrl("http://localhost:8080")
     .acceptHeader("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
     .doNotTrackHeader("1")
     .acceptLanguageHeader("en-US,en;q=0.5")

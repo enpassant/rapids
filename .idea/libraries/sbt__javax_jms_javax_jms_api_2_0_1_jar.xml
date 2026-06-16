@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: javax.jms:javax.jms-api:2.0.1:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="javax.jms" artifactId="javax.jms-api" version="2.0.1" baseVersion="2.0.1" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/javax/jms/javax.jms-api/2.0.1/javax.jms-api-2.0.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/javax/jms/javax.jms-api/2.0.1/javax.jms-api-2.0.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
