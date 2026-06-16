@@ -1,9 +1,9 @@
 package common
 
-import akka.Done
-import akka.actor._
-import akka.stream.KillSwitch
-import akka.stream.scaladsl._
+import org.apache.pekko.Done
+import org.apache.pekko.actor._
+import org.apache.pekko.stream.KillSwitch
+import org.apache.pekko.stream.scaladsl._
 import scala.concurrent.Future
 
 trait MQProtocol {

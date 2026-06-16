@@ -5,9 +5,9 @@ import blog._
 import config._
 
 import org.mongodb.scala._
-import akka.actor._
-import akka.pattern.ask
-import akka.util.Timeout
+import org.apache.pekko.actor._
+import org.apache.pekko.pattern.ask
+import org.apache.pekko.util.Timeout
 import org.apache.kafka.clients.producer.ProducerRecord
 import scala.concurrent.Future
 import scala.concurrent.duration._

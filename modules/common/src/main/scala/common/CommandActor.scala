@@ -1,7 +1,7 @@
 package common
 
-import akka.actor._
-import akka.persistence._
+import org.apache.pekko.actor._
+import org.apache.pekko.persistence._
 import org.mongodb.scala._
 import scala.concurrent.duration._
 

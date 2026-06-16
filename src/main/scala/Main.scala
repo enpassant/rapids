@@ -4,10 +4,10 @@ import blog._
 import config._
 import discussion._
 
-import akka.actor._
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.server.Directives._
-import akka.stream._
+import org.apache.pekko.actor._
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.server.Directives._
+import org.apache.pekko.stream._
 import scala.util.{Failure, Success}
 
 object Main extends App {

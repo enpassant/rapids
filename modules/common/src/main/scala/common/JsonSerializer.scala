@@ -1,6 +1,6 @@
 package common
 
-import akka.serialization._
+import org.apache.pekko.serialization._
 import org.json4s.jackson.Serialization.{ read, write }
 import org.json4s.{ DefaultFormats, Formats, jackson, Serialization }
 

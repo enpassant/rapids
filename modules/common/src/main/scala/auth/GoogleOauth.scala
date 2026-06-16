@@ -9,22 +9,22 @@ import java.security.MessageDigest
 import java.util.Base64
 import java.security._
 import java.security.spec.RSAPublicKeySpec
-import akka.actor._
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers._
-import akka.http.scaladsl.model.headers.LinkParams._
-import akka.http.scaladsl.model.ws.{UpgradeToWebSocket, TextMessage}
-import akka.http.scaladsl.server._
-import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.stream._
+import org.apache.pekko.actor._
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.model.headers._
+import org.apache.pekko.http.scaladsl.model.headers.LinkParams._
+import org.apache.pekko.http.scaladsl.model.ws.{UpgradeToWebSocket, TextMessage}
+import org.apache.pekko.http.scaladsl.server._
+import org.apache.pekko.http.scaladsl.server.Directives._
+import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshal
+import org.apache.pekko.stream._
 import org.json4s._
 import org.json4s.jackson.JsonMethods.{parse => jparse}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Try, Success, Failure}
-import akka.util.ByteString
+import org.apache.pekko.util.ByteString
 import org.json4s.jackson.JsonMethods._
 
 case class GoogleResponse(

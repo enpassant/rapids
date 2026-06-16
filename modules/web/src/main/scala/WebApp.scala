@@ -3,19 +3,19 @@ import blog.BlogSerializer
 import common.web.Directives._
 import config.{OauthConfig, ProductionKafkaConfig}
 
-import akka.actor._
-import akka.kafka._
-import akka.kafka.ConsumerMessage._
-import akka.kafka.scaladsl._
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers._
-import akka.http.scaladsl.model.headers.LinkParams._
-import akka.http.scaladsl.model.ws.{UpgradeToWebSocket, TextMessage}
-import akka.http.scaladsl.server._
-import akka.http.scaladsl.server.Directives._
-import akka.stream._
-import akka.stream.scaladsl._
+import org.apache.pekko.actor._
+import org.apache.pekko.kafka._
+import org.apache.pekko.kafka.ConsumerMessage._
+import org.apache.pekko.kafka.scaladsl._
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.model.headers._
+import org.apache.pekko.http.scaladsl.model.headers.LinkParams._
+import org.apache.pekko.http.scaladsl.model.ws.{UpgradeToWebSocket, TextMessage}
+import org.apache.pekko.http.scaladsl.server._
+import org.apache.pekko.http.scaladsl.server.Directives._
+import org.apache.pekko.stream._
+import org.apache.pekko.stream.scaladsl._
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.json4s._
 import org.json4s.jackson.JsonMethods._

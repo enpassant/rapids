@@ -4,14 +4,14 @@ import common._
 import common.web.Directives._
 import config.ProductionKafkaConfig
 
-import akka.actor._
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.ws.{UpgradeToWebSocket, TextMessage}
-import akka.http.scaladsl.server._
-import akka.http.scaladsl.server.Directives._
-import akka.stream._
-import akka.stream.scaladsl._
+import org.apache.pekko.actor._
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.model.ws.{UpgradeToWebSocket, TextMessage}
+import org.apache.pekko.http.scaladsl.server._
+import org.apache.pekko.http.scaladsl.server.Directives._
+import org.apache.pekko.stream._
+import org.apache.pekko.stream.scaladsl._
 import org.mongodb.scala._
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.json4s._

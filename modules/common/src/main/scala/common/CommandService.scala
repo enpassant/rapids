@@ -1,9 +1,9 @@
 package common
 
-import akka.actor._
-import akka.persistence._
-import akka.stream._
-import akka.stream.scaladsl._
+import org.apache.pekko.actor._
+import org.apache.pekko.persistence._
+import org.apache.pekko.stream._
+import org.apache.pekko.stream.scaladsl._
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import scala.util.{Try, Success, Failure}

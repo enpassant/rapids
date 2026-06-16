@@ -1,10 +1,10 @@
 package common
 
-import akka.actor._
-import akka.pattern.ask
-import akka.stream._
-import akka.stream.scaladsl._
-import akka.util.Timeout
+import org.apache.pekko.actor._
+import org.apache.pekko.pattern.ask
+import org.apache.pekko.stream._
+import org.apache.pekko.stream.scaladsl._
+import org.apache.pekko.util.Timeout
 import scala.concurrent.duration._
 import scala.concurrent.Future
 

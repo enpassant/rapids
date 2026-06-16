@@ -1,11 +1,11 @@
 package common
 
-import akka.http.scaladsl.marshalling._
-import akka.http.scaladsl.unmarshalling._
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.marshalling.{ Marshaller, ToEntityMarshaller }
-import akka.http.scaladsl.model.{ HttpCharsets, MediaTypes }
-import akka.http.scaladsl.unmarshalling.{ FromEntityUnmarshaller, Unmarshaller }
+import org.apache.pekko.http.scaladsl.marshalling._
+import org.apache.pekko.http.scaladsl.unmarshalling._
+import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.marshalling.{ Marshaller, ToEntityMarshaller }
+import org.apache.pekko.http.scaladsl.model.{ HttpCharsets, MediaTypes }
+import org.apache.pekko.http.scaladsl.unmarshalling.{ FromEntityUnmarshaller, Unmarshaller }
 import org.joda.time.DateTime
 import org.json4s._
 import org.json4s.JsonDSL._

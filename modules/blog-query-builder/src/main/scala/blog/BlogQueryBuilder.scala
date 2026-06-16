@@ -3,9 +3,9 @@ package blog
 import common._
 import config._
 
-import akka.actor._
-import akka.pattern.ask
-import akka.util.Timeout
+import org.apache.pekko.actor._
+import org.apache.pekko.pattern.ask
+import org.apache.pekko.util.Timeout
 import org.mongodb.scala._
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;

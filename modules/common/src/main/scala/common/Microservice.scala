@@ -1,6 +1,6 @@
 package common
 
-import akka.actor._
+import org.apache.pekko.actor._
 
 trait Microservice {
   def statActorAndProducer(mq: MQProtocol, name: String)

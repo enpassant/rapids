@@ -2,8 +2,8 @@ package blog
 
 import common._
 
-import akka.actor._
-import akka.persistence._
+import org.apache.pekko.actor._
+import org.apache.pekko.persistence._
 
 object BlogActor {
   def props(id: String) = Props(new BlogActor(id))

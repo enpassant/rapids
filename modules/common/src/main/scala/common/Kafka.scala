@@ -1,11 +1,11 @@
 package common
 
-import akka.actor._
-import akka.kafka._
-import akka.kafka.ConsumerMessage._
-import akka.kafka.scaladsl._
-import akka.stream._
-import akka.stream.scaladsl._
+import org.apache.pekko.actor._
+import org.apache.pekko.kafka._
+import org.apache.pekko.kafka.ConsumerMessage._
+import org.apache.pekko.kafka.scaladsl._
+import org.apache.pekko.stream._
+import org.apache.pekko.stream.scaladsl._
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization._
 import scala.concurrent.Future

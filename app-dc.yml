@@ -8,4 +8,4 @@ services:
       VIRTUAL_HOST_WEIGHT: 1
       SERVICE_PORTS: "8080"
       VIRTUAL_HOST: "*"
-      JAVA_OPTS: "-Dakka.contrib.persistence.mongodb.mongo.mongouri=mongodb://mongodb:27017/store"
+      JAVA_OPTS: "-Dpekko.contrib.persistence.mongodb.mongo.mongouri=mongodb://mongodb:27017/store"

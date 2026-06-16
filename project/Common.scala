@@ -4,7 +4,8 @@ import Keys._
 object Common {
   def appName = "rapids"
 
-  val akkaVersion = "2.6.20"
+  val pekkoVersion = "1.1.2"
+  val pekkoHttpVersion = "1.1.0"
   val json4sVersion = "3.6.12"
   val mongoDriverVersion = "4.11.1" 
 
@@ -24,7 +25,8 @@ object Common {
       "-target:jvm-1.8",
       "-encoding", "UTF-8"
     ),
-    resolvers += Resolver.sonatypeCentralSnapshots
+    resolvers += Resolver.sonatypeCentralSnapshots,
+    libraryDependencySchemes += "com.github.luben" % "zstd-jni" % "always"
   )
   // Settings for the app, i.e. the root project
   val appSettings = settings(appName)
@@ -40,14 +42,14 @@ object Common {
   )
 
   val commonDependencies = Seq(
-    "com.typesafe.akka"      %% "akka-actor"            % akkaVersion,
-    "com.typesafe.akka"      %% "akka-persistence"      % akkaVersion,
-    "com.typesafe.akka"      %% "akka-stream"           % akkaVersion,
-    "com.typesafe.akka"      %% "akka-stream-kafka"     % "2.1.1",
-    "com.typesafe.akka"      %% "akka-testkit"          % akkaVersion   % "test",
-    "com.typesafe.akka"      %% "akka-slf4j"            % akkaVersion,
-    "com.typesafe.akka"      %% "akka-persistence-query" % akkaVersion,
-    "com.typesafe.akka"      %% "akka-http"             % "10.2.10",
+    "org.apache.pekko"       %% "pekko-actor"            % pekkoVersion,
+    "org.apache.pekko"       %% "pekko-persistence"      % pekkoVersion,
+    "org.apache.pekko"       %% "pekko-stream"           % pekkoVersion,
+    "org.apache.pekko"       %% "pekko-connectors-kafka" % "1.1.0",
+    "org.apache.pekko"       %% "pekko-testkit"          % pekkoVersion   % "test",
+    "org.apache.pekko"       %% "pekko-slf4j"            % pekkoVersion,
+    "org.apache.pekko"       %% "pekko-persistence-query" % pekkoVersion,
+    "org.apache.pekko"       %% "pekko-http"             % pekkoHttpVersion,
     "org.json4s"             %% "json4s-jackson"        % json4sVersion,
     "org.json4s"             %% "json4s-ext"            % json4sVersion,
     "org.json4s"             %% "json4s-mongo"          % json4sVersion,

@@ -2,8 +2,8 @@ package blog
 
 import common._
 
-import akka.actor.{ ActorRef, ActorSystem }
-import akka.serialization._
+import org.apache.pekko.actor.{ ActorRef, ActorSystem }
+import org.apache.pekko.serialization._
 import com.typesafe.config.ConfigFactory
 import org.json4s.jackson.Serialization.{ read, writePretty }
 import org.json4s.{ DefaultFormats, Formats, jackson, Serialization }

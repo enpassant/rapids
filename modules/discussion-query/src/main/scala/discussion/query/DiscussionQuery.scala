@@ -4,11 +4,11 @@ import common._
 import common.web.Directives._
 import config._
 
-import akka.actor._
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.Directives._
-import akka.stream._
+import org.apache.pekko.actor._
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.server.Directives._
+import org.apache.pekko.stream._
 import com.github.enpassant.ickenham._
 import com.github.enpassant.ickenham.adapter.Json4sAdapter
 import org.mongodb.scala._

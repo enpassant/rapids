@@ -1,8 +1,8 @@
 package common
 
-import akka.actor._
-import akka.stream._
-import akka.stream.scaladsl._
+import org.apache.pekko.actor._
+import org.apache.pekko.stream._
+import org.apache.pekko.stream.scaladsl._
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.{Try, Success, Failure}

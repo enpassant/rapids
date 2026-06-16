@@ -2,10 +2,10 @@ package monitor
 
 import common._
 
-import akka.actor._
-import akka.http.scaladsl.model.ws.TextMessage
-import akka.stream._
-import akka.stream.scaladsl._
+import org.apache.pekko.actor._
+import org.apache.pekko.http.scaladsl.model.ws.TextMessage
+import org.apache.pekko.stream._
+import org.apache.pekko.stream.scaladsl._
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.{Try, Success, Failure}
