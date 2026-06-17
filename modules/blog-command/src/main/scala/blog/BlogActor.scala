@@ -10,7 +10,6 @@ object BlogActor {
 }
 
 class BlogActor(val id: String) extends CommandActor {
-  import BlogActor._
 
   override def persistenceId = s"blog-$id"
 
@@ -41,7 +40,7 @@ class BlogActor(val id: String) extends CommandActor {
         val event = BlogCreated(id, p.sub, p.name, title, content)
         persistAsync(event) {
           event =>
-            sender ! event
+            sender() ! event
             updateState(event)
         }
       }
@@ -51,18 +50,18 @@ class BlogActor(val id: String) extends CommandActor {
         val event = BlogModified(id, p.sub, p.name, title, content)
         persistAsync(event) {
           event =>
-            sender ! event
+            sender() ! event
             updateState(event)
         }
       }
     case event: DiscussionStarted =>
       persistAsync(event) {
         event =>
-          sender ! event
+          sender() ! event
           updateState(event)
       }
     case msg =>
-      sender ! WrongMessage(msg.toString)
+      sender() ! WrongMessage(msg.toString)
   }
 }
 

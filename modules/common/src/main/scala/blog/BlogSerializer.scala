@@ -1,14 +1,8 @@
 package blog
 
 import common._
-
-import org.apache.pekko.actor.{ ActorRef, ActorSystem }
-import org.apache.pekko.serialization._
 import com.typesafe.config.ConfigFactory
-import org.json4s.jackson.Serialization.{ read, writePretty }
-import org.json4s.{ DefaultFormats, Formats, jackson, Serialization }
-import org.json4s._
-import org.joda.time.DateTime
+import org.json4s.Formats
 import scala.collection.immutable.TreeMap
 
 sealed trait BlogMessage extends Serializable
@@ -119,7 +113,7 @@ case class Discussion(
 class BlogSerializer extends common.JsonSerializer {
   def identifier = 0xfecb
 
-  implicit val formats = CommonSerializer.getFormats(List(
+  implicit val formats: Formats = CommonSerializer.getFormats(List(
     classOf[LoggedIn],
     classOf[Blog],
     classOf[CreateBlog],
@@ -135,9 +129,9 @@ class BlogSerializer extends common.JsonSerializer {
     classOf[StartDiscussion]
   ))
 
-  val config = ConfigFactory.load()
+  val config: com.typesafe.config.Config = ConfigFactory.load()
 
-  val zippedSecureTrans = CommonSerializer.pipeTransformations(
+  val zippedSecureTrans: CommonSerializer.Transformation = CommonSerializer.pipeTransformations(
     CommonSerializer.ZipCompressor,
     new CommonSerializer.Cryptographer(
       config.getString("serializer.key"),

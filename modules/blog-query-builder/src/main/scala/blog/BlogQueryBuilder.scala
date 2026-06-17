@@ -2,18 +2,11 @@ package blog
 
 import common._
 import config._
-
 import org.apache.pekko.actor._
-import org.apache.pekko.pattern.ask
-import org.apache.pekko.util.Timeout
-import org.mongodb.scala._
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.options.MutableDataSet;
-import org.apache.kafka.clients.producer.ProducerRecord
 import scala.concurrent.Future
-import scala.concurrent.duration._
-import scala.util.{Failure, Success}
 import scala.util.{Try, Success, Failure}
 
 object BlogQueryBuilder extends App with Microservice {
@@ -30,7 +23,6 @@ object BlogQueryBuilder extends App with Microservice {
 
     val consumer = mq.createConsumer("blog-query", "blog-event") { msg =>
       Performance.statF(statActor) {
-        implicit val timeout = Timeout(1000.milliseconds)
         val jsonTry = Try(BlogSerializer.fromString(msg.value))
         val result = Future { jsonTry match {
           case Success(json) =>
@@ -70,8 +62,8 @@ object BlogQueryBuilder extends App with Microservice {
 
   val blogStore = new BlogStoreDB(ProductionBlogQueryBuilderConfig)
 
-  implicit val mq = new Kafka(ProductionKafkaConfig)
-  implicit val system = ActorSystem("DiscussionQueryBuilder")
+  implicit val mq: Kafka = new Kafka(ProductionKafkaConfig)
+  implicit val system: ActorSystem = ActorSystem("DiscussionQueryBuilder")
 
   start(blogStore)
 }

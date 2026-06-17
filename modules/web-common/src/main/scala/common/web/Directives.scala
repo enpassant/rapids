@@ -3,23 +3,17 @@ package common.web
 import common._
 
 import org.apache.pekko.actor._
-import org.apache.pekko.http.scaladsl.Http
 import org.apache.pekko.http.scaladsl.marshalling.ToResponseMarshallable
 import org.apache.pekko.http.scaladsl.model._
-import org.apache.pekko.http.scaladsl.model.headers.{Accept, HttpCookiePair}
+import org.apache.pekko.http.scaladsl.model.headers.Accept
 import org.apache.pekko.http.scaladsl.server.directives.Credentials
 import org.apache.pekko.http.scaladsl.server.{RequestContext, Route}
 import org.apache.pekko.http.scaladsl.server.Directives._
-import org.apache.pekko.http.scaladsl.server.Route
 import org.apache.pekko.http.scaladsl.server.Directive1
-import org.apache.pekko.stream._
 import java.util.Base64
-import org.mongodb.scala._
 import org.json4s._
 import org.json4s.jackson.JsonMethods.{parse => jparse}
 import org.json4s.JsonAST._
-import org.json4s.JsonDSL._
-import org.json4s.mongo.JObjectParser._
 
 object Directives extends BaseFormats {
   def completePage(render: JValue => String, template: String)

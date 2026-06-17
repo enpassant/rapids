@@ -5,18 +5,16 @@ import config.ProductionKafkaConfig
 
 import org.apache.pekko.actor._
 import org.apache.pekko.stream._
-import org.apache.pekko.stream.scaladsl._
 import scala.concurrent.Future
 
 object TestError extends App with BaseFormats with Microservice {
   def start(implicit
     mq: MQProtocol,
-    system: ActorSystem,
-    materializer: ActorMaterializer) =
+    system: ActorSystem) =
   {
     implicit val executionContext = system.dispatcher
 
-    val consumer = mq.createConsumer("testError", "error") {
+    val _ = mq.createConsumer("testError", "error") {
       case ConsumerData(key, value) =>
         println(s"$key error message: $value")
         Future { ConsumerData(key, value) }
@@ -26,12 +24,12 @@ object TestError extends App with BaseFormats with Microservice {
     }
   }
 
-  implicit val mq = new Kafka(ProductionKafkaConfig)
-  implicit val system = ActorSystem("Monitor")
-  implicit val materializer = ActorMaterializer()
+  implicit val mq: Kafka = new Kafka(ProductionKafkaConfig)
+  implicit val system: ActorSystem = ActorSystem("Monitor")
+  implicit val materializer: Materializer = Materializer(system)
   start
 
   scala.io.StdIn.readLine()
-  system.terminate
+  system.terminate()
 }
 

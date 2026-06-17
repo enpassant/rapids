@@ -13,11 +13,8 @@ import org.apache.pekko.actor._
 import org.apache.pekko.http.scaladsl.Http
 import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.model.headers._
-import org.apache.pekko.http.scaladsl.model.headers.LinkParams._
-import org.apache.pekko.http.scaladsl.model.ws.{UpgradeToWebSocket, TextMessage}
 import org.apache.pekko.http.scaladsl.server._
 import org.apache.pekko.http.scaladsl.server.Directives._
-import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshal
 import org.apache.pekko.stream._
 import org.json4s._
 import org.json4s.jackson.JsonMethods.{parse => jparse}
@@ -45,15 +42,15 @@ case class IdToken(
   email: String,
   email_verified: Boolean,
   at_hash: String,
-  nonce: String,
+  nonce: Option[String],
   iss: String,
   iat: Long,
   exp: Long,
   name: String,
-  picture: String,
-  given_name: String,
-  family_name: String,
-  locale: String
+  picture: Option[String],
+  given_name: Option[String],
+  family_name: Option[String],
+  locale: Option[String]
 )
 
 case class GoogleKeys(keys: List[GoogleKey])
@@ -74,6 +71,7 @@ object GoogleOauth {
 
   def extractIdToken(token: String, keys: GoogleKeys): Option[LoggedIn] = {
     val parts = token.split('.')
+    println(token)
     if (parts.length == 3) {
       implicit val formats = DefaultFormats
       val header = parts(0)
@@ -104,7 +102,7 @@ object GoogleOauth {
 
   def getGoogleKeys(
     implicit system: ActorSystem,
-    materializer: ActorMaterializer): Future[GoogleKeys] =
+    materializer: Materializer): Future[GoogleKeys] =
   {
     val responseFuture: Future[HttpResponse] =
       Http().singleRequest(
@@ -128,11 +126,10 @@ object GoogleOauth {
 
   def route(config: OauthConfig)(
     implicit system: ActorSystem,
-    materializer: ActorMaterializer
+    materializer: Materializer
   ): Route = get {
     implicit val formats = DefaultFormats
-    parameters('code, 'state) { (code, state) =>
-      val keys = getGoogleKeys
+    parameters(Symbol("code"), Symbol("state")) { (code, state) =>
       val responseFuture: Future[HttpResponse] =
         Http().singleRequest(
           HttpRequest(

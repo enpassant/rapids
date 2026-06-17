@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="sbt: org.jline:jline:3.29.0:jdk8:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="org.jline" artifactId="jline" version="3.29.0" baseVersion="3.29.0" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/jline/jline/3.29.0/jline-3.29.0-jdk8.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

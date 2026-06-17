@@ -7,7 +7,6 @@ import config.ProductionKafkaConfig
 import org.apache.pekko.actor._
 import org.apache.pekko.pattern.ask
 import org.apache.pekko.util.Timeout
-import org.apache.kafka.clients.producer.ProducerRecord
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
@@ -48,7 +47,7 @@ object DiscussionCommandApp extends App with Microservice {
         } recover {
           case e: Exception =>
             producer.offer(
-              ProducerData("error", "FATAL", WrongMessage(e + " " + e.toString)))
+              ProducerData("error", "FATAL", WrongMessage(e.toString + " " + e.toString)))
         }
       }
     }
@@ -58,8 +57,8 @@ object DiscussionCommandApp extends App with Microservice {
     }
   }
 
-  implicit val mq = new Kafka(ProductionKafkaConfig)
-  implicit val system = ActorSystem("DiscussionCommandApp")
+  implicit val mq: Kafka = new Kafka(ProductionKafkaConfig)
+  implicit val system: ActorSystem = ActorSystem("DiscussionCommandApp")
 
   start
 }

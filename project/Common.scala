@@ -4,17 +4,17 @@ import Keys._
 object Common {
   def appName = "rapids"
 
-  val pekkoVersion = "1.1.2"
-  val pekkoHttpVersion = "1.1.0"
+  val pekkoVersion = "1.5.0"
+  val pekkoHttpVersion = "1.3.0"
   val json4sVersion = "3.6.12"
-  val mongoDriverVersion = "4.11.1" 
+  val mongoDriverVersion = "5.6.5"
 
   // Common settings for every project
   def settings (theName: String) = Seq(
     name := theName,
     organization := "enpassant",
     version := "1.0-SNAPSHOT",
-    scalaVersion := "2.13.16",
+    scalaVersion := "2.13.18",
     scalacOptions ++= Seq(
       "-unchecked",
       "-feature",
@@ -56,10 +56,10 @@ object Common {
     "org.mongodb" % "mongodb-driver-core"          % mongoDriverVersion,
     "org.mongodb" % "mongodb-driver-reactivestreams" % mongoDriverVersion,
     "org.mongodb" % "bson"                         % mongoDriverVersion,
-    "org.mongodb.scala"      %% "mongo-scala-driver"    % "4.11.1",
+    "org.mongodb.scala"      %% "mongo-scala-driver"    % mongoDriverVersion,
     "com.vladsch.flexmark"    % "flexmark-all"          % "0.19.3",
     "ch.qos.logback" % "logback-classic" % "1.3.14",
-    "com.github.scullxbones" %% "akka-persistence-mongo-rxmongo" % "3.0.8" % "compile" 
+    "com.github.scullxbones" %% "pekko-persistence-mongodb" % "1.5.0"
   )
 }
 

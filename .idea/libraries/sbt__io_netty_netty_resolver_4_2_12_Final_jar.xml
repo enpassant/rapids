@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: io.netty:netty-resolver:4.2.12.Final:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="io.netty" artifactId="netty-resolver" version="4.2.12.Final" baseVersion="4.2.12.Final" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-resolver/4.2.12.Final/netty-resolver-4.2.12.Final.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/io/netty/netty-resolver/4.2.12.Final/netty-resolver-4.2.12.Final-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

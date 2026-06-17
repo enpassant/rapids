@@ -1,15 +1,10 @@
 package common
 
-import org.apache.pekko.http.scaladsl.marshalling._
-import org.apache.pekko.http.scaladsl.unmarshalling._
 import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.marshalling.{ Marshaller, ToEntityMarshaller }
 import org.apache.pekko.http.scaladsl.model.{ HttpCharsets, MediaTypes }
 import org.apache.pekko.http.scaladsl.unmarshalling.{ FromEntityUnmarshaller, Unmarshaller }
-import org.joda.time.DateTime
 import org.json4s._
-import org.json4s.JsonDSL._
-import org.json4s.mongo.JObjectParser._
 
 object BaseFormats extends BaseFormats {
 
@@ -26,14 +21,14 @@ trait Json
 trait BaseFormats {
   import BaseFormats._
 
-  implicit val serialization = jackson.Serialization
-  implicit val formats =
+  implicit val serialization: Serialization = jackson.Serialization
+  implicit val formats: Formats =
     DefaultFormats ++ org.json4s.ext.JodaTimeSerializers.all
 
-  implicit val SeqJsonMarshaller =
+  implicit val SeqJsonMarshaller: ToEntityMarshaller[JValue] =
     BaseFormats.marshaller[JValue](MediaTypes.`application/json`)
 
-  implicit val SeqJsonCollectionMarshaller =
+  implicit val SeqJsonCollectionMarshaller: ToEntityMarshaller[Seq[JValue]] =
     BaseFormats.marshaller[Seq[JValue]](MediaTypes.`application/json`)
 
   lazy val `text/html+xml` =

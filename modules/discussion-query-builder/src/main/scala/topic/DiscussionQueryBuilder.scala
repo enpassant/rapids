@@ -3,15 +3,8 @@ package discussion
 import common._
 import blog._
 import config._
-
-import org.mongodb.scala._
 import org.apache.pekko.actor._
-import org.apache.pekko.pattern.ask
-import org.apache.pekko.util.Timeout
-import org.apache.kafka.clients.producer.ProducerRecord
 import scala.concurrent.Future
-import scala.concurrent.duration._
-import scala.util.{Failure, Success}
 import scala.util.{Try, Success, Failure}
 
 object DiscussionQueryBuilder extends App with Microservice {
@@ -25,8 +18,6 @@ object DiscussionQueryBuilder extends App with Microservice {
     val consumer = mq.createConsumer("discussion-query", "discussion-event")
     { msg =>
       Performance.statF(statActor) {
-        implicit val timeout = Timeout(1000.milliseconds)
-        val key = msg.key
         val jsonTry = Try(BlogSerializer.fromString(msg.value))
         val result = Future { jsonTry match {
           case Success(json) =>
@@ -63,8 +54,8 @@ object DiscussionQueryBuilder extends App with Microservice {
   val discussionStore = new DiscussionStoreDB(
     ProductionDiscussionQueryBuilderConfig)
 
-  implicit val mq = new Kafka(ProductionKafkaConfig)
-  implicit val system = ActorSystem("DiscussionQueryBuilder")
+  implicit val mq: Kafka = new Kafka(ProductionKafkaConfig)
+  implicit val system: ActorSystem = ActorSystem("DiscussionQueryBuilder")
 
   start(discussionStore)
 }

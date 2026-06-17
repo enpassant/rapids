@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: io.github.java-diff-utils:java-diff-utils:4.16:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="io.github.java-diff-utils" artifactId="java-diff-utils" version="4.16" baseVersion="4.16" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.16/java-diff-utils-4.16.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.16/java-diff-utils-4.16-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

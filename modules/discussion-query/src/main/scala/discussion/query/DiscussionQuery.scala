@@ -3,21 +3,20 @@ package discussion.query
 import common._
 import common.web.Directives._
 import config._
-
 import org.apache.pekko.actor._
 import org.apache.pekko.http.scaladsl.Http
-import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.server.Directives._
 import org.apache.pekko.stream._
 import com.github.enpassant.ickenham._
 import com.github.enpassant.ickenham.adapter.Json4sAdapter
 import org.mongodb.scala._
 import org.mongodb.scala.model.Filters._
+
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import org.apache.kafka.clients.producer.ProducerRecord
 import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
+import org.json4s.jackson.JsonMethods
 import org.json4s.mongo.JObjectParser._
 
 object DiscussionQuery
@@ -27,10 +26,8 @@ object DiscussionQuery
     (implicit
       mq: MQProtocol,
       system: ActorSystem,
-      materializer: ActorMaterializer) =
+      materializer: Materializer) =
   {
-    implicit val executionContext = system.dispatcher
-
     val collDiscussion = config.mongoClient.getDatabase("blog")
       .getCollection("discussion")
 
@@ -72,7 +69,7 @@ object DiscussionQuery
                 10.seconds
               ) match {
                 case null => None
-                case o => Some(serialize(o))
+                case o => Some(JsonMethods.parse(o.toJson))
               }
             }
           }
@@ -82,11 +79,10 @@ object DiscussionQuery
     stat(statActorAndProducer(mq, "discussion-query")._1)(route)
   }
 
-  implicit val mq = new Kafka(ProductionKafkaConfig)
-  implicit val system = ActorSystem("DiscussionQuery")
-  implicit val materializer = ActorMaterializer()
+  implicit val mq: Kafka = new Kafka(ProductionKafkaConfig)
+  implicit val system: ActorSystem = ActorSystem("DiscussionQuery")
 
   val route = DiscussionQuery.start(ProductionDiscussionQueryConfig)
-  val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8083)
+  val bindingFuture = Http().newServerAt("0.0.0.0", 8083).bindFlow(route)
 }
 

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: nl.grons:metrics4-scala_2.13:4.3.7:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="nl.grons" artifactId="metrics4-scala_2.13" version="4.3.7" baseVersion="4.3.7" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/nl/grons/metrics4-scala_2.13/4.3.7/metrics4-scala_2.13-4.3.7.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/nl/grons/metrics4-scala_2.13/4.3.7/metrics4-scala_2.13-4.3.7-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

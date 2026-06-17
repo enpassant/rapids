@@ -129,7 +129,7 @@
 
                 var open = function() {
                     console.log("Connection is opened...");
-                    self.ws = new WebSocket("ws://" + location.hostname
+                    self.ws = new WebSocket("wss://" + location.hostname
                         + (location.port ? ':' + location.port : '')
                         + "/monitor/ws");
 

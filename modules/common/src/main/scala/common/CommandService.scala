@@ -1,11 +1,6 @@
 package common
 
 import org.apache.pekko.actor._
-import org.apache.pekko.persistence._
-import org.apache.pekko.stream._
-import org.apache.pekko.stream.scaladsl._
-import org.json4s._
-import org.json4s.jackson.JsonMethods._
 import scala.util.{Try, Success, Failure}
 
 import blog._
@@ -42,9 +37,9 @@ extends Actor with ActorLogging
             context become process(actors + (key -> actorRef))
             actorRef
           }
-          actor.tell(json, sender)
+          actor.tell(json, sender())
         case Failure(e) =>
-          sender ! WrongMessage(e + ": " + message.toString)
+          sender() ! WrongMessage(e.toString + ": " + message.toString)
       }
   }
 }

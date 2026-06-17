@@ -4,9 +4,6 @@ import common.web.Directives._
 import config.{OauthConfig, ProductionKafkaConfig}
 
 import org.apache.pekko.actor._
-import org.apache.pekko.kafka._
-import org.apache.pekko.kafka.ConsumerMessage._
-import org.apache.pekko.kafka.scaladsl._
 import org.apache.pekko.http.scaladsl.Http
 import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.model.headers._
@@ -16,7 +13,6 @@ import org.apache.pekko.http.scaladsl.server._
 import org.apache.pekko.http.scaladsl.server.Directives._
 import org.apache.pekko.stream._
 import org.apache.pekko.stream.scaladsl._
-import org.apache.kafka.clients.producer.ProducerRecord
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import scala.concurrent.Future
@@ -26,9 +22,9 @@ object WebApp extends App with Microservice {
   def start(oauthConfig: OauthConfig)
     (implicit mq: MQProtocol,
       system: ActorSystem,
-      materializer: ActorMaterializer) =
+      materializer: Materializer) =
   {
-    implicit val executionContext = system.dispatcher
+    implicit val executionContext: scala.concurrent.ExecutionContextExecutor = system.dispatcher
 
     val (statActor, producer) = statActorAndProducer(mq, "web-app")
 
@@ -44,23 +40,30 @@ object WebApp extends App with Microservice {
 
     var links = SortedSet.empty[FunctionLink]
 
-    val webAppConsumer = mq.createConsumer("webapp", "web-app") { msg =>
+    val _ = mq.createConsumer("webapp", "web-app") { msg =>
       val json = CommonSerializer.fromString(msg.value)
       json match {
         case link: FunctionLink =>
           println("New link has added: " + link)
-          links = links + link
+          links = links.union(Set(link))
         case _ =>
       }
       Future { true }
     }
 
+//    def getLink() = {
+//      Link(
+//        links.toList map { functionLink =>
+//          LinkValue(Uri(functionLink.url), title(functionLink.title))
+//        }
+//      )
+//    }
     def getLink() = {
-      Link(
-        links.toList map { functionLink =>
-          LinkValue(Uri(functionLink.url), title(functionLink.title))
-        }
-      )
+      val linkValue = links.toList.map { functionLink =>
+        s"<${functionLink.url}>; title=\"${functionLink.title}\""
+      }.mkString(", ")
+
+      RawHeader("Link", linkValue)
     }
 
     val route =
@@ -71,7 +74,7 @@ object WebApp extends App with Microservice {
               authenticates(getUser) { loggedIn =>
                 respondWithHeader(RawHeader("X-Token", loggedIn.token)) {
                   entity(as[String]) { message =>
-                    onSuccess {
+          onSuccess(Future {
                       val msgLogged = BlogSerializer.toString(loggedIn)
                       if (loggedIn.created > 0) {
                         producer.offer(
@@ -92,7 +95,7 @@ object WebApp extends App with Microservice {
                       }
                       producer.offer(
                         ProducerData(s"$topic-command", id, result))
-                    }
+                    })
                     {
                       reply =>
                         complete(s"Succesfully send command to $topic topic: $reply")
@@ -126,11 +129,13 @@ object WebApp extends App with Microservice {
             }
           }
         }
-      } ~
-      path("") {
-        (get | head) {
-          respondWithHeader(getLink()) {
-            getFromResource(s"public/html/index.html")
+      } ~ (pathSingleSlash | pathEnd) {
+        respondWithHeader(getLink()) {
+          get {
+            getFromResource("public/html/index.html")
+          } ~
+          head {
+            complete(HttpEntity.Empty)
           }
         }
       } ~
@@ -148,13 +153,13 @@ object WebApp extends App with Microservice {
 
   def getUser(id: String) = {
     User(id, id.capitalize,
-      if (scala.util.Random.nextBoolean) "admin" else "user", "checker")
+      if (scala.util.Random.nextBoolean()) "admin" else "user", "checker")
   }
 
-  implicit val mq = new Kafka(ProductionKafkaConfig)
-  implicit val system = ActorSystem("WebApp")
-  implicit val materializer = ActorMaterializer()
+  implicit val mq: Kafka = new Kafka(ProductionKafkaConfig)
+  implicit val system: ActorSystem = ActorSystem("WebApp")
+  implicit val materializer: Materializer = Materializer(system)
 
   val routeWeb = WebApp.start(OauthConfig.get)
-  val bindingFuture = Http().bindAndHandle(routeWeb, "0.0.0.0", 8081)
+  val bindingFuture = Http().newServerAt("0.0.0.0", 8081).bindFlow(routeWeb)
 }

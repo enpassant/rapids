@@ -9,7 +9,6 @@ import javax.crypto.{Cipher, SecretKeyFactory}
 import javax.crypto.spec.{IvParameterSpec, PBEKeySpec, SecretKeySpec}
 import org.json4s._
 import org.json4s.jackson.Serialization
-import org.json4s.jackson.Serialization.{read, write}
 import scala.collection.mutable.ArrayBuilder
 
 
@@ -22,7 +21,7 @@ case class FunctionLink(order: Int, url: String, title: String)
 object CommonSerializer extends JsonSerializer {
   def identifier = 0xfeca
 
-  implicit val formats = getFormats()
+  implicit val formats: Formats = getFormats()
 
   def getFormats(ls: List[Class[_]] = Nil): Formats = new DefaultFormats {
     override val typeHintFieldName = "_t"
@@ -85,7 +84,7 @@ object CommonSerializer extends JsonSerializer {
         outputBuff ++= buff.take(n)
       }
       deflater.reset()
-      outputBuff.result
+      outputBuff.result()
     }
 
     def fromBinary(inputBuff: Array[Byte]): Array[Byte] = {
@@ -110,7 +109,7 @@ object CommonSerializer extends JsonSerializer {
     private[this] val f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
     private[this] val key = f.generateSecret(spec).getEncoded
     private[this] val sKeySpec = new SecretKeySpec(key, "AES")
-    private[this] var iv: Array[Byte] = Array.fill[Byte](ivLength)(0)
+    private[this] val iv: Array[Byte] = Array.fill[Byte](ivLength)(0)
     private lazy val random = new SecureRandom()
 
     def encrypt(plainTextBytes: Array[Byte]): Array[Byte] = {

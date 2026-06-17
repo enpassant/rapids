@@ -45,8 +45,7 @@ object CommonUtil {
   def extractPayload(token: String): Option[Payload] = {
     val parts = token.split('.')
     if (parts.length == 3) {
-      val header = parts(0)
-      implicit val formats = DefaultFormats
+      implicit val formats: Formats = DefaultFormats
       Option(jparse(new String(decoder.decode(parts(1)))).extract[Payload])
     } else {
       None

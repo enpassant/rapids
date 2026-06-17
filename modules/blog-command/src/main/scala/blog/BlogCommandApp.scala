@@ -6,7 +6,6 @@ import config.ProductionKafkaConfig
 import org.apache.pekko.actor._
 import org.apache.pekko.pattern.ask
 import org.apache.pekko.util.Timeout
-import org.apache.kafka.clients.producer.ProducerRecord
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
@@ -64,8 +63,8 @@ object BlogCommandApp extends App with Microservice {
     }
   }
 
-  implicit val mq = new Kafka(ProductionKafkaConfig)
-  implicit val system = ActorSystem("BlogCommandApp")
+  implicit val mq: Kafka = new Kafka(ProductionKafkaConfig)
+  implicit val system: ActorSystem = ActorSystem("BlogCommandApp")
 
   start
 }

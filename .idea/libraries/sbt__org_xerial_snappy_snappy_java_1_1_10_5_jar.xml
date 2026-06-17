@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="sbt: org.xerial.snappy:snappy-java:1.1.10.5:jar" type="java-imported" external-system-id="SBT">
+    <properties groupId="org.xerial.snappy" artifactId="snappy-java" version="1.1.10.5" baseVersion="1.1.10.5" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/xerial/snappy/snappy-java/1.1.10.5/snappy-java-1.1.10.5.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/xerial/snappy/snappy-java/1.1.10.5/snappy-java-1.1.10.5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

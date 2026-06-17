@@ -3,33 +3,27 @@ package blog.query
 import common._
 import common.web.Directives._
 import config._
-
 import org.apache.pekko.actor._
 import org.apache.pekko.http.scaladsl.Http
-import org.apache.pekko.http.scaladsl.model._
 import org.apache.pekko.http.scaladsl.server.Directives._
-import org.apache.pekko.stream._
 import com.github.enpassant.ickenham._
 import com.github.enpassant.ickenham.adapter.Json4sAdapter
 import org.mongodb.scala._
 import org.mongodb.scala.model.Filters._
 import org.mongodb.scala.model.Projections._
+
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import org.apache.kafka.clients.producer.ProducerRecord
 import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
-import org.json4s.mongo.JObjectParser._
+import org.json4s.jackson.JsonMethods
 
 object BlogQuery extends App with BaseFormats with Microservice {
   def start(config: BlogQueryConfig)
     (implicit
       mq: MQProtocol,
-      system: ActorSystem,
-      materializer: ActorMaterializer) =
+      system: ActorSystem) =
   {
-    implicit val executionContext = system.dispatcher
-
     val collBlog = config.mongoClient.getDatabase("blog")
       .getCollection("blog")
     val title = config.title
@@ -55,7 +49,7 @@ object BlogQuery extends App with BaseFormats with Microservice {
                 .projection(exclude("content"))
                 .toFuture(),
               10.seconds
-            ).map(o => serialize(o)).toList
+            ).map(o => JsonMethods.parse(o.toJson)).toList
             Some(JObject(JField("blogs", blogs), JField("title", title)))
           }
         } ~
@@ -72,7 +66,7 @@ object BlogQuery extends App with BaseFormats with Microservice {
                 10.seconds
               ) match {
                 case null => None
-                case o => Some(serialize(o))
+                case o => Some(JsonMethods.parse(o.toJson))
               }
             }
           } ~
@@ -83,7 +77,7 @@ object BlogQuery extends App with BaseFormats with Microservice {
                 10.seconds
               ) match {
                 case null => None
-                case o => Some(serialize(o))
+                case o => Some(JsonMethods.parse(o.toJson))
               }
             }
           }
@@ -93,11 +87,10 @@ object BlogQuery extends App with BaseFormats with Microservice {
     stat(statActor)(route)
   }
 
-  implicit val mq = new Kafka(ProductionKafkaConfig)
-  implicit val system = ActorSystem("BlogQuery")
-  implicit val materializer = ActorMaterializer()
+  implicit val mq: Kafka = new Kafka(ProductionKafkaConfig)
+  implicit val system: ActorSystem = ActorSystem("BlogQuery")
 
   val route = BlogQuery.start(ProductionBlogQueryConfig)
-  val bindingFuture = Http().bindAndHandle(route, "0.0.0.0", 8082)
+  val bindingFuture = Http().newServerAt("0.0.0.0", 8082).bindFlow(route)
 }
 

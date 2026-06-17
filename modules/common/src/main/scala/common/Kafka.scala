@@ -13,11 +13,8 @@ import scala.concurrent.Future
 class Kafka(kafkaConfig: config.KafkaConfig) extends MQProtocol {
   def createProducer[A]()
     (mapper: A => ProducerData[String])
-    (implicit system: ActorSystem) =
+    (implicit system: ActorSystem): SourceQueueWithComplete[A] =
   {
-    implicit val materializer = ActorMaterializer()
-    implicit val executionContext = system.dispatcher
-
     val producerSettings = ProducerSettings(
       system,
       new ByteArraySerializer,

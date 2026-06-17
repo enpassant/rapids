@@ -1,11 +1,10 @@
 package common
 
 import org.apache.pekko.serialization._
-import org.json4s.jackson.Serialization.{ read, write }
-import org.json4s.{ DefaultFormats, Formats, jackson, Serialization }
+import org.json4s.{ Formats, jackson }
 
 abstract class JsonSerializer extends Serializer {
-  implicit val serialization = jackson.Serialization
+  implicit val serialization: jackson.Serialization.type = jackson.Serialization
   implicit def formats: Formats
 
   def includeManifest: Boolean = false

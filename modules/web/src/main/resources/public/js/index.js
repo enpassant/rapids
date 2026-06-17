@@ -203,7 +203,7 @@
 
     const parseLink = function(link) {
         const linkObj = {};
-        const re = /<([^>]+)>(.*)/g;
+        const re = /<([^>]+)>(.*)/;
         const result = re.exec(link.trim());
         if (result && result.length >= 3) {
             linkObj.url = result[1];
@@ -245,7 +245,7 @@
     }
 
     const login = function() {
-        window.location.assign("https://accounts.google.com/o/oauth2/v2/auth?client_id=33475451407-kv7l7blhf3jiha12c95doqvunb0uajop.apps.googleusercontent.com&redirect_uri=https://feca.mooo.com/app/auth/callback&response_type=code&access_type=online&scope=email openid profile&nonce=feca&state=feca|" + encodeURIComponent(window.location.href));
+        window.location.assign("https://accounts.google.com/o/oauth2/v2/auth?client_id=33475451407-kv7l7blhf3jiha12c95doqvunb0uajop.apps.googleusercontent.com&redirect_uri=https://app.d1j.eu/auth/callback&response_type=code&access_type=online&scope=email openid profile&nonce=feca&state=feca|" + encodeURIComponent(window.location.href));
     };
 
     if (token) extractPayload();
