@@ -29,12 +29,13 @@ class DiscussionStoreDB(config: DiscussionQueryBuilderConfig)
     Await.result(collDiscussion.insertOne(doc).toFuture(), 10.seconds)
   }
 
-  def addComment(commentAdded: CommentAdded) = {
+  def addComment(commentAdded: CommentAdded, htmlContent: String) = {
     val doc = Document(
       "commentId" -> commentAdded.commentId,
       "userId" -> commentAdded.userId,
       "userName" -> commentAdded.userName,
       "content" -> commentAdded.content,
+      "htmlContent" -> htmlContent,
       "comments" -> BsonArray()
     )
     Await.result(
@@ -43,7 +44,7 @@ class DiscussionStoreDB(config: DiscussionQueryBuilderConfig)
     )
   }
 
-  def replayComment(commentReplied: CommentReplied) = {
+  def replayComment(commentReplied: CommentReplied, htmlContent: String) = {
     val pos = commentReplied.path.tail.foldLeft("comments") {
       (p, i) => s"$p.$i.comments"
     }
@@ -52,6 +53,7 @@ class DiscussionStoreDB(config: DiscussionQueryBuilderConfig)
       "userId" -> commentReplied.userId,
       "userName" -> commentReplied.userName,
       "content" -> commentReplied.content,
+      "htmlContent" -> htmlContent,
       "comments" -> BsonArray()
     )
     Await.result(

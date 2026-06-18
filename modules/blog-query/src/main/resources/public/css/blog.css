@@ -1,0 +1,134 @@
+:root {
+    --bg-color: #ffffff;
+    --text-color: #333333;
+    --card-bg: #f9f9f9;
+    --card-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    --link-color: #0066cc;
+    --button-bg: #f0f0f0;
+    --button-text: #555555;
+    --meta-color: #777777;
+    --border-color: #eeeeee;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #1a1a1a;
+        --text-color: #e0e0e0;
+        --card-bg: #2d2d2d;
+        --card-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        --link-color: #4da3ff;
+        --button-bg: #3d3d3d;
+        --button-text: #cccccc;
+        --meta-color: #aaaaaa;
+        --border-color: #444444;
+    }
+}
+
+.blog-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 10px;
+    color: var(--text-color);
+}
+
+.blog-post {
+    background: var(--card-bg);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: var(--card-shadow);
+    border-left: 4px solid var(--link-color);
+}
+
+h2.blog {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.4rem;
+}
+
+h2.blog a {
+    color: var(--link-color);
+    text-decoration: none;
+}
+
+h2.blog a:hover {
+    text-decoration: underline;
+}
+
+.blog-meta {
+    font-size: 0.85rem;
+    color: var(--meta-color);
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.blog-content {
+    line-height: 1.5;
+    font-size: 1rem;
+}
+
+.blog-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.blog-discussions {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.discussion {
+    background: var(--button-bg);
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+}
+
+.discussion a {
+    color: var(--button-text);
+    text-decoration: none;
+}
+
+.discussion:hover {
+    filter: brightness(1.1);
+}
+
+/* Syntax highlighting dark mode support */
+@media (prefers-color-scheme: dark) {
+    .hljs {
+        background: #002b36 !important;
+        color: #839496 !important;
+    }
+    .hljs-comment, .hljs-quote { color: #586e75 !important; }
+    .hljs-keyword, .hljs-selector-tag, .hljs-addition { color: #859900 !important; }
+    .hljs-number, .hljs-string, .hljs-meta .hljs-meta-string, .hljs-literal, .hljs-doctag, .hljs-regexp { color: #2aa198 !important; }
+    .hljs-title, .hljs-section, .hljs-name, .hljs-selector-id, .hljs-selector-class { color: #268bd2 !important; }
+    .hljs-attribute, .hljs-attr, .hljs-variable, .hljs-template-variable, .hljs-class .hljs-title, .hljs-type { color: #b58900 !important; }
+    .hljs-symbol, .hljs-bullet, .hljs-subst, .hljs-meta, .hljs-meta .hljs-keyword, .hljs-selector-attr, .hljs-selector-pseudo, .hljs-link { color: #cb4b16 !important; }
+    .hljs-built_in, .hljs-deletion { color: #dc322f !important; }
+}
+
+/* Override index.css defaults where necessary */
+.button {
+    background: var(--button-bg) !important;
+    color: var(--button-text) !important;
+    border-radius: 4px;
+    padding: 4px 12px !important;
+    font-size: 0.85rem !important;
+    box-shadow: none !important;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s;
+}
+
+.button:hover {
+    background: var(--link-color) !important;
+    color: white !important;
+    border-color: var(--link-color);
+}

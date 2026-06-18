@@ -2,37 +2,62 @@
 </div>
 
 <style>
+    body {
+        background-color: #1a1a1a;
+        color: #e0e0e0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        margin: 0;
+        padding: 10px;
+    }
+
+    #monitor {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-start;
+    }
+
     svg.stat {
-        margin: 2px;
-        background: #ffffff;
+        background: #2d2d2d;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        transition: transform 0.2s;
+    }
+
+    svg.stat:hover {
+        transform: translateY(-2px);
+    }
+
+    svg.stat text {
+        fill: #e0e0e0;
     }
 
     svg.error {
-        background: #ffafaf;
+        background: #4a1c1c;
     }
 
     svg.warning {
-        background: #ffedaf;
+        background: #4a3d1c;
     }
 
     svg.info {
-        background: #afceff;
+        background: #1c2d4a;
     }
 
     svg.normal {
-        border: 2px solid #000000;
+        border-left: 4px solid #4caf50;
     }
 
     svg.veryslow {
-        border: 2px solid #ff0000;
+        border-left: 4px solid #f44336;
     }
 
     svg.slow {
-        border: 2px solid #0000ff;
+        border-left: 4px solid #2196f3;
     }
 
     svg.moderate {
-        border: 2px solid #ffff00;
+        border-left: 4px solid #ffeb3b;
     }
 </style>
 
@@ -41,23 +66,28 @@
         const { render, Component, createElement } = Inferno;
 
         function Rect(width, x, y, c) {
-            const color = c || "black";
+            const color = c || "#888";
             return createElement(
                 'rect',
-                { "width": width, "height": 12, "x": x, "y": y,
-                    "stroke-width": 0, "fill": color });
+                { "width": width, "height": 10, "x": x, "y": y,
+                    "stroke-width": 0, "fill": color, "rx": 1 });
         }
 
-        function Bar(max, width, ext, y, c) {
+        function Bar(max, width, ext, y, label, c) {
             const w = norm(width, max);
             const e = norm(ext, max);
-            const rects = [ Rect(w, 0, y) ].concat(
-                (ext > 0) ? [ Rect(e, w, y, c) ] : []);
-            const children = rects.concat([
+            const rects = [ Rect(w, 40, y) ].concat(
+                (ext > 0) ? [ Rect(e, 40 + w, y, c) ] : []);
+            const children = [
                 createElement(
                     'text',
-                    { "x": w + e + 2, "height": 12, "y": y + 9,
-                        "font-size": 9 },
+                    { "x": 2, "y": y + 8, "font-size": 8, "fill": "#aaa" },
+                    label)
+            ].concat(rects).concat([
+                createElement(
+                    'text',
+                    { "x": 40 + w + e + 2, "y": y + 8,
+                        "font-size": 8 },
                     (ext > 0) ? (width + "/" + ext) : width )
             ]);
             return createElement('g', { "className": "bar" }, children);
@@ -85,19 +115,19 @@
 
         function MsStat(props, maxNum, maxTime) {
             const bars = [
-                Bar(maxNum, props.stat.reqNum, props.stat.failed, 30, "red"),
-                Bar(maxTime, props.stat.min, 0, 45),
-                Bar(maxTime, props.stat.avg, 0, 60),
-                Bar(maxTime, props.stat.max, 0, 75)
+                Bar(maxNum, props.stat.reqNum, props.stat.failed, 22, "req", "#f44336"),
+                Bar(maxTime, props.stat.min, 0, 34, "min"),
+                Bar(maxTime, props.stat.avg, 0, 46, "avg"),
+                Bar(maxTime, props.stat.max, 0, 58, "max")
             ];
             return createElement('svg',
                 { "className": "stat " + borderClass(props.stat.avg) +
                     " " + errorClass(props.stat.time),
-                    "width": 150, "height": 100 },
+                    "width": 140, "height": 75 },
                 [
                     createElement(
                         'text',
-                        { "x": 1, "y": 15 },
+                        { "x": 5, "y": 14, "font-size": 10, "font-weight": "bold" },
                         props.key)
                 ].concat(bars)
             );

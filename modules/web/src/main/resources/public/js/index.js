@@ -162,7 +162,9 @@
             ajaxGet(window.location.href, "HEAD").then(
                 function(data) {
                     url = baseUrl;
-                    router();
+                    if (url) {
+                        router();
+                    }
                 }
             );
             return;

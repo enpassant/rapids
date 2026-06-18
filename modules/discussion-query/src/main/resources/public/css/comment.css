@@ -1,0 +1,101 @@
+:root {
+    --bg-color: #ffffff;
+    --text-color: #333333;
+    --comment-bg: #ffffff;
+    --comment-border: #e1e4e8;
+    --comment-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    --header-bg: #f6f8fa;
+    --link-color: #0366d6;
+    --button-bg: #fafbfc;
+    --button-text: #24292e;
+    --name-color: #24292e;
+    --indent-border: #d1d5da;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #1a1a1a;
+        --text-color: #e0e0e0;
+        --comment-bg: #2d2d2d;
+        --comment-border: #444d56;
+        --comment-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        --header-bg: #343a40;
+        --link-color: #58a6ff;
+        --button-bg: #3d3d3d;
+        --button-text: #c9d1d9;
+        --name-color: #f0f6fc;
+        --indent-border: #444d56;
+    }
+}
+
+.comment {
+    margin-top: 12px;
+    margin-bottom: 8px;
+    border: 1px solid var(--comment-border);
+    border-radius: 6px;
+    background-color: var(--comment-bg);
+    box-shadow: var(--comment-shadow);
+    overflow: hidden;
+    color: var(--text-color);
+}
+
+/* Indentation for nested comments */
+.comment .comment {
+    margin-left: 16px;
+    margin-top: 8px;
+    border-left: 3px solid var(--indent-border);
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 12px;
+    background-color: var(--header-bg);
+    border-bottom: 1px solid var(--comment-border);
+    font-size: 0.85rem;
+}
+
+.comment-header .name {
+    font-weight: 600;
+    color: var(--name-color) !important;
+    background: transparent !important;
+    padding: 0 !important;
+}
+
+.comment-content {
+    padding: 10px 12px;
+    line-height: 1.4;
+    font-size: 0.95rem;
+}
+
+/* Button styling for comments */
+.comment .button {
+    display: inline-block;
+    padding: 2px 8px !important;
+    margin-left: 4px;
+    font-size: 0.75rem !important;
+    background-color: var(--button-bg) !important;
+    color: var(--button-text) !important;
+    border: 1px solid var(--comment-border);
+    border-radius: 4px;
+    text-decoration: none;
+    box-shadow: none !important;
+    transition: all 0.1s;
+}
+
+.comment .button:hover {
+    background-color: var(--link-color) !important;
+    color: #ffffff !important;
+    border-color: var(--link-color);
+}
+
+.comment-header a {
+    color: var(--link-color);
+}
+
+/* Compact spacing for nested elements */
+.comment div {
+    margin: 0;
+    padding: 0;
+}

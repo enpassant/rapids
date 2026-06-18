@@ -13,8 +13,12 @@
                 <a href="/discussion/{{_id}}/comment/{{this.commentId}}/new" class="button">Válasz</a>
             </div>
         </div>
-        <div>
-            {{content}}
+        <div class="comment-content">
+            {{#if htmlContent}}
+                {{{htmlContent}}}
+            {{else}}
+                {{{content}}}
+            {{/if}}
         </div>
     </div>
     {{#if comments}}
@@ -22,3 +26,6 @@
     {{/if}}
 </div>
 {{/each}}
+
+<link href="css/comment.css" type="text/css" rel="stylesheet" />
+

@@ -1,35 +1,40 @@
 version: '3.2'
 services:
-  zookeeper:
-    image: wurstmeister/zookeeper:latest
-    ports:
-      - target: 2181
-        published: 2181
-        protocol: tcp
-        mode: host
   kafka:
-    image: wurstmeister/kafka:latest
-    deploy:
-      mode: global
+    image: docker.io/apache/kafka:latest
+    container_name: kafka-kraft
     ports:
       - target: 9094
         published: 9094
         protocol: tcp
         mode: host
     environment:
-      HOSTNAME_COMMAND: ip -4 addr show eth1 | grep -o 'inet\s\+[0-9.]\+' | cut -d ' ' -f 2
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://_{HOSTNAME_COMMAND}:9094
-      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:9094
+      # KRaft Alapbeállítások (Kombinált Node)
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+
+      # Hallgatók és Biztonsági Protokollok
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9092,OUTSIDE://0.0.0.0:9094,CONTROLLER://0.0.0.0:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT,CONTROLLER:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
-      KAFKA_CREATE_TOPICS: "blog-command:1:1, client-commands:1:1, blog-event:1:1, performance:1:1, discussion-event:1:1, web-app:1:1, user:1:1, discussion-command:1:1, error:1:1"
-      KAFKA_LOG_DIRS: /kafka/kafka-logs
+
+      # Dinamikus IP meghatározás a gazdagép felé (Hasonlóan a korábbi megoldásodhoz)
+      # Megjegyzés: Ha fix IP-d vagy domained van, írd be közvetlenül a localhost helyére!
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://localhost:9092,OUTSIDE://${MY_HOST_IP}:9094
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      # Perzisztens adatok rögzítése az új belső elérési útra
       - type: bind
         source: ~/kafkadata
-        target: /kafka/kafka-logs
+        target: /var/lib/kafka/data
+
   mongodb:
     image: mongo:latest
     deploy:
