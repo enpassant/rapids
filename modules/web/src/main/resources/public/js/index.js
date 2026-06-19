@@ -155,6 +155,8 @@
     }
 
     var el = null;
+    var scriptsAdded = false;
+
     function router () {
         el = el || byId('view');
         var url = fullUrl(location.hash.slice(2)) || baseUrl;
@@ -253,7 +255,7 @@
     if (token) extractPayload();
 
     window.addEventListener('hashchange', router);
-    window.addEventListener('load', router);
+    window.addEventListener('DOMContentLoaded', router);
     byId('btnLogin').addEventListener('click', login);
     <!--var webSocket = WebSocketTest();-->
 })();

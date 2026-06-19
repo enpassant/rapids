@@ -105,6 +105,21 @@ h2 {
   #messages { flex: 0 2 15%; order: 4; }
 }
 
+/* Syntax highlighting dark mode support */
+@media (prefers-color-scheme: dark) {
+    .hljs {
+        background: #002b36 !important;
+        color: #839496 !important;
+    }
+    .hljs-comment, .hljs-quote { color: #586e75 !important; }
+    .hljs-keyword, .hljs-selector-tag, .hljs-addition { color: #859900 !important; }
+    .hljs-number, .hljs-string, .hljs-meta .hljs-meta-string, .hljs-literal, .hljs-doctag, .hljs-regexp { color: #2aa198 !important; }
+    .hljs-title, .hljs-section, .hljs-name, .hljs-selector-id, .hljs-selector-class { color: #268bd2 !important; }
+    .hljs-attribute, .hljs-attr, .hljs-variable, .hljs-template-variable, .hljs-class .hljs-title, .hljs-type { color: #b58900 !important; }
+    .hljs-symbol, .hljs-bullet, .hljs-subst, .hljs-meta, .hljs-meta .hljs-keyword, .hljs-selector-attr, .hljs-selector-pseudo, .hljs-link { color: #cb4b16 !important; }
+    .hljs-built_in, .hljs-deletion { color: #dc322f !important; }
+}
+
 .wrapped-container {
 }
 

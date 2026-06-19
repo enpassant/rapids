@@ -11,3 +11,10 @@
 
 <link href="css/comment.css" type="text/css" rel="stylesheet" />
 
+<script>
+    var codes = document.querySelectorAll('pre code:not(.hljs)');
+    for (i = 0; i < codes.length; i++) {
+        hljs.highlightElement(codes[i]);
+    }
+</script>
+
