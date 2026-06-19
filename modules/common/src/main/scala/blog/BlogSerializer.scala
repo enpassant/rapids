@@ -9,7 +9,7 @@ sealed trait BlogMessage extends Serializable
 case class WrongMessage(message: String) extends BlogMessage
 
 sealed trait BlogCommand extends BlogMessage
-case class CreateBlog(title: String, content: String, loggedIn: LoggedIn)
+case class CreateBlog(title: String, content: String, datetime: java.time.ZonedDateTime, loggedIn: LoggedIn)
   extends BlogCommand with UserCommand
 case class ModifyBlog(title: String, content: String, loggedIn: LoggedIn)
   extends BlogCommand with UserCommand
@@ -20,7 +20,8 @@ case class BlogCreated(
   userId: String,
   userName: String,
   title: String,
-  content: String
+  content: String,
+  datetime: java.time.ZonedDateTime
 ) extends BlogEvent
 case class BlogModified(
   id: String,

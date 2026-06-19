@@ -8,6 +8,7 @@ import org.apache.pekko.http.scaladsl.Http
 import org.apache.pekko.http.scaladsl.server.Directives._
 import com.github.enpassant.ickenham._
 import com.github.enpassant.ickenham.adapter.Json4sAdapter
+import org.json4s
 import org.mongodb.scala._
 import org.mongodb.scala.model.Filters._
 import org.mongodb.scala.model.Projections._
@@ -17,6 +18,9 @@ import scala.concurrent.duration._
 import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods
+
+import java.time.format.DateTimeFormatter
+import java.time.{ZoneId, ZonedDateTime}
 
 object BlogQuery extends App with BaseFormats with Microservice {
   def start(config: BlogQueryConfig)
@@ -49,7 +53,9 @@ object BlogQuery extends App with BaseFormats with Microservice {
                 .projection(exclude("content"))
                 .toFuture(),
               10.seconds
-            ).map(o => JsonMethods.parse(o.toJson)).toList
+            ).map(o => JsonMethods.parse(o.toJson))
+              .map(o => transformDateTimeToStr(o)
+              ).toList
             Some(JObject(JField("blogs", blogs), JField("title", title)))
           }
         } ~

@@ -1,10 +1,16 @@
 package common
 
 import org.apache.pekko.http.scaladsl.model._
-import org.apache.pekko.http.scaladsl.marshalling.{ Marshaller, ToEntityMarshaller }
-import org.apache.pekko.http.scaladsl.model.{ HttpCharsets, MediaTypes }
-import org.apache.pekko.http.scaladsl.unmarshalling.{ FromEntityUnmarshaller, Unmarshaller }
+import org.apache.pekko.http.scaladsl.marshalling.{Marshaller, ToEntityMarshaller}
+import org.apache.pekko.http.scaladsl.model.{HttpCharsets, MediaTypes}
+import org.apache.pekko.http.scaladsl.unmarshalling.{FromEntityUnmarshaller, Unmarshaller}
+import org.json4s
+import org.json4s.JsonAST.{JField, JString}
 import org.json4s._
+import org.json4s.ext.JavaTimeSerializers
+
+import java.time.format.DateTimeFormatter
+import java.time.{ZoneId, ZonedDateTime}
 
 object BaseFormats extends BaseFormats {
 
@@ -23,13 +29,15 @@ trait BaseFormats {
 
   implicit val serialization: Serialization = jackson.Serialization
   implicit val formats: Formats =
-    DefaultFormats ++ org.json4s.ext.JodaTimeSerializers.all
+    DefaultFormats + CustomZonedDateTimeSerializer
 
   implicit val SeqJsonMarshaller: ToEntityMarshaller[JValue] =
     BaseFormats.marshaller[JValue](MediaTypes.`application/json`)
 
   implicit val SeqJsonCollectionMarshaller: ToEntityMarshaller[Seq[JValue]] =
     BaseFormats.marshaller[Seq[JValue]](MediaTypes.`application/json`)
+
+  val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd. HH:mm:ss")
 
   lazy val `text/html+xml` =
     customMediaTypeUTF8("html+xml", "text")
@@ -113,6 +121,16 @@ trait BaseFormats {
         Marshaller.StringMarshaller.wrap(mediaType)(serialization.write[A])
       case _ =>
         Marshaller.StringMarshaller.wrap(mediaType)(serialization.writePretty[A])
+    }
+  }
+
+  def transformDateTimeToStr(o: json4s.JValue) = {
+    o.transformField {
+      case JField("datetime", JString(isoString)) =>
+        val localDateTimeStr = ZonedDateTime.parse(isoString)
+          .withZoneSameInstant(ZoneId.systemDefault())
+          .format(dateTimeFormatter)
+        JField("datetime", JString(localDateTimeStr))
     }
   }
 }

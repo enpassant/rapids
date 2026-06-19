@@ -1,6 +1,7 @@
 package common
 
 import com.typesafe.config.ConfigFactory
+
 import java.security.SecureRandom
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -8,7 +9,9 @@ import java.util.zip.{Deflater, Inflater}
 import javax.crypto.{Cipher, SecretKeyFactory}
 import javax.crypto.spec.{IvParameterSpec, PBEKeySpec, SecretKeySpec}
 import org.json4s._
+import org.json4s.ext.JavaTimeSerializers
 import org.json4s.jackson.Serialization
+
 import scala.collection.mutable.ArrayBuilder
 
 
@@ -30,7 +33,7 @@ object CommonSerializer extends JsonSerializer {
       classOf[Stat] ::
       ls
     )
-  } ++ org.json4s.ext.JodaTimeSerializers.all + LocalDateSerializer
+  } + CustomZonedDateTimeSerializer
 
   def read[T: Manifest](data: Array[Byte])
     (implicit formats: Formats, transformation: Transformation) =

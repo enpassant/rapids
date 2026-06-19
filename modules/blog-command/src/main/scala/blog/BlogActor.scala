@@ -16,7 +16,7 @@ class BlogActor(val id: String) extends CommandActor {
   var state: Option[Blog] = None
 
   def updateState(event: BlogMessage): Unit = event match {
-    case BlogCreated(id, userId, userName, title, content) =>
+    case BlogCreated(id, userId, userName, title, content, _) =>
       state = Some(Blog(title, content))
     case BlogModified(id, userId, userName, title, content) =>
       state = Some(Blog(title, content))
@@ -34,10 +34,10 @@ class BlogActor(val id: String) extends CommandActor {
 
   val processCommand: Receive = {
     case "snap"  => saveSnapshot(state)
-    case CreateBlog(title, content, loggedIn) if !state.isDefined =>
+    case CreateBlog(title, content, datetime, loggedIn) if !state.isDefined =>
       val payload = CommonUtil.extractPayload(loggedIn.token)
       payload foreach { p =>
-        val event = BlogCreated(id, loggedIn.userId, loggedIn.userName, title, content)
+        val event = BlogCreated(id, loggedIn.userId, loggedIn.userName, title, content, datetime)
         persistAsync(event) {
           event =>
             sender() ! event

@@ -10,12 +10,15 @@
         <h2>
             <a href="/blog/{{_id}}">{{title}}</a>
         </h2>
-        <span class="name">{{userName}}</span>
-        {{#each discussions}}
-        <span class="discussion">
-            <a href="/discussion/{{id}}">{{title}}</a>
-        </span>
-        {{/each}}
+        <p>
+            <span class="name datetime">{{datetime}}</span>
+            <span class="name">{{userName}}</span>
+            {{#each discussions}}
+            <span class="discussion">
+                <a href="/discussion/{{id}}">{{title}}</a>
+            </span>
+            {{/each}}
+        </p>
     </div>
     {{/each}}
 </div>

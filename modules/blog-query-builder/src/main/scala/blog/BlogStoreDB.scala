@@ -1,16 +1,18 @@
 package blog
 
+import common.BaseFormats
 import config._
-
+import org.json4s.jackson.{JsonMethods, Serialization}
 import org.mongodb.scala._
 import org.mongodb.scala.bson.collection.immutable.Document
-import org.mongodb.scala.bson.BsonArray
+import org.mongodb.scala.bson.{BsonArray, BsonString}
 import org.mongodb.scala.model.Filters._
 import org.mongodb.scala.model.Updates._
+
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class BlogStoreDB(config: BlogQueryBuilderConfig) extends BlogStore {
+class BlogStoreDB(config: BlogQueryBuilderConfig) extends BlogStore with BaseFormats {
   val collection = config.mongoClient.getDatabase("blog")
     .getCollection("blog")
 
@@ -22,6 +24,11 @@ class BlogStoreDB(config: BlogQueryBuilderConfig) extends BlogStore {
       "title" -> blogCreated.title,
       "content" -> blogCreated.content,
       "htmlContent" -> htmlContent,
+      "datetime" -> BsonString(
+        JsonMethods.parse(
+          Serialization.write(blogCreated.datetime)
+        ).values.toString
+      ),
       "discussions" -> BsonArray()
     )
     Await.result(collection.insertOne(doc).toFuture(), 10.seconds)

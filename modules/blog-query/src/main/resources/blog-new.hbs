@@ -21,6 +21,7 @@
             "_t": "CreateBlog",
             "title": title,
             "content": content,
+            "datetime": new Date().toISOString(),
             "loggedIn": ""
         };
         ajaxPost("/commands/blog/{{uuid}}", data);

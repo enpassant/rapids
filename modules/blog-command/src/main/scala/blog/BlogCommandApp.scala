@@ -31,7 +31,7 @@ object BlogCommandApp extends App with Microservice {
         implicit val timeout = Timeout(3000.milliseconds)
         val result = service ? common.ConsumerData(msg.key, msg.value)
         result collect {
-          case event @ BlogCreated(blogId, userId, userName, title, content) =>
+          case event @ BlogCreated(blogId, userId, userName, title, content, _) =>
             //val id = common.CommonUtil.uuid
             val id = s"disc-$blogId"
             producer.offer(

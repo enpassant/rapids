@@ -27,7 +27,7 @@ object BlogQueryBuilder extends App with Microservice {
         val result = Future { jsonTry match {
           case Success(json) =>
             json match {
-              case blogCreated @ BlogCreated(_, userId, _, _, content) =>
+              case blogCreated @ BlogCreated(_, userId, _, _, content, _) =>
                 val document = parser.parse(content)
                 val htmlContent = renderer.render(document)
                 blogStore.insert(blogCreated, htmlContent)
