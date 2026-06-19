@@ -57,7 +57,7 @@ class DiscussionActor(val id: String) extends CommandActor {
       payload foreach { p =>
         val index = state.get.childCount
         val event =
-          CommentAdded(state.get.id, commentId, p.sub, p.name, content, index)
+          CommentAdded(state.get.id, commentId, loggedIn.userId, loggedIn.userName, content, index)
         persistAsync(event) { event =>
           sender() ! event
           updateState(event)
@@ -73,7 +73,7 @@ class DiscussionActor(val id: String) extends CommandActor {
         val id = state.get.id
         val path = (parentComment.childCount) :: parentComment.path
         val event =
-          CommentReplied(id, commentId, p.sub, p.name, parentId, content, path)
+          CommentReplied(id, commentId, loggedIn.userName, loggedIn.userName, parentId, content, path)
         persistAsync(event) { event =>
           sender() ! event
           updateState(event)

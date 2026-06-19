@@ -26,7 +26,7 @@ object DiscussionCommandApp extends App with Microservice {
     val service = system.actorOf(
       CommandService.props(
         BlogSerializer.fromString,
-        "blog",
+        "disc",
         DiscussionActor.props),
       "discussion-service")
 

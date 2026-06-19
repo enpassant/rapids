@@ -37,7 +37,7 @@ class BlogActor(val id: String) extends CommandActor {
     case CreateBlog(title, content, loggedIn) if !state.isDefined =>
       val payload = CommonUtil.extractPayload(loggedIn.token)
       payload foreach { p =>
-        val event = BlogCreated(id, p.sub, p.name, title, content)
+        val event = BlogCreated(id, loggedIn.userId, loggedIn.userName, title, content)
         persistAsync(event) {
           event =>
             sender() ! event
@@ -47,7 +47,7 @@ class BlogActor(val id: String) extends CommandActor {
     case ModifyBlog(title, content, loggedIn) if state.isDefined =>
       val payload = CommonUtil.extractPayload(loggedIn.token)
       payload foreach { p =>
-        val event = BlogModified(id, p.sub, p.name, title, content)
+        val event = BlogModified(id, loggedIn.userId, loggedIn.userName, title, content)
         persistAsync(event) {
           event =>
             sender() ! event

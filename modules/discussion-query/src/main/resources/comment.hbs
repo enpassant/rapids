@@ -6,11 +6,17 @@
                 <span class="name">{{userName}}</span>
             </div>
             <div>
-                <a href="/discussion/{{_id}}#{{this.commentId}}" class="button">permalink</a>
+                <a href="/discussion/{{_id}}#{{this.commentId}}" title="Permalink" class="button">
+                    <span class="material-symbols-outlined md-12">link_2</span>
+                </a>
                 {{#if ../commentId}}
-                <a href="/discussion/{{_id}}#{{../commentId}}" class="button">szülő</a>
+                <a href="/discussion/{{_id}}#{{../commentId}}" title="Szülő hozzászólás" class="button">
+                    <span class="material-symbols-outlined md-12">arrow_shape_up</span>
+                </a>
                 {{/if}}
-                <a href="/discussion/{{_id}}/comment/{{this.commentId}}/new" class="button">Válasz</a>
+                <a href="/discussion/{{_id}}/comment/{{this.commentId}}/new" title="Válasz üzenet" class="button">
+                    <span class="material-symbols-outlined md-12">reply</span>
+                </a>
             </div>
         </div>
         <div class="comment-content">

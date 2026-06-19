@@ -25,8 +25,6 @@ object Main extends App {
     else if (isDev) new Kafka(DevelopmentKafkaConfig)
     else new Kafka(ProductionKafkaConfig)
 
-  println("Program has started")
-
   val blogStore = new BlogStoreDB(
     if (isProd) ProductionBlogQueryBuilderConfig
     else DevelopmentBlogQueryBuilderConfig
@@ -37,8 +35,6 @@ object Main extends App {
   )
 
   val routeWeb = WebApp.start(OauthConfig.get)
-
-  Thread.sleep(2000)
 
   val routeBlogQuery =
     blog.query.BlogQuery.start(
@@ -90,6 +86,8 @@ object Main extends App {
     println("Exiting")
     system.terminate()
   }
+
+  println("Program has started")
 
   if (!isProd) {
     testError.TestError.start

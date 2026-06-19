@@ -43,8 +43,8 @@
 .comment .comment {
     margin-left: 16px;
     margin-top: 8px;
-    border-left: 3px solid var(--indent-border);
-}
+
+    padding: 0 4px}
 
 .comment-header {
     display: flex;

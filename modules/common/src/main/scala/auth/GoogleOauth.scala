@@ -71,7 +71,6 @@ object GoogleOauth {
 
   def extractIdToken(token: String, keys: GoogleKeys): Option[LoggedIn] = {
     val parts = token.split('.')
-    println(token)
     if (parts.length == 3) {
       implicit val formats = DefaultFormats
       val header = parts(0)

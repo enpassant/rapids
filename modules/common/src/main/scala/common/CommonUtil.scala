@@ -19,7 +19,7 @@ trait UserCommand {
   def loggedIn: LoggedIn
 }
 
-case class LoggedIn(userId: String, token: String, validTo: Long, created: Long)
+case class LoggedIn(userId: String, userName: String, token: String, validTo: Long, created: Long)
 
 object CommonUtil {
   def uuid = java.util.UUID.randomUUID.toString
@@ -38,7 +38,7 @@ object CommonUtil {
     val payload64 = encoder.encodeToString(payload.padTo(len, ' ').getBytes)
     CommonUtil.encodeOpt("secret", s"$header.$payload64") { t =>
       val token = encoder.encodeToString(t)
-      Some(LoggedIn(user.id, s"$header.$payload64.$token", validTo, created))
+      Some(LoggedIn(user.id, user.name, s"$header.$payload64.$token", validTo, created))
     }
   }
 

@@ -46,7 +46,7 @@ class DiscussionStoreDB(config: DiscussionQueryBuilderConfig)
 
   def replayComment(commentReplied: CommentReplied, htmlContent: String) = {
     val pos = commentReplied.path.tail.foldLeft("comments") {
-      (p, i) => s"$p.$i.comments"
+      (p, i) => s"comments.$i.$p"
     }
     val doc = Document(
       "commentId" -> commentReplied.commentId,
