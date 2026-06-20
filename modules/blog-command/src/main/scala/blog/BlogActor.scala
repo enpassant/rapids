@@ -16,11 +16,11 @@ class BlogActor(val id: String) extends CommandActor {
   var state: Option[Blog] = None
 
   def updateState(event: BlogMessage): Unit = event match {
-    case BlogCreated(id, userId, userName, title, content, _) =>
+    case BlogCreated(_, _, _, title, content, _) =>
       state = Some(Blog(title, content))
-    case BlogModified(id, userId, userName, title, content) =>
+    case BlogModified(_, _, _, title, content) =>
       state = Some(Blog(title, content))
-    case DiscussionStarted(id, userId, userName, blogId, title) =>
+    case DiscussionStarted(id, _, _, _, _, title) =>
       state = state map { blog =>
         blog.copy(discussions = DiscussionItem(id, title) :: blog.discussions)
       }
@@ -34,7 +34,7 @@ class BlogActor(val id: String) extends CommandActor {
 
   val processCommand: Receive = {
     case "snap"  => saveSnapshot(state)
-    case CreateBlog(title, content, datetime, loggedIn) if !state.isDefined =>
+    case CreateBlog(title, content, datetime, loggedIn) if !state.isDefined && datetime != null =>
       val payload = CommonUtil.extractPayload(loggedIn.token)
       payload foreach { p =>
         val event = BlogCreated(id, loggedIn.userId, loggedIn.userName, title, content, datetime)

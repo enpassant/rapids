@@ -1,11 +1,13 @@
 <div>
     <h2 class="blog">
         <a href="/blog/{{_id}}">{{title}}</a>
+        <a href="/blog/{{_id}}/edit" title="Szerkesztés" class="button">
+            <span class="material-symbols-outlined md-12">edit</span>
+        </a>
     </h2>
-    <div>
-        <a href="/blog/{{_id}}/edit" class="button">Edit</a>
-    </div>
-    <p>{{userName}}</p>
+    <p>
+        <span class="name">{{userName}} | {{datetime}}</span>
+    </p>
 </div>
 <div>
     {{#if htmlContent}}
@@ -17,7 +19,7 @@
 <div>
     {{#each discussions}}
     <span class="discussion">
-        <a href="/discussion/{{id}}">{{title}}</a>
+        <a href="/discussion/{{id}}">Hozzászólások</a>
     </span>
     {{/each}}
 </div>

@@ -46,12 +46,14 @@ case class StartDiscussion(
   blogId: String,
   title: String,
   userId: String,
-  userName: String
+  userName: String,
+  datetime: java.time.ZonedDateTime
 ) extends DiscussionCommand
 
 case class AddComment(
   id: String,
   content: String,
+  datetime: java.time.ZonedDateTime,
   loggedIn: LoggedIn
 ) extends DiscussionCommand
 
@@ -59,6 +61,7 @@ case class ReplyComment(
   id: String,
   parentId: String,
   content: String,
+  datetime: java.time.ZonedDateTime,
   loggedIn: LoggedIn
 ) extends DiscussionCommand
 
@@ -71,6 +74,7 @@ case class DiscussionStarted(
   userId: String,
   userName: String,
   blogId: String,
+  datetime: java.time.ZonedDateTime,
   title: String
 ) extends DiscussionEvent
 
@@ -80,6 +84,7 @@ case class CommentAdded(
   userId: String,
   userName: String,
   content: String,
+  datetime: java.time.ZonedDateTime,
   index: Int
 ) extends DiscussionEvent
 
@@ -90,6 +95,7 @@ case class CommentReplied(
   userName: String,
   parentId: String,
   content: String,
+  datetime: java.time.ZonedDateTime,
   path: List[Int]
 ) extends DiscussionEvent
 

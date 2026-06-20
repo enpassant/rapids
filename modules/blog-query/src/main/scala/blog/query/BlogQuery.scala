@@ -54,8 +54,8 @@ object BlogQuery extends App with BaseFormats with Microservice {
                 .toFuture(),
               10.seconds
             ).map(o => JsonMethods.parse(o.toJson))
-              .map(o => transformDateTimeToStr(o)
-              ).toList
+              .map(o => transformDateTimeToStr(o))
+              .toList
             Some(JObject(JField("blogs", blogs), JField("title", title)))
           }
         } ~
@@ -73,6 +73,7 @@ object BlogQuery extends App with BaseFormats with Microservice {
               ) match {
                 case null => None
                 case o => Some(JsonMethods.parse(o.toJson))
+                  .map(o => transformDateTimeToStr(o))
               }
             }
           } ~
@@ -84,6 +85,7 @@ object BlogQuery extends App with BaseFormats with Microservice {
               ) match {
                 case null => None
                 case o => Some(JsonMethods.parse(o.toJson))
+                  .map(o => transformDateTimeToStr(o))
               }
             }
           }

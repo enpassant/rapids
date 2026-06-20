@@ -41,7 +41,7 @@ object BlogQueryBuilder extends App with Microservice {
                 }
                 producer.offer(ProducerData(
                   "client-commands", userId, """{"value":"BlogModified"}"""))
-              case discussionStarted @ DiscussionStarted(_, userId, _, _, _) =>
+              case discussionStarted @ DiscussionStarted(_, userId, _, _, _, _) =>
                 blogStore.addDiscussion(discussionStarted)
                 producer.offer(ProducerData(
                   "client-commands", userId, """{"value":"DiscussionStarted"}"""))

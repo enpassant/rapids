@@ -70,6 +70,7 @@ object DiscussionQuery
               ) match {
                 case null => None
                 case o => Some(JsonMethods.parse(o.toJson))
+                  .map(o => transformDateTimeToStr(o))
               }
             }
           }

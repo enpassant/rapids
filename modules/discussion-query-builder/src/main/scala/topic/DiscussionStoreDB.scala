@@ -1,41 +1,58 @@
 package discussion
 
 import blog._
+import common.BaseFormats
 import config._
-
+import org.json4s.jackson.{JsonMethods, Serialization}
 import org.mongodb.scala._
 import org.mongodb.scala.bson.collection.immutable.Document
-import org.mongodb.scala.bson.BsonArray
+import org.mongodb.scala.bson.{BsonArray, BsonString}
 import org.mongodb.scala.model.Filters._
 import org.mongodb.scala.model.Updates._
+
+import java.time.ZonedDateTime
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
 class DiscussionStoreDB(config: DiscussionQueryBuilderConfig)
-  extends DiscussionStore
+  extends DiscussionStore with BaseFormats
 {
   val collDiscussion = config.mongoClient.getDatabase("blog")
     .getCollection("discussion")
 
   def insert(discussionStarted: DiscussionStarted) = {
+    val datetime = Option(discussionStarted.datetime).getOrElse(ZonedDateTime.now())
     val doc = Document(
       "_id" -> discussionStarted.id,
       "userId" -> discussionStarted.userId,
       "userName" -> discussionStarted.userName,
       "blogId" -> discussionStarted.blogId,
       "title" -> discussionStarted.title,
+      "datetime" ->
+        BsonString(
+          JsonMethods.parse(
+            Serialization.write(datetime)
+          ).values.toString
+        ),
       "comments" -> BsonArray()
     )
     Await.result(collDiscussion.insertOne(doc).toFuture(), 10.seconds)
   }
 
   def addComment(commentAdded: CommentAdded, htmlContent: String) = {
+    val datetime = Option(commentAdded.datetime).getOrElse(ZonedDateTime.now())
     val doc = Document(
       "commentId" -> commentAdded.commentId,
       "userId" -> commentAdded.userId,
       "userName" -> commentAdded.userName,
       "content" -> commentAdded.content,
       "htmlContent" -> htmlContent,
+      "datetime" ->
+        BsonString(
+          JsonMethods.parse(
+            Serialization.write(datetime)
+          ).values.toString
+        ),
       "comments" -> BsonArray()
     )
     Await.result(
@@ -45,6 +62,7 @@ class DiscussionStoreDB(config: DiscussionQueryBuilderConfig)
   }
 
   def replayComment(commentReplied: CommentReplied, htmlContent: String) = {
+    val datetime = Option(commentReplied.datetime).getOrElse(ZonedDateTime.now())
     val pos = commentReplied.path.tail.foldLeft("comments") {
       (p, i) => s"comments.$i.$p"
     }
@@ -54,6 +72,12 @@ class DiscussionStoreDB(config: DiscussionQueryBuilderConfig)
       "userName" -> commentReplied.userName,
       "content" -> commentReplied.content,
       "htmlContent" -> htmlContent,
+      "datetime" ->
+        BsonString(
+          JsonMethods.parse(
+            Serialization.write(datetime)
+          ).values.toString
+        ),
       "comments" -> BsonArray()
     )
     Await.result(

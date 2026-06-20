@@ -11,11 +11,10 @@
             <a href="/blog/{{_id}}">{{title}}</a>
         </h2>
         <p>
-            <span class="name datetime">{{datetime}}</span>
-            <span class="name">{{userName}}</span>
+            <span class="name">{{userName}} | {{datetime}}</span>
             {{#each discussions}}
             <span class="discussion">
-                <a href="/discussion/{{id}}">{{title}}</a>
+                <a href="/discussion/{{id}}">Hozzászólások</a>
             </span>
             {{/each}}
         </p>

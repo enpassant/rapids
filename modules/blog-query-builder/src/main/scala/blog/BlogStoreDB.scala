@@ -9,6 +9,7 @@ import org.mongodb.scala.bson.{BsonArray, BsonString}
 import org.mongodb.scala.model.Filters._
 import org.mongodb.scala.model.Updates._
 
+import java.time.ZonedDateTime
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
@@ -17,6 +18,7 @@ class BlogStoreDB(config: BlogQueryBuilderConfig) extends BlogStore with BaseFor
     .getCollection("blog")
 
   def insert(blogCreated: BlogCreated, htmlContent: String): Unit = {
+    val datetime = Option(blogCreated.datetime).getOrElse(ZonedDateTime.now())
     val doc = Document(
       "_id" -> blogCreated.id,
       "userId" -> blogCreated.userId,
@@ -24,11 +26,12 @@ class BlogStoreDB(config: BlogQueryBuilderConfig) extends BlogStore with BaseFor
       "title" -> blogCreated.title,
       "content" -> blogCreated.content,
       "htmlContent" -> htmlContent,
-      "datetime" -> BsonString(
-        JsonMethods.parse(
-          Serialization.write(blogCreated.datetime)
-        ).values.toString
-      ),
+      "datetime" ->
+          BsonString(
+            JsonMethods.parse(
+              Serialization.write(datetime)
+            ).values.toString
+          ),
       "discussions" -> BsonArray()
     )
     Await.result(collection.insertOne(doc).toFuture(), 10.seconds)

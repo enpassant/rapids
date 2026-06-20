@@ -31,7 +31,7 @@ object BlogCommandApp extends App with Microservice {
         implicit val timeout = Timeout(3000.milliseconds)
         val result = service ? common.ConsumerData(msg.key, msg.value)
         result collect {
-          case event @ BlogCreated(blogId, userId, userName, title, content, _) =>
+          case event @ BlogCreated(blogId, userId, userName, title, content, datetime) =>
             //val id = common.CommonUtil.uuid
             val id = s"disc-$blogId"
             producer.offer(
@@ -40,11 +40,11 @@ object BlogCommandApp extends App with Microservice {
               ProducerData(
                 "discussion-command",
                 id,
-                StartDiscussion(id, blogId, title, userId, userName)))
+                StartDiscussion(id, blogId, title, userId, userName, datetime)))
           case event @ BlogModified(blogId, userId, userName, title, content) =>
             producer.offer(
               ProducerData("blog-event", blogId, event))
-          case event @ DiscussionStarted(id, userId, userName, blogId, title) =>
+          case event @ DiscussionStarted(id, userId, userName, blogId, title, _) =>
             producer.offer(
               ProducerData("blog-event", blogId, event))
           case message: WrongMessage =>

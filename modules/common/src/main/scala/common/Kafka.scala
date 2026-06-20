@@ -43,6 +43,7 @@ class Kafka(kafkaConfig: config.KafkaConfig) extends MQProtocol {
     )
       .withBootstrapServers(kafkaConfig.server)
       .withGroupId(groupId)
+      .withProperties(("auto.offset.reset", "earliest"))
 
     Consumer.committableSource(
       consumerSettings,

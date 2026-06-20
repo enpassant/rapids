@@ -31,7 +31,7 @@ object DiscussionQueryBuilder extends App with Microservice {
             json match {
               case discussionStarted: DiscussionStarted =>
                 Try { discussionStore.insert(discussionStarted) }
-              case commentAdded @ CommentAdded(_, _, userId, _, content, _) =>
+              case commentAdded @ CommentAdded(_, _, userId, _, content, _, _) =>
                 Try {
                   val document = parser.parse(content)
                   val htmlContent = renderer.render(document)
@@ -39,7 +39,7 @@ object DiscussionQueryBuilder extends App with Microservice {
                   producer.offer(ProducerData(
                     "client-commands", userId, """{"value":"CommentAdded"}"""))
                 }
-              case commentReplied @ CommentReplied(_, _, userId, _, _, content, _) =>
+              case commentReplied @ CommentReplied(_, _, userId, _, _, content, _, _) =>
                 Try {
                   val document = parser.parse(content)
                   val htmlContent = renderer.render(document)
