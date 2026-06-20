@@ -1,5 +1,8 @@
 #!bash
 
+mkdir -p ~/mongodata
+mkdir -p ~/kafkadata
+
 # 1. IP cím kinyerése az eth1 interfészről
 echo "-> IP cím lekérdezése az eth1 interfészről..."
 export MY_HOST_IP=$(ip -4 addr show eno1 | grep -o 'inet\s\+[0-9.]\+' | cut -d ' ' -f 2)
@@ -28,5 +31,37 @@ until podman exec --workdir /opt/kafka/bin/ kafka-kraft ./kafka-broker-api-versi
     sleep 2
 done
 echo -e "\n-> Kafka sikeresen elindult!"
+
+# 5. A létrehozandó topicok listája
+TOPICS=(
+    "blog-command"
+    "client-commands"
+    "blog-event"
+    "performance"
+    "discussion-event"
+    "web-app"
+    "user"
+    "discussion-command"
+    "error"
+)
+
+# 6. Topicok automatikus létrehozása loop segítségével
+echo "-> Topicok létrehozása..."
+for TOPIC in "${TOPICS[@]}"; do
+    # Ellenőrzés a megfelelő mappából indítva
+    podman exec --workdir /opt/kafka/bin/ kafka-kraft ./kafka-topics.sh --bootstrap-server 127.0.0.1:9092 --list | grep -q "^${TOPIC}$"
+
+    if [ $? -eq 0 ]; then
+        echo "   [!] A topic már létezik: $TOPIC"
+    else
+        # Létrehozás a megfelelő mappából indítva
+        podman exec --workdir /opt/kafka/bin/ kafka-kraft ./kafka-topics.sh --create \
+            --bootstrap-server 127.0.0.1:9092 \
+            --topic "$TOPIC" \
+            --partitions 1 \
+            --replication-factor 1
+        echo "   [✓] Sikeresen létrehozva: $TOPIC"
+    fi
+done
 
 echo "=== A Kafka KRaft fürt üzemkész és a topicok konfigurálva lettek! ==="
